@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -98,6 +99,8 @@ private fun ApprovedBrowserApp(
     var query by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("הכול") }
     var webView by remember { mutableStateOf<WebView?>(null) }
+    var loading by remember { mutableStateOf(false) }
+    var navTick by remember { mutableIntStateOf(0) }
 
     val categories = remember(sites) { listOf("הכול") + sites.map { it.category }.distinct() }
     val filtered = remember(sites, query, category) {
@@ -127,11 +130,18 @@ private fun ApprovedBrowserApp(
                         }
                     },
                     actions = {
-                        IconButton({ settings = true }) { Icon(Icons.Default.Settings, "הגדרות") }
-                        IconButton({ home = true }) { Icon(Icons.Default.Home, "בית") }
-                        IconButton({ webView?.goBack() }) { Icon(Icons.Default.ArrowBack, "חזור") }
-                        IconButton({ webView?.goForward() }) { Icon(Icons.Default.ArrowForward, "קדימה") }
-                        IconButton({ webView?.reload() }) { Icon(Icons.Default.Refresh, "רענן") }
+                        val view = webView
+                        IconButton(onClick = { settings = true }) { Icon(Icons.Default.Settings, "הגדרות") }
+                        IconButton(onClick = { home = true }) { Icon(Icons.Default.Home, "בית") }
+                        IconButton(
+                            onClick = { view?.goBack(); navTick++ },
+                            enabled = view?.canGoBack() == true
+                        ) { Icon(Icons.Default.ArrowBack, "חזור") }
+                        IconButton(
+                            onClick = { view?.goForward(); navTick++ },
+                            enabled = view?.canGoForward() == true
+                        ) { Icon(Icons.Default.ArrowForward, "קדימה") }
+                        IconButton(onClick = { view?.reload() }, enabled = view != null) { Icon(Icons.Default.Refresh, "רענן") }
                     }
                 )
                 Row(
@@ -153,6 +163,9 @@ private fun ApprovedBrowserApp(
                             blocked = false
                         } else blocked = true
                     }) { Icon(Icons.Default.Search, "פתח") }
+                }
+                if (loading) {
+                    LinearProgressIndicator(Modifier.fillMaxWidth())
                 }
                 if (blocked) {
                     Text(
@@ -232,16 +245,22 @@ private fun ApprovedBrowserApp(
                     WebView(ctx).also { view ->
                         webView = view
                         configureApprovedWebView(view)
-                        view.webViewClient = BrowserWebViewClient({ sites }) {
-                            blocked = true
-                            home = false
-                        }
-                        view.loadUrl(url)
+                        view.webViewClient = BrowserWebViewClient(
+                            sitesProvider = { sites },
+                            onBlockedNavigation = { blocked = true },
+                            onPageStateChanged = { currentUrl, isLoading ->
+                                if (!currentUrl.isNullOrBlank()) {
+                                    address = currentUrl
+                                }
+                                loading = isLoading
+                                navTick++
+                            }
+                        )
+                        if (url.isNotBlank()) view.loadUrl(url)
                     }
                 },
                 update = { view ->
                     webView = view
-                    if (view.url != url && url.isNotBlank()) view.loadUrl(url)
                 }
             )
         }
