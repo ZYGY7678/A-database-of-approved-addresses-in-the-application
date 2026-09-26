@@ -84,7 +84,7 @@ class MainActivity : ComponentActivity() {
 @SuppressLint("SetJavaScriptEnabled")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ApprovedBrowserApp(
+private fun ApprovedBrowserApp(
     prefs: BrowserPrefs,
     onPrefsChange: (BrowserPrefs) -> Unit
 ) {
@@ -248,6 +248,7 @@ fun ApprovedBrowserApp(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SettingsScreen(
     prefs: BrowserPrefs,
