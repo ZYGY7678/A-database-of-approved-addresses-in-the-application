@@ -10,9 +10,18 @@ import java.io.ByteArrayInputStream
 
 class BrowserWebViewClient(
     private val sitesProvider: () -> List<Site>,
-    private val onBlockedNavigation: () -> Unit
+    private val onBlockedNavigation: () -> Unit,
+    private val onPageStateChanged: (String?, Boolean) -> Unit
 ) : WebViewClient() {
     private val blockedExtensions = listOf(".jpg",".jpeg",".png",".gif",".webp",".bmp",".avif",".svg",".ico",".mp4",".webm",".mov",".mkv",".avi",".m4v",".mp3",".wav",".ogg",".m4a")
+    override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+        onPageStateChanged(url, true)
+    }
+
+    override fun onPageFinished(view: WebView?, url: String?) {
+        onPageStateChanged(url, false)
+    }
+
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
         val url = request?.url?.toString() ?: return true
         if (url.startsWith("https://") || url.startsWith("http://")) {
@@ -42,6 +51,12 @@ fun configureApprovedWebView(webView: WebView) {
         allowContentAccess = false
         javaScriptCanOpenWindowsAutomatically = false
         mediaPlaybackRequiresUserGesture = true
+        setSupportMultipleWindows(false)
         safeBrowsingEnabled = true
+        builtInZoomControls = true
+        displayZoomControls = false
+        useWideViewPort = true
+        loadWithOverviewMode = true
+        textZoom = 100
     }
 }
