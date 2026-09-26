@@ -3,6 +3,7 @@ package com.zygy7678.approvedbrowser
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.view.WindowManager
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -88,7 +89,16 @@ private data class BrowserPrefs(
     val showCategories: Boolean = true,
     val largeText: Boolean = false,
     val roundedCards: Boolean = true,
-    val route: BrowserRoute = BrowserRoute.ETROG
+    val route: BrowserRoute = BrowserRoute.ETROG,
+    val showAppClock: Boolean = true,
+    val timeFormat24: Boolean = true,
+    val timeOffsetMinutes: Int = 0,
+    val autoLockMinutes: Int = 0,
+    val clearOnExit: Boolean = false,
+    val blockExternalApps: Boolean = true,
+    val preventScreenshots: Boolean = true,
+    val disableJavascript: Boolean = false,
+    val blockPopups: Boolean = true
 )
 
 private class PrefStore(context: Context) {
@@ -102,6 +112,15 @@ private class PrefStore(context: Context) {
         showCategories = p.getBoolean("showCategories", true),
         largeText = p.getBoolean("largeText", false),
         roundedCards = p.getBoolean("roundedCards", true),
+        showAppClock = p.getBoolean("showAppClock", true),
+        timeFormat24 = p.getBoolean("timeFormat24", true),
+        timeOffsetMinutes = p.getInt("timeOffsetMinutes", 0),
+        autoLockMinutes = p.getInt("autoLockMinutes", 0),
+        clearOnExit = p.getBoolean("clearOnExit", false),
+        blockExternalApps = p.getBoolean("blockExternalApps", true),
+        preventScreenshots = p.getBoolean("preventScreenshots", true),
+        disableJavascript = p.getBoolean("disableJavascript", false),
+        blockPopups = p.getBoolean("blockPopups", true),
         route = runCatching {
             BrowserRoute.valueOf(p.getString("route", BrowserRoute.ETROG.name) ?: BrowserRoute.ETROG.name)
         }.getOrDefault(BrowserRoute.ETROG)
@@ -116,6 +135,15 @@ private class PrefStore(context: Context) {
             .putBoolean("showCategories", v.showCategories)
             .putBoolean("largeText", v.largeText)
             .putBoolean("roundedCards", v.roundedCards)
+            .putBoolean("showAppClock", v.showAppClock)
+            .putBoolean("timeFormat24", v.timeFormat24)
+            .putInt("timeOffsetMinutes", v.timeOffsetMinutes)
+            .putInt("autoLockMinutes", v.autoLockMinutes)
+            .putBoolean("clearOnExit", v.clearOnExit)
+            .putBoolean("blockExternalApps", v.blockExternalApps)
+            .putBoolean("preventScreenshots", v.preventScreenshots)
+            .putBoolean("disableJavascript", v.disableJavascript)
+            .putBoolean("blockPopups", v.blockPopups)
             .putString("route", v.route.name)
             .apply()
     }
@@ -210,6 +238,13 @@ private fun ApprovedBrowserApp(
                                     fontSize = 11.sp,
                                     color = MaterialTheme.colorScheme.primary
                                 )
+                                if (prefs.showAppClock) {
+                                    Text(
+                                        formatAppTime(prefs.timeFormat24, prefs.timeOffsetMinutes),
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             }
                         },
                         actions = {
@@ -339,7 +374,20 @@ private fun ApprovedBrowserApp(
                     factory = { ctx ->
                         WebView(ctx).also { view ->
                             webView = view
-                            configureApprovedWebView(view)
+                            configureApprovedWebView(
+                                view,
+                                disableJavascript = prefs.disableJavascript,
+                                blockPopups = prefs.blockPopups
+                            )
+                            if (prefs.preventScreenshots) {
+                                (context as? ComponentActivity)?.window?.addFlags(
+                                    WindowManager.LayoutParams.FLAG_SECURE
+                                )
+                            } else {
+                                (context as? ComponentActivity)?.window?.clearFlags(
+                                    WindowManager.LayoutParams.FLAG_SECURE
+                                )
+                            }
 
                             view.webViewClient = BrowserWebViewClient(
                                 sitesProvider = {
@@ -944,6 +992,51 @@ private fun SettingsScreen(
                 }
             }
 
+            item { SettingsHeader("אבטחה מתקדמת", "שליטה נוספת על הגלישה והגישה") }
+            item {
+                SettingSwitch("חסימת פתיחה באפליקציות חיצוניות", "מונע מעבר מאושר לאפליקציות אחרות.", prefs.blockExternalApps) {
+                    onPrefsChange(prefs.copy(blockExternalApps = it))
+                }
+            }
+            item {
+                SettingSwitch("חסימת חלונות קופצים", "מונע פתיחת חלונות חדשים מתוך האתר.", prefs.blockPopups) {
+                    onPrefsChange(prefs.copy(blockPopups = it))
+                }
+            }
+            item {
+                SettingSwitch("השבתת JavaScript", "הגנה מחמירה יותר; חלק מהאתרים עלולים לא לעבוד.", prefs.disableJavascript) {
+                    onPrefsChange(prefs.copy(disableJavascript = it))
+                }
+            }
+            item {
+                SettingSwitch("מניעת צילומי מסך", "מפעיל FLAG_SECURE של Android.", prefs.preventScreenshots) {
+                    onPrefsChange(prefs.copy(preventScreenshots = it))
+                }
+            }
+            item {
+                SettingSwitch("ניקוי בעת יציאה", "נקה את מצב הגלישה בעת יציאה.", prefs.clearOnExit) {
+                    onPrefsChange(prefs.copy(clearOnExit = it))
+                }
+            }
+            item {
+                SettingInfo("נעילה אוטומטית", if (prefs.autoLockMinutes == 0) "כבוי" else "נעילה לאחר " + prefs.autoLockMinutes + " דקות ללא פעילות")
+            }
+
+            item { SettingsHeader("זמן ותאריך", "שעון פנימי לתצוגה באפליקציה") }
+            item {
+                SettingSwitch("הצג שעון", "מציג את השעה בסרגל העליון.", prefs.showAppClock) {
+                    onPrefsChange(prefs.copy(showAppClock = it))
+                }
+            }
+            item {
+                SettingSwitch("פורמט 24 שעות", "18:30 במקום 6:30 PM.", prefs.timeFormat24) {
+                    onPrefsChange(prefs.copy(timeFormat24 = it))
+                }
+            }
+            item {
+                SettingInfo("כוונון זמן", if (prefs.timeOffsetMinutes == 0) "מסונכרן לזמן המכשיר" else "הסטה של " + prefs.timeOffsetMinutes + " דקות")
+            }
+
             item { SettingsHeader("עיצוב", "התאם את המראה, הצפיפות והקריאה") }
             item {
                 SettingSwitch(
@@ -1017,6 +1110,21 @@ private fun SettingsScreen(
                 )
             }
         }
+    }
+}
+
+private fun formatAppTime(format24: Boolean, offsetMinutes: Int): String {
+    val calendar = java.util.Calendar.getInstance().apply {
+        timeInMillis = System.currentTimeMillis() + offsetMinutes * 60_000L
+    }
+    val hour24 = calendar.get(java.util.Calendar.HOUR_OF_DAY)
+    val minute = calendar.get(java.util.Calendar.MINUTE)
+    return if (format24) {
+        "%02d:%02d".format(hour24, minute)
+    } else {
+        val hour = if (hour24 % 12 == 0) 12 else hour24 % 12
+        val suffix = if (hour24 < 12) "AM" else "PM"
+        "%d:%02d %s".format(hour, minute, suffix)
     }
 }
 
