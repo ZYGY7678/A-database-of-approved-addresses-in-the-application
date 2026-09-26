@@ -1,0 +1,3022 @@
+{
+  "version": 2,
+  "textOnly": true,
+  "blockImages": true,
+  "blockVideo": true,
+  "blockAudio": true,
+  "blockSvg": true,
+  "onlyApprovedHosts": true,
+  "allowedAi": [
+    "ChatGPT",
+    "Grok",
+    "Claude",
+    "Gemini"
+  ],
+  "totalApprovedAddresses": 500,
+  "ai": [
+    {
+      "name": "ChatGPT",
+      "url": "https://chatgpt.com/",
+      "host": "chatgpt.com",
+      "category": "בינה מלאכותית"
+    },
+    {
+      "name": "Grok",
+      "url": "https://grok.com/",
+      "host": "grok.com",
+      "category": "בינה מלאכותית"
+    },
+    {
+      "name": "Claude",
+      "url": "https://claude.ai/",
+      "host": "claude.ai",
+      "category": "בינה מלאכותית"
+    },
+    {
+      "name": "Gemini",
+      "url": "https://gemini.google.com/",
+      "host": "gemini.google.com",
+      "category": "בינה מלאכותית"
+    }
+  ],
+  "forums": [
+    {
+      "name": "מתמחים טופ",
+      "url": "https://mitmachim.top/",
+      "host": "mitmachim.top",
+      "category": "פורומים"
+    },
+    {
+      "name": "תחומים",
+      "url": "https://tchumim.com/",
+      "host": "tchumim.com",
+      "category": "פורומים"
+    },
+    {
+      "name": "פרוג",
+      "url": "https://www.prog.co.il/",
+      "host": "www.prog.co.il",
+      "category": "פורומים"
+    },
+    {
+      "name": "מקצב",
+      "url": "https://miktzav.com/",
+      "host": "miktzav.com",
+      "category": "פורומים"
+    },
+    {
+      "name": "המוזיקאי",
+      "url": "https://hamusicay.com/",
+      "host": "hamusicay.com",
+      "category": "פורומים"
+    },
+    {
+      "name": "פורום ימות המשיח",
+      "url": "https://f2.freeivr.co.il/",
+      "host": "f2.freeivr.co.il",
+      "category": "פורומים"
+    },
+    {
+      "name": "פורום נטפרי",
+      "url": "https://forum.netfree.link/",
+      "host": "forum.netfree.link",
+      "category": "פורומים"
+    },
+    {
+      "name": "רכבים זה לזה",
+      "url": "https://rechavimzelaze.ovh/",
+      "host": "rechavimzelaze.ovh",
+      "category": "פורומים"
+    },
+    {
+      "name": "פורום אוצר החכמה",
+      "url": "https://forum.otzar.org/index.php",
+      "host": "forum.otzar.org",
+      "category": "פורומים"
+    },
+    {
+      "name": "פורום אוצר התורה",
+      "url": "https://forum-otzar-hatorah.co.il/",
+      "host": "forum-otzar-hatorah.co.il",
+      "category": "פורומים"
+    },
+    {
+      "name": "פורום לתורה",
+      "url": "https://tora-forum.co.il/",
+      "host": "tora-forum.co.il",
+      "category": "פורומים"
+    },
+    {
+      "name": "פורום מורשת מרן",
+      "url": "http://forum.moreshet-maran.com/",
+      "host": "forum.moreshet-maran.com",
+      "category": "פורומים"
+    },
+    {
+      "name": "אידישע וועלט",
+      "url": "https://www.ivelt.com/",
+      "host": "www.ivelt.com",
+      "category": "פורומים"
+    },
+    {
+      "name": "פורום סייפר",
+      "url": "https://forum.safera.co.il/",
+      "host": "forum.safera.co.il",
+      "category": "פורומים"
+    },
+    {
+      "name": "פרוג — מידע ועזרה הדדית",
+      "url": "https://www.prog.co.il/?section=14",
+      "host": "www.prog.co.il",
+      "category": "פורומים"
+    },
+    {
+      "name": "פרוג — תכנות",
+      "url": "https://www.prog.co.il/?section=15",
+      "host": "www.prog.co.il",
+      "category": "פורומים"
+    },
+    {
+      "name": "פרוג — עיצוב גרפי",
+      "url": "https://www.prog.co.il/?section=16",
+      "host": "www.prog.co.il",
+      "category": "פורומים"
+    },
+    {
+      "name": "פרוג — החצרות",
+      "url": "https://www.prog.co.il/?section=17",
+      "host": "www.prog.co.il",
+      "category": "פורומים"
+    },
+    {
+      "name": "פרוג — מוזיקה ונגינה",
+      "url": "https://www.prog.co.il/?section=18",
+      "host": "www.prog.co.il",
+      "category": "פורומים"
+    },
+    {
+      "name": "מתמחים טופ — טכנולוגיה",
+      "url": "https://mitmachim.top/?section=19",
+      "host": "mitmachim.top",
+      "category": "פורומים"
+    }
+  ],
+  "core": [
+    {
+      "name": "אתר מידע 1",
+      "url": "https://wikipedia.org/",
+      "host": "wikipedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 2",
+      "url": "https://wikipedia.org/about",
+      "host": "wikipedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 3",
+      "url": "https://wikipedia.org/help",
+      "host": "wikipedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 4",
+      "url": "https://wikipedia.org/faq",
+      "host": "wikipedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 5",
+      "url": "https://wikipedia.org/search",
+      "host": "wikipedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 6",
+      "url": "https://wikipedia.org/services",
+      "host": "wikipedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 7",
+      "url": "https://wikipedia.org/information",
+      "host": "wikipedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 8",
+      "url": "https://wikipedia.org/articles",
+      "host": "wikipedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 9",
+      "url": "https://wikipedia.org/guides",
+      "host": "wikipedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 10",
+      "url": "https://wikipedia.org/news",
+      "host": "wikipedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 11",
+      "url": "https://wikimedia.org/",
+      "host": "wikimedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 12",
+      "url": "https://wikimedia.org/about",
+      "host": "wikimedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 13",
+      "url": "https://wikimedia.org/help",
+      "host": "wikimedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 14",
+      "url": "https://wikimedia.org/faq",
+      "host": "wikimedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 15",
+      "url": "https://wikimedia.org/search",
+      "host": "wikimedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 16",
+      "url": "https://wikimedia.org/services",
+      "host": "wikimedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 17",
+      "url": "https://wikimedia.org/information",
+      "host": "wikimedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 18",
+      "url": "https://wikimedia.org/articles",
+      "host": "wikimedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 19",
+      "url": "https://wikimedia.org/guides",
+      "host": "wikimedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 20",
+      "url": "https://wikimedia.org/news",
+      "host": "wikimedia.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 21",
+      "url": "https://gov.il/",
+      "host": "gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 22",
+      "url": "https://gov.il/about",
+      "host": "gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 23",
+      "url": "https://gov.il/help",
+      "host": "gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 24",
+      "url": "https://gov.il/faq",
+      "host": "gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 25",
+      "url": "https://gov.il/search",
+      "host": "gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 26",
+      "url": "https://gov.il/services",
+      "host": "gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 27",
+      "url": "https://gov.il/information",
+      "host": "gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 28",
+      "url": "https://gov.il/articles",
+      "host": "gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 29",
+      "url": "https://gov.il/guides",
+      "host": "gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 30",
+      "url": "https://gov.il/news",
+      "host": "gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 31",
+      "url": "https://knesset.gov.il/",
+      "host": "knesset.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 32",
+      "url": "https://knesset.gov.il/about",
+      "host": "knesset.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 33",
+      "url": "https://knesset.gov.il/help",
+      "host": "knesset.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 34",
+      "url": "https://knesset.gov.il/faq",
+      "host": "knesset.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 35",
+      "url": "https://knesset.gov.il/search",
+      "host": "knesset.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 36",
+      "url": "https://knesset.gov.il/services",
+      "host": "knesset.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 37",
+      "url": "https://knesset.gov.il/information",
+      "host": "knesset.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 38",
+      "url": "https://knesset.gov.il/articles",
+      "host": "knesset.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 39",
+      "url": "https://knesset.gov.il/guides",
+      "host": "knesset.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 40",
+      "url": "https://knesset.gov.il/news",
+      "host": "knesset.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 41",
+      "url": "https://btl.gov.il/",
+      "host": "btl.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 42",
+      "url": "https://btl.gov.il/about",
+      "host": "btl.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 43",
+      "url": "https://btl.gov.il/help",
+      "host": "btl.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 44",
+      "url": "https://btl.gov.il/faq",
+      "host": "btl.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 45",
+      "url": "https://btl.gov.il/search",
+      "host": "btl.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 46",
+      "url": "https://btl.gov.il/services",
+      "host": "btl.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 47",
+      "url": "https://btl.gov.il/information",
+      "host": "btl.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 48",
+      "url": "https://btl.gov.il/articles",
+      "host": "btl.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 49",
+      "url": "https://btl.gov.il/guides",
+      "host": "btl.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 50",
+      "url": "https://btl.gov.il/news",
+      "host": "btl.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 51",
+      "url": "https://taxes.gov.il/",
+      "host": "taxes.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 52",
+      "url": "https://taxes.gov.il/about",
+      "host": "taxes.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 53",
+      "url": "https://taxes.gov.il/help",
+      "host": "taxes.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 54",
+      "url": "https://taxes.gov.il/faq",
+      "host": "taxes.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 55",
+      "url": "https://taxes.gov.il/search",
+      "host": "taxes.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 56",
+      "url": "https://taxes.gov.il/services",
+      "host": "taxes.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 57",
+      "url": "https://taxes.gov.il/information",
+      "host": "taxes.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 58",
+      "url": "https://taxes.gov.il/articles",
+      "host": "taxes.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 59",
+      "url": "https://taxes.gov.il/guides",
+      "host": "taxes.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 60",
+      "url": "https://taxes.gov.il/news",
+      "host": "taxes.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 61",
+      "url": "https://data.gov.il/",
+      "host": "data.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 62",
+      "url": "https://data.gov.il/about",
+      "host": "data.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 63",
+      "url": "https://data.gov.il/help",
+      "host": "data.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 64",
+      "url": "https://data.gov.il/faq",
+      "host": "data.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 65",
+      "url": "https://data.gov.il/search",
+      "host": "data.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 66",
+      "url": "https://data.gov.il/services",
+      "host": "data.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 67",
+      "url": "https://data.gov.il/information",
+      "host": "data.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 68",
+      "url": "https://data.gov.il/articles",
+      "host": "data.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 69",
+      "url": "https://data.gov.il/guides",
+      "host": "data.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 70",
+      "url": "https://data.gov.il/news",
+      "host": "data.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 71",
+      "url": "https://police.gov.il/",
+      "host": "police.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 72",
+      "url": "https://police.gov.il/about",
+      "host": "police.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 73",
+      "url": "https://police.gov.il/help",
+      "host": "police.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 74",
+      "url": "https://police.gov.il/faq",
+      "host": "police.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 75",
+      "url": "https://police.gov.il/search",
+      "host": "police.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 76",
+      "url": "https://police.gov.il/services",
+      "host": "police.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 77",
+      "url": "https://police.gov.il/information",
+      "host": "police.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 78",
+      "url": "https://police.gov.il/articles",
+      "host": "police.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 79",
+      "url": "https://police.gov.il/guides",
+      "host": "police.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 80",
+      "url": "https://police.gov.il/news",
+      "host": "police.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 81",
+      "url": "https://health.gov.il/",
+      "host": "health.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 82",
+      "url": "https://health.gov.il/about",
+      "host": "health.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 83",
+      "url": "https://health.gov.il/help",
+      "host": "health.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 84",
+      "url": "https://health.gov.il/faq",
+      "host": "health.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 85",
+      "url": "https://health.gov.il/search",
+      "host": "health.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 86",
+      "url": "https://health.gov.il/services",
+      "host": "health.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 87",
+      "url": "https://health.gov.il/information",
+      "host": "health.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 88",
+      "url": "https://health.gov.il/articles",
+      "host": "health.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 89",
+      "url": "https://health.gov.il/guides",
+      "host": "health.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 90",
+      "url": "https://health.gov.il/news",
+      "host": "health.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 91",
+      "url": "https://education.gov.il/",
+      "host": "education.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 92",
+      "url": "https://education.gov.il/about",
+      "host": "education.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 93",
+      "url": "https://education.gov.il/help",
+      "host": "education.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 94",
+      "url": "https://education.gov.il/faq",
+      "host": "education.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 95",
+      "url": "https://education.gov.il/search",
+      "host": "education.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 96",
+      "url": "https://education.gov.il/services",
+      "host": "education.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 97",
+      "url": "https://education.gov.il/information",
+      "host": "education.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 98",
+      "url": "https://education.gov.il/articles",
+      "host": "education.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 99",
+      "url": "https://education.gov.il/guides",
+      "host": "education.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 100",
+      "url": "https://education.gov.il/news",
+      "host": "education.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 101",
+      "url": "https://justice.gov.il/",
+      "host": "justice.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 102",
+      "url": "https://justice.gov.il/about",
+      "host": "justice.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 103",
+      "url": "https://justice.gov.il/help",
+      "host": "justice.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 104",
+      "url": "https://justice.gov.il/faq",
+      "host": "justice.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 105",
+      "url": "https://justice.gov.il/search",
+      "host": "justice.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 106",
+      "url": "https://justice.gov.il/services",
+      "host": "justice.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 107",
+      "url": "https://justice.gov.il/information",
+      "host": "justice.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 108",
+      "url": "https://justice.gov.il/articles",
+      "host": "justice.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 109",
+      "url": "https://justice.gov.il/guides",
+      "host": "justice.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 110",
+      "url": "https://justice.gov.il/news",
+      "host": "justice.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 111",
+      "url": "https://bankisrael.gov.il/",
+      "host": "bankisrael.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 112",
+      "url": "https://bankisrael.gov.il/about",
+      "host": "bankisrael.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 113",
+      "url": "https://bankisrael.gov.il/help",
+      "host": "bankisrael.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 114",
+      "url": "https://bankisrael.gov.il/faq",
+      "host": "bankisrael.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 115",
+      "url": "https://bankisrael.gov.il/search",
+      "host": "bankisrael.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 116",
+      "url": "https://bankisrael.gov.il/services",
+      "host": "bankisrael.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 117",
+      "url": "https://bankisrael.gov.il/information",
+      "host": "bankisrael.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 118",
+      "url": "https://bankisrael.gov.il/articles",
+      "host": "bankisrael.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 119",
+      "url": "https://bankisrael.gov.il/guides",
+      "host": "bankisrael.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 120",
+      "url": "https://bankisrael.gov.il/news",
+      "host": "bankisrael.gov.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 121",
+      "url": "https://israelpost.co.il/",
+      "host": "israelpost.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 122",
+      "url": "https://israelpost.co.il/about",
+      "host": "israelpost.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 123",
+      "url": "https://israelpost.co.il/help",
+      "host": "israelpost.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 124",
+      "url": "https://israelpost.co.il/faq",
+      "host": "israelpost.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 125",
+      "url": "https://israelpost.co.il/search",
+      "host": "israelpost.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 126",
+      "url": "https://israelpost.co.il/services",
+      "host": "israelpost.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 127",
+      "url": "https://israelpost.co.il/information",
+      "host": "israelpost.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 128",
+      "url": "https://israelpost.co.il/articles",
+      "host": "israelpost.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 129",
+      "url": "https://israelpost.co.il/guides",
+      "host": "israelpost.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 130",
+      "url": "https://israelpost.co.il/news",
+      "host": "israelpost.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 131",
+      "url": "https://b144.co.il/",
+      "host": "b144.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 132",
+      "url": "https://b144.co.il/about",
+      "host": "b144.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 133",
+      "url": "https://b144.co.il/help",
+      "host": "b144.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 134",
+      "url": "https://b144.co.il/faq",
+      "host": "b144.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 135",
+      "url": "https://b144.co.il/search",
+      "host": "b144.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 136",
+      "url": "https://b144.co.il/services",
+      "host": "b144.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 137",
+      "url": "https://b144.co.il/information",
+      "host": "b144.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 138",
+      "url": "https://b144.co.il/articles",
+      "host": "b144.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 139",
+      "url": "https://b144.co.il/guides",
+      "host": "b144.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 140",
+      "url": "https://b144.co.il/news",
+      "host": "b144.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 141",
+      "url": "https://zap.co.il/",
+      "host": "zap.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 142",
+      "url": "https://zap.co.il/about",
+      "host": "zap.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 143",
+      "url": "https://zap.co.il/help",
+      "host": "zap.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 144",
+      "url": "https://zap.co.il/faq",
+      "host": "zap.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 145",
+      "url": "https://zap.co.il/search",
+      "host": "zap.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 146",
+      "url": "https://zap.co.il/services",
+      "host": "zap.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 147",
+      "url": "https://zap.co.il/information",
+      "host": "zap.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 148",
+      "url": "https://zap.co.il/articles",
+      "host": "zap.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 149",
+      "url": "https://zap.co.il/guides",
+      "host": "zap.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 150",
+      "url": "https://zap.co.il/news",
+      "host": "zap.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 151",
+      "url": "https://walla.co.il/",
+      "host": "walla.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 152",
+      "url": "https://walla.co.il/about",
+      "host": "walla.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 153",
+      "url": "https://walla.co.il/help",
+      "host": "walla.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 154",
+      "url": "https://walla.co.il/faq",
+      "host": "walla.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 155",
+      "url": "https://walla.co.il/search",
+      "host": "walla.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 156",
+      "url": "https://walla.co.il/services",
+      "host": "walla.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 157",
+      "url": "https://walla.co.il/information",
+      "host": "walla.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 158",
+      "url": "https://walla.co.il/articles",
+      "host": "walla.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 159",
+      "url": "https://walla.co.il/guides",
+      "host": "walla.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 160",
+      "url": "https://walla.co.il/news",
+      "host": "walla.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 161",
+      "url": "https://ynet.co.il/",
+      "host": "ynet.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 162",
+      "url": "https://ynet.co.il/about",
+      "host": "ynet.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 163",
+      "url": "https://ynet.co.il/help",
+      "host": "ynet.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 164",
+      "url": "https://ynet.co.il/faq",
+      "host": "ynet.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 165",
+      "url": "https://ynet.co.il/search",
+      "host": "ynet.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 166",
+      "url": "https://ynet.co.il/services",
+      "host": "ynet.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 167",
+      "url": "https://ynet.co.il/information",
+      "host": "ynet.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 168",
+      "url": "https://ynet.co.il/articles",
+      "host": "ynet.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 169",
+      "url": "https://ynet.co.il/guides",
+      "host": "ynet.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 170",
+      "url": "https://ynet.co.il/news",
+      "host": "ynet.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 171",
+      "url": "https://mako.co.il/",
+      "host": "mako.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 172",
+      "url": "https://mako.co.il/about",
+      "host": "mako.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 173",
+      "url": "https://mako.co.il/help",
+      "host": "mako.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 174",
+      "url": "https://mako.co.il/faq",
+      "host": "mako.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 175",
+      "url": "https://mako.co.il/search",
+      "host": "mako.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 176",
+      "url": "https://mako.co.il/services",
+      "host": "mako.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 177",
+      "url": "https://mako.co.il/information",
+      "host": "mako.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 178",
+      "url": "https://mako.co.il/articles",
+      "host": "mako.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 179",
+      "url": "https://mako.co.il/guides",
+      "host": "mako.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 180",
+      "url": "https://mako.co.il/news",
+      "host": "mako.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 181",
+      "url": "https://haaretz.co.il/",
+      "host": "haaretz.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 182",
+      "url": "https://haaretz.co.il/about",
+      "host": "haaretz.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 183",
+      "url": "https://haaretz.co.il/help",
+      "host": "haaretz.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 184",
+      "url": "https://haaretz.co.il/faq",
+      "host": "haaretz.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 185",
+      "url": "https://haaretz.co.il/search",
+      "host": "haaretz.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 186",
+      "url": "https://haaretz.co.il/services",
+      "host": "haaretz.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 187",
+      "url": "https://haaretz.co.il/information",
+      "host": "haaretz.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 188",
+      "url": "https://haaretz.co.il/articles",
+      "host": "haaretz.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 189",
+      "url": "https://haaretz.co.il/guides",
+      "host": "haaretz.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 190",
+      "url": "https://haaretz.co.il/news",
+      "host": "haaretz.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 191",
+      "url": "https://calcalist.co.il/",
+      "host": "calcalist.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 192",
+      "url": "https://calcalist.co.il/about",
+      "host": "calcalist.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 193",
+      "url": "https://calcalist.co.il/help",
+      "host": "calcalist.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 194",
+      "url": "https://calcalist.co.il/faq",
+      "host": "calcalist.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 195",
+      "url": "https://calcalist.co.il/search",
+      "host": "calcalist.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 196",
+      "url": "https://calcalist.co.il/services",
+      "host": "calcalist.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 197",
+      "url": "https://calcalist.co.il/information",
+      "host": "calcalist.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 198",
+      "url": "https://calcalist.co.il/articles",
+      "host": "calcalist.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 199",
+      "url": "https://calcalist.co.il/guides",
+      "host": "calcalist.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 200",
+      "url": "https://calcalist.co.il/news",
+      "host": "calcalist.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 201",
+      "url": "https://globes.co.il/",
+      "host": "globes.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 202",
+      "url": "https://globes.co.il/about",
+      "host": "globes.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 203",
+      "url": "https://globes.co.il/help",
+      "host": "globes.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 204",
+      "url": "https://globes.co.il/faq",
+      "host": "globes.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 205",
+      "url": "https://globes.co.il/search",
+      "host": "globes.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 206",
+      "url": "https://globes.co.il/services",
+      "host": "globes.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 207",
+      "url": "https://globes.co.il/information",
+      "host": "globes.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 208",
+      "url": "https://globes.co.il/articles",
+      "host": "globes.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 209",
+      "url": "https://globes.co.il/guides",
+      "host": "globes.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 210",
+      "url": "https://globes.co.il/news",
+      "host": "globes.co.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 211",
+      "url": "https://themarker.com/",
+      "host": "themarker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 212",
+      "url": "https://themarker.com/about",
+      "host": "themarker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 213",
+      "url": "https://themarker.com/help",
+      "host": "themarker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 214",
+      "url": "https://themarker.com/faq",
+      "host": "themarker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 215",
+      "url": "https://themarker.com/search",
+      "host": "themarker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 216",
+      "url": "https://themarker.com/services",
+      "host": "themarker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 217",
+      "url": "https://themarker.com/information",
+      "host": "themarker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 218",
+      "url": "https://themarker.com/articles",
+      "host": "themarker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 219",
+      "url": "https://themarker.com/guides",
+      "host": "themarker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 220",
+      "url": "https://themarker.com/news",
+      "host": "themarker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 221",
+      "url": "https://kan.org.il/",
+      "host": "kan.org.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 222",
+      "url": "https://kan.org.il/about",
+      "host": "kan.org.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 223",
+      "url": "https://kan.org.il/help",
+      "host": "kan.org.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 224",
+      "url": "https://kan.org.il/faq",
+      "host": "kan.org.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 225",
+      "url": "https://kan.org.il/search",
+      "host": "kan.org.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 226",
+      "url": "https://kan.org.il/services",
+      "host": "kan.org.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 227",
+      "url": "https://kan.org.il/information",
+      "host": "kan.org.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 228",
+      "url": "https://kan.org.il/articles",
+      "host": "kan.org.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 229",
+      "url": "https://kan.org.il/guides",
+      "host": "kan.org.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 230",
+      "url": "https://kan.org.il/news",
+      "host": "kan.org.il",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 231",
+      "url": "https://news.google.com/",
+      "host": "news.google.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 232",
+      "url": "https://news.google.com/about",
+      "host": "news.google.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 233",
+      "url": "https://news.google.com/help",
+      "host": "news.google.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 234",
+      "url": "https://news.google.com/faq",
+      "host": "news.google.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 235",
+      "url": "https://news.google.com/search",
+      "host": "news.google.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 236",
+      "url": "https://news.google.com/services",
+      "host": "news.google.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 237",
+      "url": "https://news.google.com/information",
+      "host": "news.google.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 238",
+      "url": "https://news.google.com/articles",
+      "host": "news.google.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 239",
+      "url": "https://news.google.com/guides",
+      "host": "news.google.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 240",
+      "url": "https://news.google.com/news",
+      "host": "news.google.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 241",
+      "url": "https://bbc.com/",
+      "host": "bbc.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 242",
+      "url": "https://bbc.com/about",
+      "host": "bbc.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 243",
+      "url": "https://bbc.com/help",
+      "host": "bbc.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 244",
+      "url": "https://bbc.com/faq",
+      "host": "bbc.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 245",
+      "url": "https://bbc.com/search",
+      "host": "bbc.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 246",
+      "url": "https://bbc.com/services",
+      "host": "bbc.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 247",
+      "url": "https://bbc.com/information",
+      "host": "bbc.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 248",
+      "url": "https://bbc.com/articles",
+      "host": "bbc.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 249",
+      "url": "https://bbc.com/guides",
+      "host": "bbc.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 250",
+      "url": "https://bbc.com/news",
+      "host": "bbc.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 251",
+      "url": "https://reuters.com/",
+      "host": "reuters.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 252",
+      "url": "https://reuters.com/about",
+      "host": "reuters.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 253",
+      "url": "https://reuters.com/help",
+      "host": "reuters.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 254",
+      "url": "https://reuters.com/faq",
+      "host": "reuters.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 255",
+      "url": "https://reuters.com/search",
+      "host": "reuters.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 256",
+      "url": "https://reuters.com/services",
+      "host": "reuters.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 257",
+      "url": "https://reuters.com/information",
+      "host": "reuters.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 258",
+      "url": "https://reuters.com/articles",
+      "host": "reuters.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 259",
+      "url": "https://reuters.com/guides",
+      "host": "reuters.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 260",
+      "url": "https://reuters.com/news",
+      "host": "reuters.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 261",
+      "url": "https://nasa.gov/",
+      "host": "nasa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 262",
+      "url": "https://nasa.gov/about",
+      "host": "nasa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 263",
+      "url": "https://nasa.gov/help",
+      "host": "nasa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 264",
+      "url": "https://nasa.gov/faq",
+      "host": "nasa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 265",
+      "url": "https://nasa.gov/search",
+      "host": "nasa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 266",
+      "url": "https://nasa.gov/services",
+      "host": "nasa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 267",
+      "url": "https://nasa.gov/information",
+      "host": "nasa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 268",
+      "url": "https://nasa.gov/articles",
+      "host": "nasa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 269",
+      "url": "https://nasa.gov/guides",
+      "host": "nasa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 270",
+      "url": "https://nasa.gov/news",
+      "host": "nasa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 271",
+      "url": "https://noaa.gov/",
+      "host": "noaa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 272",
+      "url": "https://noaa.gov/about",
+      "host": "noaa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 273",
+      "url": "https://noaa.gov/help",
+      "host": "noaa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 274",
+      "url": "https://noaa.gov/faq",
+      "host": "noaa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 275",
+      "url": "https://noaa.gov/search",
+      "host": "noaa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 276",
+      "url": "https://noaa.gov/services",
+      "host": "noaa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 277",
+      "url": "https://noaa.gov/information",
+      "host": "noaa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 278",
+      "url": "https://noaa.gov/articles",
+      "host": "noaa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 279",
+      "url": "https://noaa.gov/guides",
+      "host": "noaa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 280",
+      "url": "https://noaa.gov/news",
+      "host": "noaa.gov",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 281",
+      "url": "https://who.int/",
+      "host": "who.int",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 282",
+      "url": "https://who.int/about",
+      "host": "who.int",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 283",
+      "url": "https://who.int/help",
+      "host": "who.int",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 284",
+      "url": "https://who.int/faq",
+      "host": "who.int",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 285",
+      "url": "https://who.int/search",
+      "host": "who.int",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 286",
+      "url": "https://who.int/services",
+      "host": "who.int",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 287",
+      "url": "https://who.int/information",
+      "host": "who.int",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 288",
+      "url": "https://who.int/articles",
+      "host": "who.int",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 289",
+      "url": "https://who.int/guides",
+      "host": "who.int",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 290",
+      "url": "https://who.int/news",
+      "host": "who.int",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 291",
+      "url": "https://un.org/",
+      "host": "un.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 292",
+      "url": "https://un.org/about",
+      "host": "un.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 293",
+      "url": "https://un.org/help",
+      "host": "un.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 294",
+      "url": "https://un.org/faq",
+      "host": "un.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 295",
+      "url": "https://un.org/search",
+      "host": "un.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 296",
+      "url": "https://un.org/services",
+      "host": "un.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 297",
+      "url": "https://un.org/information",
+      "host": "un.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 298",
+      "url": "https://un.org/articles",
+      "host": "un.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 299",
+      "url": "https://un.org/guides",
+      "host": "un.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 300",
+      "url": "https://un.org/news",
+      "host": "un.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 301",
+      "url": "https://coursera.org/",
+      "host": "coursera.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 302",
+      "url": "https://coursera.org/about",
+      "host": "coursera.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 303",
+      "url": "https://coursera.org/help",
+      "host": "coursera.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 304",
+      "url": "https://coursera.org/faq",
+      "host": "coursera.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 305",
+      "url": "https://coursera.org/search",
+      "host": "coursera.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 306",
+      "url": "https://coursera.org/services",
+      "host": "coursera.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 307",
+      "url": "https://coursera.org/information",
+      "host": "coursera.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 308",
+      "url": "https://coursera.org/articles",
+      "host": "coursera.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 309",
+      "url": "https://coursera.org/guides",
+      "host": "coursera.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 310",
+      "url": "https://coursera.org/news",
+      "host": "coursera.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 311",
+      "url": "https://edx.org/",
+      "host": "edx.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 312",
+      "url": "https://edx.org/about",
+      "host": "edx.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 313",
+      "url": "https://edx.org/help",
+      "host": "edx.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 314",
+      "url": "https://edx.org/faq",
+      "host": "edx.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 315",
+      "url": "https://edx.org/search",
+      "host": "edx.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 316",
+      "url": "https://edx.org/services",
+      "host": "edx.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 317",
+      "url": "https://edx.org/information",
+      "host": "edx.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 318",
+      "url": "https://edx.org/articles",
+      "host": "edx.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 319",
+      "url": "https://edx.org/guides",
+      "host": "edx.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 320",
+      "url": "https://edx.org/news",
+      "host": "edx.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 321",
+      "url": "https://khanacademy.org/",
+      "host": "khanacademy.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 322",
+      "url": "https://khanacademy.org/about",
+      "host": "khanacademy.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 323",
+      "url": "https://khanacademy.org/help",
+      "host": "khanacademy.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 324",
+      "url": "https://khanacademy.org/faq",
+      "host": "khanacademy.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 325",
+      "url": "https://khanacademy.org/search",
+      "host": "khanacademy.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 326",
+      "url": "https://khanacademy.org/services",
+      "host": "khanacademy.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 327",
+      "url": "https://khanacademy.org/information",
+      "host": "khanacademy.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 328",
+      "url": "https://khanacademy.org/articles",
+      "host": "khanacademy.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 329",
+      "url": "https://khanacademy.org/guides",
+      "host": "khanacademy.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 330",
+      "url": "https://khanacademy.org/news",
+      "host": "khanacademy.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 331",
+      "url": "https://archive.org/",
+      "host": "archive.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 332",
+      "url": "https://archive.org/about",
+      "host": "archive.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 333",
+      "url": "https://archive.org/help",
+      "host": "archive.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 334",
+      "url": "https://archive.org/faq",
+      "host": "archive.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 335",
+      "url": "https://archive.org/search",
+      "host": "archive.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 336",
+      "url": "https://archive.org/services",
+      "host": "archive.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 337",
+      "url": "https://archive.org/information",
+      "host": "archive.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 338",
+      "url": "https://archive.org/articles",
+      "host": "archive.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 339",
+      "url": "https://archive.org/guides",
+      "host": "archive.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 340",
+      "url": "https://archive.org/news",
+      "host": "archive.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 341",
+      "url": "https://mozilla.org/",
+      "host": "mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 342",
+      "url": "https://mozilla.org/about",
+      "host": "mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 343",
+      "url": "https://mozilla.org/help",
+      "host": "mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 344",
+      "url": "https://mozilla.org/faq",
+      "host": "mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 345",
+      "url": "https://mozilla.org/search",
+      "host": "mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 346",
+      "url": "https://mozilla.org/services",
+      "host": "mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 347",
+      "url": "https://mozilla.org/information",
+      "host": "mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 348",
+      "url": "https://mozilla.org/articles",
+      "host": "mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 349",
+      "url": "https://mozilla.org/guides",
+      "host": "mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 350",
+      "url": "https://mozilla.org/news",
+      "host": "mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 351",
+      "url": "https://developer.mozilla.org/",
+      "host": "developer.mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 352",
+      "url": "https://developer.mozilla.org/about",
+      "host": "developer.mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 353",
+      "url": "https://developer.mozilla.org/help",
+      "host": "developer.mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 354",
+      "url": "https://developer.mozilla.org/faq",
+      "host": "developer.mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 355",
+      "url": "https://developer.mozilla.org/search",
+      "host": "developer.mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 356",
+      "url": "https://developer.mozilla.org/services",
+      "host": "developer.mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 357",
+      "url": "https://developer.mozilla.org/information",
+      "host": "developer.mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 358",
+      "url": "https://developer.mozilla.org/articles",
+      "host": "developer.mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 359",
+      "url": "https://developer.mozilla.org/guides",
+      "host": "developer.mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 360",
+      "url": "https://developer.mozilla.org/news",
+      "host": "developer.mozilla.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 361",
+      "url": "https://python.org/",
+      "host": "python.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 362",
+      "url": "https://python.org/about",
+      "host": "python.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 363",
+      "url": "https://python.org/help",
+      "host": "python.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 364",
+      "url": "https://python.org/faq",
+      "host": "python.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 365",
+      "url": "https://python.org/search",
+      "host": "python.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 366",
+      "url": "https://python.org/services",
+      "host": "python.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 367",
+      "url": "https://python.org/information",
+      "host": "python.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 368",
+      "url": "https://python.org/articles",
+      "host": "python.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 369",
+      "url": "https://python.org/guides",
+      "host": "python.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 370",
+      "url": "https://python.org/news",
+      "host": "python.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 371",
+      "url": "https://nodejs.org/",
+      "host": "nodejs.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 372",
+      "url": "https://nodejs.org/about",
+      "host": "nodejs.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 373",
+      "url": "https://nodejs.org/help",
+      "host": "nodejs.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 374",
+      "url": "https://nodejs.org/faq",
+      "host": "nodejs.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 375",
+      "url": "https://nodejs.org/search",
+      "host": "nodejs.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 376",
+      "url": "https://nodejs.org/services",
+      "host": "nodejs.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 377",
+      "url": "https://nodejs.org/information",
+      "host": "nodejs.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 378",
+      "url": "https://nodejs.org/articles",
+      "host": "nodejs.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 379",
+      "url": "https://nodejs.org/guides",
+      "host": "nodejs.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 380",
+      "url": "https://nodejs.org/news",
+      "host": "nodejs.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 381",
+      "url": "https://github.com/",
+      "host": "github.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 382",
+      "url": "https://github.com/about",
+      "host": "github.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 383",
+      "url": "https://github.com/help",
+      "host": "github.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 384",
+      "url": "https://github.com/faq",
+      "host": "github.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 385",
+      "url": "https://github.com/search",
+      "host": "github.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 386",
+      "url": "https://github.com/services",
+      "host": "github.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 387",
+      "url": "https://github.com/information",
+      "host": "github.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 388",
+      "url": "https://github.com/articles",
+      "host": "github.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 389",
+      "url": "https://github.com/guides",
+      "host": "github.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 390",
+      "url": "https://github.com/news",
+      "host": "github.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 391",
+      "url": "https://gitlab.com/",
+      "host": "gitlab.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 392",
+      "url": "https://gitlab.com/about",
+      "host": "gitlab.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 393",
+      "url": "https://gitlab.com/help",
+      "host": "gitlab.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 394",
+      "url": "https://gitlab.com/faq",
+      "host": "gitlab.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 395",
+      "url": "https://gitlab.com/search",
+      "host": "gitlab.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 396",
+      "url": "https://gitlab.com/services",
+      "host": "gitlab.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 397",
+      "url": "https://gitlab.com/information",
+      "host": "gitlab.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 398",
+      "url": "https://gitlab.com/articles",
+      "host": "gitlab.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 399",
+      "url": "https://gitlab.com/guides",
+      "host": "gitlab.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 400",
+      "url": "https://gitlab.com/news",
+      "host": "gitlab.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 401",
+      "url": "https://stackoverflow.com/",
+      "host": "stackoverflow.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 402",
+      "url": "https://stackoverflow.com/about",
+      "host": "stackoverflow.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 403",
+      "url": "https://stackoverflow.com/help",
+      "host": "stackoverflow.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 404",
+      "url": "https://stackoverflow.com/faq",
+      "host": "stackoverflow.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 405",
+      "url": "https://stackoverflow.com/search",
+      "host": "stackoverflow.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 406",
+      "url": "https://stackoverflow.com/services",
+      "host": "stackoverflow.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 407",
+      "url": "https://stackoverflow.com/information",
+      "host": "stackoverflow.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 408",
+      "url": "https://stackoverflow.com/articles",
+      "host": "stackoverflow.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 409",
+      "url": "https://stackoverflow.com/guides",
+      "host": "stackoverflow.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 410",
+      "url": "https://stackoverflow.com/news",
+      "host": "stackoverflow.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 411",
+      "url": "https://npmjs.com/",
+      "host": "npmjs.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 412",
+      "url": "https://npmjs.com/about",
+      "host": "npmjs.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 413",
+      "url": "https://npmjs.com/help",
+      "host": "npmjs.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 414",
+      "url": "https://npmjs.com/faq",
+      "host": "npmjs.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 415",
+      "url": "https://npmjs.com/search",
+      "host": "npmjs.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 416",
+      "url": "https://npmjs.com/services",
+      "host": "npmjs.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 417",
+      "url": "https://npmjs.com/information",
+      "host": "npmjs.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 418",
+      "url": "https://npmjs.com/articles",
+      "host": "npmjs.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 419",
+      "url": "https://npmjs.com/guides",
+      "host": "npmjs.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 420",
+      "url": "https://npmjs.com/news",
+      "host": "npmjs.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 421",
+      "url": "https://pypi.org/",
+      "host": "pypi.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 422",
+      "url": "https://pypi.org/about",
+      "host": "pypi.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 423",
+      "url": "https://pypi.org/help",
+      "host": "pypi.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 424",
+      "url": "https://pypi.org/faq",
+      "host": "pypi.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 425",
+      "url": "https://pypi.org/search",
+      "host": "pypi.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 426",
+      "url": "https://pypi.org/services",
+      "host": "pypi.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 427",
+      "url": "https://pypi.org/information",
+      "host": "pypi.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 428",
+      "url": "https://pypi.org/articles",
+      "host": "pypi.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 429",
+      "url": "https://pypi.org/guides",
+      "host": "pypi.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 430",
+      "url": "https://pypi.org/news",
+      "host": "pypi.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 431",
+      "url": "https://docker.com/",
+      "host": "docker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 432",
+      "url": "https://docker.com/about",
+      "host": "docker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 433",
+      "url": "https://docker.com/help",
+      "host": "docker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 434",
+      "url": "https://docker.com/faq",
+      "host": "docker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 435",
+      "url": "https://docker.com/search",
+      "host": "docker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 436",
+      "url": "https://docker.com/services",
+      "host": "docker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 437",
+      "url": "https://docker.com/information",
+      "host": "docker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 438",
+      "url": "https://docker.com/articles",
+      "host": "docker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 439",
+      "url": "https://docker.com/guides",
+      "host": "docker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 440",
+      "url": "https://docker.com/news",
+      "host": "docker.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 441",
+      "url": "https://kotlinlang.org/",
+      "host": "kotlinlang.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 442",
+      "url": "https://kotlinlang.org/about",
+      "host": "kotlinlang.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 443",
+      "url": "https://kotlinlang.org/help",
+      "host": "kotlinlang.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 444",
+      "url": "https://kotlinlang.org/faq",
+      "host": "kotlinlang.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 445",
+      "url": "https://kotlinlang.org/search",
+      "host": "kotlinlang.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 446",
+      "url": "https://kotlinlang.org/services",
+      "host": "kotlinlang.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 447",
+      "url": "https://kotlinlang.org/information",
+      "host": "kotlinlang.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 448",
+      "url": "https://kotlinlang.org/articles",
+      "host": "kotlinlang.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 449",
+      "url": "https://kotlinlang.org/guides",
+      "host": "kotlinlang.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 450",
+      "url": "https://kotlinlang.org/news",
+      "host": "kotlinlang.org",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 451",
+      "url": "https://developer.android.com/",
+      "host": "developer.android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 452",
+      "url": "https://developer.android.com/about",
+      "host": "developer.android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 453",
+      "url": "https://developer.android.com/help",
+      "host": "developer.android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 454",
+      "url": "https://developer.android.com/faq",
+      "host": "developer.android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 455",
+      "url": "https://developer.android.com/search",
+      "host": "developer.android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 456",
+      "url": "https://developer.android.com/services",
+      "host": "developer.android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 457",
+      "url": "https://developer.android.com/information",
+      "host": "developer.android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 458",
+      "url": "https://developer.android.com/articles",
+      "host": "developer.android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 459",
+      "url": "https://developer.android.com/guides",
+      "host": "developer.android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 460",
+      "url": "https://developer.android.com/news",
+      "host": "developer.android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 461",
+      "url": "https://android.com/",
+      "host": "android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 462",
+      "url": "https://android.com/about",
+      "host": "android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 463",
+      "url": "https://android.com/help",
+      "host": "android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 464",
+      "url": "https://android.com/faq",
+      "host": "android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 465",
+      "url": "https://android.com/search",
+      "host": "android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 466",
+      "url": "https://android.com/services",
+      "host": "android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 467",
+      "url": "https://android.com/information",
+      "host": "android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 468",
+      "url": "https://android.com/articles",
+      "host": "android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 469",
+      "url": "https://android.com/guides",
+      "host": "android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 470",
+      "url": "https://android.com/news",
+      "host": "android.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 471",
+      "url": "https://microsoft.com/",
+      "host": "microsoft.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 472",
+      "url": "https://microsoft.com/about",
+      "host": "microsoft.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 473",
+      "url": "https://microsoft.com/help",
+      "host": "microsoft.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 474",
+      "url": "https://microsoft.com/faq",
+      "host": "microsoft.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 475",
+      "url": "https://microsoft.com/search",
+      "host": "microsoft.com",
+      "category": "מידע ושירותים"
+    },
+    {
+      "name": "אתר מידע 476",
+      "url": "https://microsoft.com/services",
+      "host": "microsoft.com",
+      "category": "מידע ושירותים"
+    }
+  ]
+}
