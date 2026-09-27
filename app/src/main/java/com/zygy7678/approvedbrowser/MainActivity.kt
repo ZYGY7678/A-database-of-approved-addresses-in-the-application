@@ -308,6 +308,7 @@ private fun ApprovedBrowserApp(
     var requestThanksDialog by remember { mutableStateOf(false) }
 
     var accessDialog by remember { mutableStateOf(false) }
+    var pendingAccessAction by remember { mutableStateOf<(() -> Unit)?>(null) }
     var sensitiveAccessDialog by remember { mutableStateOf(false) }
     var pendingSensitiveAction by remember { mutableStateOf<(() -> Unit)?>(null) }
     var routeDialog by remember { mutableStateOf(false) }
@@ -376,7 +377,15 @@ private fun ApprovedBrowserApp(
                 prefs = prefs,
                 securityHasCode = accessStore.hasCode(),
                 onPrefsChange = onPrefsChange,
-                onOpenSecurity = { securityFolderOpen = true },
+                onOpenSecurity = {
+                    if (accessStore.hasCode()) {
+                        pendingAccessAction = { securityFolderOpen = true }
+                        accessDialog = true
+                    } else {
+                        pendingSensitiveAction = { securityFolderOpen = true }
+                        changeCodeDialog = true
+                    }
+                },
                 onSiteRequest = { siteRequestDialog = true },
                 onBack = { settings = false }
             )
@@ -588,9 +597,11 @@ private fun ApprovedBrowserApp(
             store = accessStore,
             onVerified = {
                 accessDialog = false
-                routeDialog = true
+                val action = pendingAccessAction
+                pendingAccessAction = null
+                action?.invoke()
             },
-            onDismiss = { accessDialog = false }
+            onDismiss = { accessDialog = false; pendingAccessAction = null }
         )
     }
 
