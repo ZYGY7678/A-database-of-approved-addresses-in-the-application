@@ -81,9 +81,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.input.pointer.awaitPointerEvent
-import androidx.compose.ui.input.pointer.awaitPointerEventScope
-import androidx.compose.ui.input.pointer.pointerInput
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -588,6 +585,9 @@ private fun HomeScreen(
     onToggleFavorite: (Site) -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val sitesByCategory = remember(availableSites) {
+        availableSites.groupBy { it.category }
+    }
 
     Column(Modifier.fillMaxSize()) {
         OutlinedTextField(
