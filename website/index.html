@@ -26,39 +26,24 @@
   <section class="card">
     <h2>בחירת מסלול</h2>
     <p>בחר כאן איזה סינון והגנה יהיו פעילים במכשיר. הבחירה תישמר באפליקציה בזמן ההגדרה.</p>
-
     <div class="route-options" role="radiogroup" aria-label="בחירת מסלול">
       <button type="button" class="route-option selected" data-route="ETROG" aria-pressed="true">
         <div class="route-title"><span>אתרוג</span><span class="route-tag">מינימלי</span></div>
         <p class="route-summary">אתרים חיוניים ומאושרים בלבד</p>
-        <div class="route-details">
-          <div><b>יהיה לך:</b> אתרים מאושרים חיוניים לפי הרשימה.</div>
-          <div><b>לא יהיה לך:</b> אתרי AI, פורומים ואתרי חדשות.</div>
-        </div>
+        <div class="route-details"><div><b>יהיה לך:</b> אתרים מאושרים חיוניים לפי הרשימה.</div><div><b>לא יהיה לך:</b> אתרי AI, פורומים ואתרי חדשות.</div></div>
       </button>
-
       <button type="button" class="route-option" data-route="HADASS" aria-pressed="false">
         <div class="route-title"><span>הדס</span><span class="route-tag">מאוזן</span></div>
         <p class="route-summary">אתרים מאושרים + AI, בלי חדשות ופורומים</p>
-        <div class="route-details">
-          <div><b>יהיה לך:</b> אתרים מאושרים ואתרי AI מאושרים.</div>
-          <div><b>לא יהיה לך:</b> אתרי חדשות ופורומים.</div>
-        </div>
+        <div class="route-details"><div><b>יהיה לך:</b> אתרים מאושרים ואתרי AI מאושרים.</div><div><b>לא יהיה לך:</b> אתרי חדשות ופורומים.</div></div>
       </button>
-
       <button type="button" class="route-option" data-route="LULAV" aria-pressed="false">
         <div class="route-title"><span>לולב</span><span class="route-tag">מורחב</span></div>
         <p class="route-summary">כל האתרים המאושרים, כולל תמונות</p>
-        <div class="route-details">
-          <div><b>יהיה לך:</b> כל האתרים המאושרים, כולל AI, פורומים, חדשות ותמונות.</div>
-          <div><b>לא יהיה לך:</b> רק אתרים שלא נמצאים ברשימת האתרים המאושרים.</div>
-        </div>
+        <div class="route-details"><div><b>יהיה לך:</b> כל האתרים המאושרים, כולל AI, פורומים, חדשות ותמונות.</div><div><b>לא יהיה לך:</b> רק אתרים שלא נמצאים ברשימת האתרים המאושרים.</div></div>
       </button>
     </div>
-
-    <div id="selectedRouteNotice" class="route-selection-notice">
-      המסלול שנבחר: <b>אתרוג</b> — אתרים חיוניים ומאושרים בלבד
-    </div>
+    <div id="selectedRouteNotice" class="route-selection-notice">המסלול שנבחר: <b>אתרוג</b> — אתרים חיוניים ומאושרים בלבד</div>
   </section>
 
   <section class="card">
@@ -73,6 +58,13 @@
     <button id="setup" class="primary" disabled>הגדר בעל מכשיר + קוד גישה</button>
     <div id="setupNotice" class="notice">חבר קודם את הטלפון ואשר את חלון ניפוי ה־USB. לאחר החיבור הכפתור יופעל.</div>
     <div class="notice">אין צורך להתקין ADB או כלי נוסף במחשב. האתר משתמש בחיבור USB ישירות דרך הדפדפן הנתמך.</div>
+  </section>
+
+  <section class="card">
+    <h2>שחרור המכשיר</h2>
+    <p>אם האפליקציה שלנו מוגדרת כ־Device Owner ונעלה את המכשיר למסך נעול, הכפתור הזה מנסה להסיר את מנהל המכשיר דרך חיבור ADB. הוא לא מבצע איפוס מפעל.</p>
+    <button id="removeOwner" class="secondary" disabled>הסר את מנהל המכשיר של האפליקציה</button>
+    <div id="removeOwnerNotice" class="notice">חבר קודם את הטלפון. הכפתור פועל רק מול החבילה של האפליקציה שלנו.</div>
   </section>
 
   <section class="card">
