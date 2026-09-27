@@ -22,15 +22,6 @@ class BrowserWebViewClient(
         ".mp3", ".wav", ".ogg", ".m4a"
     )
 
-    private val imageExtensions = listOf(
-        ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".avif", ".svg", ".ico"
-    )
-
-    private val imageEnabledHosts = setOf(
-        "mitmachim.top",
-        "prog.co.il"
-    )
-
     override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
         onPageStateChanged(url, true)
     }
@@ -62,40 +53,22 @@ class BrowserWebViewClient(
         request: WebResourceRequest?
     ): WebResourceResponse? {
         val requestUrl = request?.url ?: return null
-        val url = requestUrl.toString().lowercase()
         val path = requestUrl.path?.lowercase() ?: ""
-        val mainHost = runCatching {
-            URI(view?.url ?: "").host?.lowercase()
-        }.getOrNull().orEmpty()
 
-        // Keep media blocked as before.
+        // Keep the existing protection against direct audio/video files.
+        // Images, CSS, JavaScript, fonts, XHR/fetch and CDN resources are
+        // otherwise allowed like a normal Chromium/WebView page.
         if (blockedMediaExtensions.any(path::endsWith)) {
             return emptyResponse()
         }
 
-        // Images are enabled only on the two sites explicitly approved by the user.
-        // Accept headers catch many image URLs that have no .jpg/.png suffix.
-        val accept = request?.requestHeaders
-            ?.entries
-            ?.firstOrNull { it.key.equals("Accept", ignoreCase = true) }
-            ?.value
-            ?.lowercase()
-            .orEmpty()
-
-        val looksLikeImage =
-            imageExtensions.any(path::endsWith) ||
-            accept.contains("image/")
-
-        if (looksLikeImage && !isImageEnabledHost(mainHost)) {
-            return emptyResponse()
-        }
-
-        // Important compatibility change:
-        // sub-resources such as CSS, JavaScript, fonts and APIs may come from
-        // a site's CDN or other supporting host. Blocking every non-whitelisted
-        // sub-resource was the main reason many otherwise-approved sites broke.
+        // Do not filter images by hostname. Modern sites often serve images
+        // from CDNs, image proxies, signed URLs or different subdomains.
+        // Blocking those resources makes approved sites look broken.
         //
-        // Top-level navigation is still restricted by shouldOverrideUrlLoading.
+        // The security boundary remains the top-level navigation check above:
+        // a resource may load for an approved page, but navigation to an
+        // unapproved HTTP(S) page is still blocked.
         return super.shouldInterceptRequest(view, request)
     }
 
@@ -141,6 +114,14 @@ fun configureApprovedWebView(
 
         javaScriptCanOpenWindowsAutomatically = false
         mediaPlaybackRequiresUserGesture = true
+
+        // Present a Chrome-like mobile user agent. Some sites otherwise detect
+        // Android WebView ("wv") and serve a reduced or incompatible page.
+        userAgentString = userAgentString
+            .replace("; wv", "")
+            .replace(" Version/4.0", "")
+            .replace(Regex(" Chrome/[^ ]+"), " Chrome/140.0.0.0")
+
 
         // Keep popups/new windows disabled unless the setting explicitly allows them.
         setSupportMultipleWindows(!blockPopups)
