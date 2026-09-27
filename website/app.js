@@ -341,17 +341,24 @@
       log("בודק אם כבר מוגדר Device Owner...");
 
       const owners = await runShell("dpm list-owners");
-      // dpm list-owners may print informational text even when no owner exists.
-      // Only a real ComponentInfo package is evidence of an existing owner.
+      const profiles = await runShell("dpm list-owners --user 0").catch(() => "");
       const ownerPackages = [...owners.matchAll(/ComponentInfo\{([^/}\s]+)\/[^}]*\}/g)]
+        .map(match => match[1])
+        .filter(Boolean);
+      const profilePackages = [...profiles.matchAll(/ComponentInfo\{([^/}\s]+)\/[^}]*\}/g)]
         .map(match => match[1])
         .filter(Boolean);
       const hasOurOwner = ownerPackages.includes(PACKAGE);
 
       log("מצב בעל המכשיר: " + (ownerPackages.length ? ownerPackages.join(", ") : "לא נמצא בעל מכשיר"));
+      log("בדיקת פרופיל עבודה: " + (profilePackages.length ? profilePackages.join(", ") : "לא נמצא Profile Owner"));
 
-      if (!hasOurOwner && ownerPackages.length > 0) {
-        throw new Error("כבר מוגדר במכשיר בעל מכשיר אחר: " + ownerPackages.join(", "));
+      if (!hasOurOwner && profilePackages.length > 0) {
+        throw new Error(
+          "לא ניתן להגדיר את האפליקציה כבעלת המכשיר כי כבר מוגדר Profile Owner: " +
+          profilePackages.join(", ") +
+          ". יש להסיר קודם את פרופיל העבודה/הניהול הקיים במכשיר."
+        );
       }
 
       if (!hasOurOwner) {
