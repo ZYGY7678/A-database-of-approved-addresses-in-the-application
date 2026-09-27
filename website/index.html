@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>דפדפן מאושר — מרכז ניהול והגנת המכשיר</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="app">
+  <header class="header">
+    <div>
+      <h1>דפדפן מאושר</h1>
+      <p>מרכז ניהול והגנת המכשיר</p>
+    </div>
+    <div class="logo" aria-label="דפדפן מאושר">
+      <span class="globe"></span><span class="route r1"></span><span class="route r2"></span><span class="lock">●</span>
+    </div>
+  </header>
+
+  <section class="card">
+    <div class="row">
+      <div><h2>חיבור למכשיר</h2><p id="deviceStatus">האתר לא יכול לקרוא חיבור ADB ישירות מהדפדפן</p></div>
+      <span class="badge">ממתין לחיבור</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>מסלולי הגנה</h2>
+    <p>הגדרות המסלול מנוהלות מתוך אפליקציית דפדפן מאושר</p>
+    <div class="chips"><span>אתרוג</span><span>הדס</span><span>לולב</span></div>
+  </section>
+
+  <section class="card">
+    <h2>הגנת המכשיר</h2>
+    <p>לפני ההפעלה בחר כאן את קוד הגישה של האפליקציה. הקוד יועבר לכלי המחשב ויוגדר באפליקציה לאחר השלמת בעל המכשיר.</p>
+    <div class="fields">
+      <label>קוד גישה חדש<input id="code" type="password" inputmode="numeric" maxlength="12" autocomplete="new-password"></label>
+      <label>אימות הקוד<input id="confirm" type="password" inputmode="numeric" maxlength="12" autocomplete="new-password"></label>
+    </div>
+    <small>4–12 ספרות. הקוד לא יוצג ביומן הפעולות.</small>
+    <button id="setup" class="primary">הגדר בעל מכשיר + קוד גישה</button>
+    <div class="notice">הפעולה עצמה מתבצעת בכלי ADB במחשב, משום שאתר רגיל אינו מקבל הרשאה להריץ פקודת Device Owner על Android.</div>
+    <div class="command">adb shell dpm set-device-owner com.zygy7678.approvedbrowser/.ApprovedBrowserDeviceAdminReceiver</div>
+  </section>
+
+  <section class="card">
+    <h2>הפעלת אפשרויות למפתחים</h2>
+    <ol>
+      <li>פתח בטלפון <b>הגדרות → אודות הטלפון</b>.</li>
+      <li>מצא <b>מספר Build / מספר גרסה</b>, לפעמים תחת <b>פרטי תוכנה</b>.</li>
+      <li>לחץ על מספר ה־Build <b>7 פעמים</b> ואשר קוד נעילה אם נדרש.</li>
+      <li>חזור להגדרות וחפש <b>אפשרויות למפתחים</b>.</li>
+      <li>הפעל את האפשרויות למפתחים ואת <b>ניפוי USB</b>.</li>
+      <li>חבר את הטלפון למחשב ואשר את חלון הרשאת ניפוי ה־USB.</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>יומן פעולות</h2>
+    <pre id="log">האתר מוכן. הזן קוד גישה והמשך בכלי המחשב.</pre>
+  </section>
+
+  <footer><span>דפדפן מאושר • כלי ADB</span><button id="download" class="secondary">הוראות וכלי למחשב</button></footer>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
