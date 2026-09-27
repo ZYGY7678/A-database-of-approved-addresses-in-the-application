@@ -83,6 +83,31 @@ object DeviceManagement {
         }
     }
 
+    fun applyManagedAppPolicies(
+        context: Context,
+        lockedPackages: Set<String>,
+        protectedUninstallPackages: Set<String>
+    ) {
+        val dpm = context.getSystemService(DevicePolicyManager::class.java) ?: return
+        if (!dpm.isDeviceOwnerApp(context.packageName)) return
+        val admin = adminComponent(context)
+        val pm = context.packageManager
+        val installedLaunchers = pm.queryIntentActivities(
+            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER),
+            PackageManager.MATCH_ALL
+        ).map { it.activityInfo.packageName }.toSet()
+        val safeLocked = lockedPackages.filter { it != context.packageName && it in installedLaunchers }.toTypedArray()
+        val safeProtected = protectedUninstallPackages.filter { it != context.packageName && it in installedLaunchers }.toSet()
+        runCatching { dpm.setPackagesSuspended(admin, safeLocked, true) }
+        for (packageName in installedLaunchers) {
+            if (packageName == context.packageName) continue
+            if (packageName !in lockedPackages) {
+                runCatching { dpm.setPackagesSuspended(admin, arrayOf(packageName), false) }
+            }
+            runCatching { dpm.setUninstallBlocked(admin, packageName, packageName in safeProtected) }
+        }
+    }
+
     fun startKioskIfPossible(context: Context) {
         if (!isDeviceOwner(context)) return
         enforcePolicies(context)
