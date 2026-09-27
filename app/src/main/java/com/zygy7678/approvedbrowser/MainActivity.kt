@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -1489,7 +1490,7 @@ private fun SettingsScreen(
                     ) {
                         Text("דפדפן מאושר", fontWeight = FontWeight.Bold)
                         Text(
-                            "פותח באהבה ע"י חייא שיאומי ממתמחים טופ",
+                            "פותח באהבה ע\"י חייא שיאומי ממתמחים טופ",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -1675,7 +1676,7 @@ private fun WeeklyLockWindowDialog(
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            items(java.util.Calendar.SUNDAY..java.util.Calendar.SATURDAY) { day ->
+                            items((java.util.Calendar.SUNDAY..java.util.Calendar.SATURDAY).toList()) { day ->
                                 FilterChip(
                                     selected = day in selectedDays,
                                     onClick = {
