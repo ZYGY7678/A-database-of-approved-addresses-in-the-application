@@ -275,6 +275,7 @@ private fun ApprovedBrowserApp(
     var address by remember { mutableStateOf(initialAllowedUrl ?: initialExternalUrl.orEmpty()) }
     var home by remember { mutableStateOf(initialAllowedUrl == null) }
     var settings by remember { mutableStateOf(false) }
+    var securityFolderOpen by remember { mutableStateOf(false) }
     var blocked by remember {
         mutableStateOf(initialExternalUrl != null && initialAllowedUrl == null)
     }
@@ -283,6 +284,7 @@ private fun ApprovedBrowserApp(
     var loading by remember { mutableStateOf(false) }
     var selectedSiteForAction by remember { mutableStateOf<Site?>(null) }
     var siteRequestDialog by remember { mutableStateOf(false) }
+    var requestThanksDialog by remember { mutableStateOf(false) }
 
     var accessDialog by remember { mutableStateOf(false) }
     var sensitiveAccessDialog by remember { mutableStateOf(false) }
@@ -309,6 +311,7 @@ private fun ApprovedBrowserApp(
 
     BackHandler(enabled = !home || settings) {
         when {
+            securityFolderOpen -> securityFolderOpen = false
             settings -> settings = false
             webView?.canGoBack() == true -> webView?.goBack()
             else -> home = true
@@ -317,21 +320,37 @@ private fun ApprovedBrowserApp(
 
     Box(Modifier.fillMaxSize()) {
     if (settings) {
-        SettingsScreen(
-            prefs = prefs,
-            route = route,
-            onPrefsChange = onPrefsChange,
-            onChangeRoute = { accessDialog = true },
-            onChangeCode = { pendingSensitiveAction = { changeCodeDialog = true }; sensitiveAccessDialog = true },
-            onDeviceOwnerInstructions = { pendingSensitiveAction = { deviceOwnerInstructionsDialog = true }; sensitiveAccessDialog = true },
-            onSiteRequest = { siteRequestDialog = true },
-            onWeeklyLockChange = { windows ->
-                pendingWeeklyWindows = windows
-                scheduleAccessDialog = true
-            },
-            onSensitiveChange = { action -> pendingSensitiveAction = action; sensitiveAccessDialog = true },
-            onBack = { settings = false }
-        )
+        if (securityFolderOpen) {
+            SecuritySettingsScreen(
+                prefs = prefs,
+                route = route,
+                onPrefsChange = onPrefsChange,
+                onChangeRoute = { routeDialog = true },
+                onChangeCode = { changeCodeDialog = true },
+                onDeviceOwnerInstructions = { deviceOwnerInstructionsDialog = true },
+                onWeeklyLockChange = { windows ->
+                    onPrefsChange(prefs.copy(weeklyLockWindows = windows))
+                },
+                onBack = { securityFolderOpen = false }
+            )
+        } else {
+            SettingsScreen(
+                prefs = prefs,
+                securityHasCode = accessStore.hasCode(),
+                onPrefsChange = onPrefsChange,
+                onOpenSecurity = {
+                    if (accessStore.hasCode()) {
+                        pendingSensitiveAction = { securityFolderOpen = true }
+                        sensitiveAccessDialog = true
+                    } else {
+                        pendingSensitiveAction = { securityFolderOpen = true }
+                        changeCodeDialog = true
+                    }
+                },
+                onSiteRequest = { siteRequestDialog = true },
+                onBack = { settings = false }
+            )
+        }
     } else {
         Scaffold(
             topBar = {
@@ -356,7 +375,7 @@ private fun ApprovedBrowserApp(
                         },
                         actions = {
                             AssistChip(
-                                onClick = { accessDialog = true },
+                                onClick = { settings = true },
                                 label = { Text(route.title) },
                                 leadingIcon = {
                                     Icon(
@@ -582,8 +601,16 @@ private fun ApprovedBrowserApp(
     if (changeCodeDialog) {
         ChangeAccessCodeDialog(
             store = accessStore,
-            onSaved = { changeCodeDialog = false },
-            onDismiss = { changeCodeDialog = false }
+            allowNoExistingCode = true,
+            onSaved = {
+                changeCodeDialog = false
+                pendingSensitiveAction?.invoke()
+                pendingSensitiveAction = null
+            },
+            onDismiss = {
+                changeCodeDialog = false
+                pendingSensitiveAction = null
+            }
         )
     }
 
@@ -597,23 +624,25 @@ private fun ApprovedBrowserApp(
             onDismiss = { selectedSiteForAction = null },
             onReport = {
                 selectedSiteForAction = null
-                openDeveloperIssue(
-                    context = context,
-                    type = "תלונה על אתר מאושר",
-                    title = site.name,
-                    url = site.url,
-                    reason = "המשתמש דיווח על בעיה באתר מאושר וביקש מהמפתח לבדוק את האתר."
-                )
+                if (openDeveloperIssue(
+                        context = context,
+                        type = "תלונה על אתר מאושר",
+                        title = site.name,
+                        url = site.url,
+                        reason = "המשתמש דיווח על בעיה באתר מאושר וביקש מהמפתח לבדוק את האתר."
+                    )
+                ) requestThanksDialog = true
             },
             onRemovalRequest = {
                 selectedSiteForAction = null
-                openDeveloperIssue(
-                    context = context,
-                    type = "בקשה להסרת אתר מאושר",
-                    title = site.name,
-                    url = site.url,
-                    reason = "המשתמש מבקש לבדוק את האתר ולהסיר אותו מרשימת האתרים המאושרים."
-                )
+                if (openDeveloperIssue(
+                        context = context,
+                        type = "בקשה להסרת אתר מאושר",
+                        title = site.name,
+                        url = site.url,
+                        reason = "המשתמש מבקש לבדוק את האתר ולהסיר אותו מרשימת האתרים המאושרים."
+                    )
+                ) requestThanksDialog = true
             }
         )
     }
@@ -623,15 +652,20 @@ private fun ApprovedBrowserApp(
             onDismiss = { siteRequestDialog = false },
             onSubmit = { title, url, reason ->
                 siteRequestDialog = false
-                openDeveloperIssue(
-                    context = context,
-                    type = "בקשת אישור אתר חדש",
-                    title = title,
-                    url = url,
-                    reason = reason
-                )
+                if (openDeveloperIssue(
+                        context = context,
+                        type = "בקשת אישור אתר חדש",
+                        title = title,
+                        url = url,
+                        reason = reason
+                    )
+                ) requestThanksDialog = true
             }
         )
+    }
+
+    if (requestThanksDialog) {
+        RequestThanksDialog(onDismiss = { requestThanksDialog = false })
     }
 
     if (appLocked) {
@@ -661,8 +695,18 @@ private fun HomeScreen(
     onLongPressSite: (Site) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val sitesByCategory = remember(availableSites) {
-        availableSites.groupBy { it.category }
+    val sitesByCategory = remember(availableSites) { availableSites.groupBy { it.category } }
+    val searchResults by remember(availableSites, query) {
+        derivedStateOf {
+            val normalizedQuery = query.trim().lowercase()
+            if (normalizedQuery.isBlank()) emptyList()
+            else availableSites.filter {
+                listOf(it.name, it.url, it.host, it.category)
+                    .joinToString(" ")
+                    .lowercase()
+                    .contains(normalizedQuery)
+            }
+        }
     }
 
     Column(Modifier.fillMaxSize()) {
@@ -671,9 +715,7 @@ private fun HomeScreen(
             onValueChange = onQueryChange,
             singleLine = true,
             maxLines = 1,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp, vertical = 6.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 6.dp),
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = "חיפוש") },
             trailingIcon = {
                 if (query.isNotBlank()) {
@@ -682,174 +724,47 @@ private fun HomeScreen(
                     }
                 }
             },
-            placeholder = { Text("חיפוש באתר, כתובת או קטגוריה") }
+            placeholder = { Text("חיפוש בכל האתרים — שם, כתובת או קטגוריה") }
         )
 
-        ScrollableTabRow(
-            selectedTabIndex = pagerState.currentPage,
-            edgePadding = 10.dp,
-            divider = {}
-        ) {
-            categories.forEachIndexed { index, name ->
-                Tab(
-                    selected = pagerState.currentPage == index,
-                    onClick = {
-                        onSelectCategory(index)
-                        if (pagerState.currentPage != index) {
-                            scope.launch { pagerState.animateScrollToPage(index) }
-                        }
-                    },
-                    text = {
-                        Text(
-                            if (name == "מועדפים") "★ מועדפים" else name,
-                            fontWeight = if (pagerState.currentPage == index) {
-                                FontWeight.Bold
-                            } else {
-                                FontWeight.Normal
-                            }
-                        )
-                    }
-                )
-            }
-        }
-
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(horizontal = 8.dp),
-            beyondViewportPageCount = 0
-        ) { page ->
-            val pageName = categories[page]
-
-            val pageSites by remember(pageName, availableSites, sitesByCategory, favorites, query) {
-                derivedStateOf {
-                    val source = if (query.isNotBlank()) {
-                        availableSites
-                    } else {
-                        when (pageName) {
-                            "מועדפים" -> availableSites.filter { siteKey(it) in favorites }
-                            "הכול" -> availableSites
-                            else -> sitesByCategory[pageName].orEmpty()
-                        }
-                    }
-                    if (query.isBlank()) {
-                        source
-                    } else {
-                        val normalizedQuery = query.trim().lowercase()
-                        source.filter {
-                            val haystack = listOf(it.name, it.url, it.host, it.category)
-                                .joinToString(" ")
-                                .lowercase()
-                            normalizedQuery.isBlank() || haystack.contains(normalizedQuery)
-                        }
-                    }
-                }
-            }
-
+        if (query.isNotBlank()) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(top = 10.dp, bottom = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(
-                    if (prefs.compact) 6.dp else 9.dp
-                )
+                contentPadding = PaddingValues(top = 6.dp, bottom = 20.dp, start = 8.dp, end = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(if (prefs.compact) 6.dp else 9.dp)
             ) {
                 item {
                     ElevatedCard(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.elevatedCardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
+                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                     ) {
                         Column(Modifier.padding(16.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    if (pageName == "מועדפים") {
-                                        Icons.Default.Star
-                                    } else {
-                                        Icons.Default.Menu
-                                    },
-                                    contentDescription = null
-                                )
-                                Spacer(Modifier.size(8.dp))
-
-                                Column(Modifier.weight(1f)) {
-                                    Text(
-                                        pageName,
-                                        style = MaterialTheme.typography.titleLarge,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Text(
-                                        if (pageName == "מועדפים") {
-                                            pageSites.size.toString() + " אתרים שמורים"
-                                        } else {
-                                            pageSites.size.toString() + " אתרים"
-                                        },
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-
-                                FilterChip(
-                                    selected = true,
-                                    onClick = {},
-                                    label = { Text("מאושר") },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Default.Check,
-                                            contentDescription = null
-                                        )
-                                    }
-                                )
-                            }
+                            Text("תוצאות חיפוש בכל האתרים", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                            Text(
+                                searchResults.size.toString() + " אתרים נמצאו",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
                 }
-
-                if (pageSites.isEmpty()) {
+                if (searchResults.isEmpty()) {
                     item {
                         OutlinedCard(Modifier.fillMaxWidth()) {
                             Column(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(24.dp),
+                                Modifier.fillMaxWidth().padding(24.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Icon(
-                                    if (pageName == "מועדפים") {
-                                        Icons.Default.StarBorder
-                                    } else {
-                                        Icons.Default.Search
-                                    },
-                                    contentDescription = null,
-                                    modifier = Modifier.size(42.dp)
-                                )
+                                Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(42.dp))
                                 Spacer(Modifier.height(8.dp))
-                                Text(
-                                    if (pageName == "מועדפים") {
-                                        "עדיין אין מועדפים"
-                                    } else {
-                                        "לא נמצאו אתרים"
-                                    },
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                                Text(
-                                    if (pageName == "מועדפים") {
-                                        "לחץ על הכוכב ליד אתר כדי לשמור אותו כאן."
-                                    } else {
-                                        "נסה חיפוש אחר."
-                                    },
-                                    style = MaterialTheme.typography.bodySmall
-                                )
+                                Text("לא נמצאו אתרים", fontWeight = FontWeight.SemiBold)
+                                Text("נסה שם אתר, כתובת, דומיין או קטגוריה אחרת.", style = MaterialTheme.typography.bodySmall)
                             }
                         }
                     }
                 }
-
-                items(
-                    items = pageSites,
-                    key = { siteKey(it) }
-                ) { site ->
+                items(items = searchResults, key = { "search-" + siteKey(it) }) { site ->
                     SiteCard(
                         site = site,
                         favorite = siteKey(site) in favorites,
@@ -861,6 +776,117 @@ private fun HomeScreen(
                         onToggleFavorite = { onToggleFavorite(site) },
                         onLongPress = { onLongPressSite(site) }
                     )
+                }
+            }
+        } else {
+            ScrollableTabRow(
+                selectedTabIndex = pagerState.currentPage,
+                edgePadding = 10.dp,
+                divider = {}
+            ) {
+                categories.forEachIndexed { index, name ->
+                    Tab(
+                        selected = pagerState.currentPage == index,
+                        onClick = {
+                            onSelectCategory(index)
+                            if (pagerState.currentPage != index) scope.launch { pagerState.animateScrollToPage(index) }
+                        },
+                        text = {
+                            Text(
+                                if (name == "מועדפים") "★ מועדפים" else name,
+                                fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Normal
+                            )
+                        }
+                    )
+                }
+            }
+
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(horizontal = 8.dp),
+                beyondViewportPageCount = 0
+            ) { page ->
+                val pageName = categories[page]
+                val pageSites = when (pageName) {
+                    "מועדפים" -> availableSites.filter { siteKey(it) in favorites }
+                    "הכול" -> availableSites
+                    else -> sitesByCategory[pageName].orEmpty()
+                }
+
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(top = 10.dp, bottom = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(if (prefs.compact) 6.dp else 9.dp)
+                ) {
+                    item {
+                        ElevatedCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(20.dp),
+                            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            Column(Modifier.padding(16.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(if (pageName == "מועדפים") Icons.Default.Star else Icons.Default.Menu, contentDescription = null)
+                                    Spacer(Modifier.size(8.dp))
+                                    Column(Modifier.weight(1f)) {
+                                        Text(pageName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                                        Text(
+                                            if (pageName == "מועדפים") pageSites.size.toString() + " אתרים שמורים"
+                                            else pageSites.size.toString() + " אתרים",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    FilterChip(
+                                        selected = true,
+                                        onClick = {},
+                                        label = { Text("מאושר") },
+                                        leadingIcon = { Icon(Icons.Default.Check, contentDescription = null) }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    if (pageSites.isEmpty()) {
+                        item {
+                            OutlinedCard(Modifier.fillMaxWidth()) {
+                                Column(
+                                    Modifier.fillMaxWidth().padding(24.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Icon(
+                                        if (pageName == "מועדפים") Icons.Default.StarBorder else Icons.Default.Search,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(42.dp)
+                                    )
+                                    Spacer(Modifier.height(8.dp))
+                                    Text(
+                                        if (pageName == "מועדפים") "עדיין אין מועדפים" else "לא נמצאו אתרים",
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                    Text(
+                                        if (pageName == "מועדפים") "לחץ על הכוכב ליד אתר כדי לשמור אותו כאן."
+                                        else "נסה חיפוש אחר.",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    items(items = pageSites, key = { siteKey(it) }) { site ->
+                        SiteCard(
+                            site = site,
+                            favorite = siteKey(site) in favorites,
+                            showCategory = prefs.showCategories,
+                            showUrl = prefs.showUrls,
+                            largeText = prefs.largeText,
+                            rounded = prefs.roundedCards,
+                            onOpen = { onOpenSite(site) },
+                            onToggleFavorite = { onToggleFavorite(site) },
+                            onLongPress = { onLongPressSite(site) }
+                        )
+                    }
                 }
             }
         }
@@ -1042,7 +1068,7 @@ private fun openDeveloperIssue(
     title: String,
     url: String,
     reason: String
-) {
+): Boolean {
     val issueTitle = "[$type] $title"
     val body = """
 בקשה שנשלחה מתוך דפדפן מאושר
@@ -1058,9 +1084,22 @@ $reason
 """.trimIndent()
     val issueUrl = "https://github.com/ZYGY7678/A-database-of-approved-addresses-in-the-application/issues/new" +
         "?title=${Uri.encode(issueTitle)}&body=${Uri.encode(body)}"
-    runCatching {
+    return runCatching {
         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(issueUrl)))
-    }
+        true
+    }.getOrElse { false }
+}
+
+@Composable
+private fun RequestThanksDialog(
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("תודה רבה") },
+        text = { Text("תודה רבה! נראה את פנייתכם בהקדם האפשרי.") },
+        confirmButton = { Button(onClick = onDismiss) { Text("סגור") } }
+    )
 }
 
 @Composable
@@ -1174,33 +1213,34 @@ private fun RouteSelectionDialog(
 @Composable
 private fun ChangeAccessCodeDialog(
     store: AccessCodeStore,
+    allowNoExistingCode: Boolean = false,
     onSaved: () -> Unit,
     onDismiss: () -> Unit
 ) {
     var oldCode by remember { mutableStateOf("") }
     var newCode by remember { mutableStateOf("") }
     var error by remember { mutableStateOf("") }
+    val hasExistingCode = store.hasCode()
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("שינוי קוד גישה") },
+        title = { Text(if (hasExistingCode) "שינוי קוד מנהל" else "הגדרת קוד מנהל") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("אפשר לשנות את הקוד רק אחרי הזנת הקוד הנוכחי.")
-
-                OutlinedTextField(
-                    value = oldCode,
-                    onValueChange = {
-                        oldCode = it.filter(Char::isDigit).take(12)
-                    },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.NumberPassword
-                    ),
-                    visualTransformation = PasswordVisualTransformation(),
-                    label = { Text("קוד נוכחי") }
+                Text(
+                    if (hasExistingCode) "קוד המנהל מגן על כל הגדרות האבטחה שבתיקיית האבטחה."
+                    else "לא מוגדר כרגע קוד גישה. הגדר קוד אחד שיגן על כל הגדרות האבטחה."
                 )
-
+                if (hasExistingCode) {
+                    OutlinedTextField(
+                        value = oldCode,
+                        onValueChange = { oldCode = it.filter(Char::isDigit).take(12) },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                        visualTransformation = PasswordVisualTransformation(),
+                        label = { Text("קוד נוכחי") }
+                    )
+                }
                 OutlinedTextField(
                     value = newCode,
                     onValueChange = {
@@ -1208,37 +1248,28 @@ private fun ChangeAccessCodeDialog(
                         error = ""
                     },
                     singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.NumberPassword
-                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                     visualTransformation = PasswordVisualTransformation(),
                     label = { Text("קוד חדש, לפחות 4 ספרות") },
                     isError = error.isNotBlank(),
-                    supportingText = {
-                        if (error.isNotBlank()) Text(error)
-                    }
+                    supportingText = { if (error.isNotBlank()) Text(error) }
                 )
             }
         },
         confirmButton = {
-            Button(
-                onClick = {
-                    when {
-                        !store.verify(oldCode) -> error = "הקוד הנוכחי שגוי"
-                        newCode.length < 4 -> error = "הקוד החדש קצר מדי"
-                        !store.changeCode(newCode) -> error = "לא ניתן לשמור את הקוד"
-                        else -> onSaved()
-                    }
+            Button(onClick = {
+                when {
+                    hasExistingCode && !store.verify(oldCode) -> error = "הקוד הנוכחי שגוי"
+                    !allowNoExistingCode && !hasExistingCode -> error = "יש להגדיר קוד מנהל"
+                    newCode.length < 4 -> error = "הקוד החדש קצר מדי"
+                    !store.changeCode(newCode) -> error = "לא ניתן לשמור את הקוד"
+                    else -> onSaved()
                 }
-            ) {
-                Text("שמור")
+            }) {
+                Text(if (hasExistingCode) "שמור" else "הגדר קוד")
             }
         },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("ביטול")
-            }
-        }
+        dismissButton = { TextButton(onClick = onDismiss) { Text("ביטול") } }
     )
 }
 
@@ -1246,14 +1277,10 @@ private fun ChangeAccessCodeDialog(
 @Composable
 private fun SettingsScreen(
     prefs: BrowserPrefs,
-    route: BrowserRoute,
+    securityHasCode: Boolean,
     onPrefsChange: (BrowserPrefs) -> Unit,
-    onChangeRoute: () -> Unit,
-    onChangeCode: () -> Unit,
-    onDeviceOwnerInstructions: () -> Unit,
+    onOpenSecurity: () -> Unit,
     onSiteRequest: () -> Unit,
-    onWeeklyLockChange: (List<WeeklyLockWindow>) -> Unit,
-    onSensitiveChange: (() -> Unit) -> Unit,
     onBack: () -> Unit
 ) {
     Scaffold(
@@ -1269,170 +1296,57 @@ private fun SettingsScreen(
         }
     ) { padding ->
         LazyColumn(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 12.dp),
+            Modifier.fillMaxSize().padding(padding).padding(horizontal = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(bottom = 24.dp)
         ) {
             item {
                 SettingsHeader(
-                    "אבטחה וסינון המכשיר",
-                    "הגדרות הסינון והגישה למכשיר מוגנות בקוד גישה."
+                    "אבטחה ומאבטח",
+                    "כל הגדרות ההגנה, הסינון, המסלול וקוד המנהל נמצאות בתוך תיקייה מוגנת אחת."
                 )
             }
-
             item {
-                ElevatedCard(Modifier.fillMaxWidth()) {
+                OutlinedCard(modifier = Modifier.fillMaxWidth(), onClick = onOpenSecurity) {
                     Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(14.dp),
+                        Modifier.fillMaxWidth().padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(Icons.Default.Lock, contentDescription = null)
-                        Spacer(Modifier.size(10.dp))
-
+                        Spacer(Modifier.size(12.dp))
                         Column(Modifier.weight(1f)) {
+                            Text("🔐 תיקיית אבטחה ומאבטח", fontWeight = FontWeight.Bold)
                             Text(
-                                route.title + " — " + route.description,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                "הגישה למסלול מוגנת בקוד",
+                                if (securityHasCode) {
+                                    "מוגנת בקוד מנהל • כל הגדרות האבטחה נמצאות כאן"
+                                } else {
+                                    "אין קוד מנהל עדיין • בכניסה הראשונה תתבקש להגדיר קוד"
+                                },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-
-                        OutlinedButton(onClick = onChangeRoute) {
-                            Text("שינוי")
-                        }
+                        TextButton(onClick = onOpenSecurity) { Text("כניסה") }
                     }
                 }
-            }
-
-            item {
-                OutlinedCard(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = onChangeCode
-                ) {
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(14.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(Icons.Default.SwapHoriz, contentDescription = null)
-                        Spacer(Modifier.size(10.dp))
-
-                        Column(Modifier.weight(1f)) {
-                            Text("קוד גישה", fontWeight = FontWeight.SemiBold)
-                            Text(
-                                "שנה את הקוד שמגן על החלפת מסלולים",
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
-                    }
-                }
-            }
-
-            item { SettingsHeader("הגנת המכשיר", "הגנה ברמת Android — פעילה לאחר הגדרת האפליקציה כבעלת המכשיר") }
-            item {
-                val owner = DeviceManagement.isDeviceOwner(LocalContext.current)
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SettingInfo(
-                        "מצב הגנה על האפליקציה",
-                        if (owner) "האפליקציה מוגדרת כבעלת המכשיר ואינה ניתנת להסרה רגילה" else "טרם הוגדרה כבעלת המכשיר"
-                    )
-                    OutlinedButton(onClick = onDeviceOwnerInstructions, modifier = Modifier.fillMaxWidth()) {
-                        Text("הוראות הפעלה והגדרת בעל המכשיר")
-                    }
-                }
-            }
-
-            item { SettingsHeader("הגנת הגלישה", "שליטה נוספת על הגלישה והגישה") }
-            item {
-                SettingSwitch("חסימת פתיחה באפליקציות חיצוניות", "מונע מעבר מאושר לאפליקציות אחרות.", prefs.blockExternalApps) {
-                    onSensitiveChange { onPrefsChange(prefs.copy(blockExternalApps = it)) }
-                }
-            }
-            item {
-                SettingSwitch("חסימת חלונות קופצים", "מונע פתיחת חלונות חדשים מתוך האתר.", prefs.blockPopups) {
-                    onSensitiveChange { onPrefsChange(prefs.copy(blockPopups = it)) }
-                }
-            }
-            item {
-                SettingSwitch("השבתת JavaScript", "הגנה מחמירה יותר; חלק מהאתרים עלולים לא לעבוד.", prefs.disableJavascript) {
-                    onSensitiveChange { onPrefsChange(prefs.copy(disableJavascript = it)) }
-                }
-            }
-            item {
-                SettingSwitch("מניעת צילומי מסך", "מפעיל FLAG_SECURE של Android.", prefs.preventScreenshots) {
-                    onSensitiveChange { onPrefsChange(prefs.copy(preventScreenshots = it)) }
-                }
-            }
-            item {
-                SettingSwitch("ניקוי בעת יציאה", "נקה את מצב הגלישה בעת יציאה.", prefs.clearOnExit) {
-                    onSensitiveChange { onPrefsChange(prefs.copy(clearOnExit = it)) }
-                }
-            }
-            item {
-                WeeklyLockScheduleSetting(prefs.weeklyLockWindows, onWeeklyLockChange)
             }
 
             item { SettingsHeader("זמן ותאריך", "שעון פנימי לתצוגה באפליקציה") }
+            item { SettingSwitch("הצג שעון", "מציג את השעה בסרגל העליון.", prefs.showAppClock) { onPrefsChange(prefs.copy(showAppClock = it)) } }
+            item { SettingSwitch("פורמט 24 שעות", "18:30 במקום 6:30 PM.", prefs.timeFormat24) { onPrefsChange(prefs.copy(timeFormat24 = it)) } }
             item {
-                SettingSwitch("הצג שעון", "מציג את השעה בסרגל העליון.", prefs.showAppClock) {
-                    onPrefsChange(prefs.copy(showAppClock = it))
-                }
-            }
-            item {
-                SettingSwitch("פורמט 24 שעות", "18:30 במקום 6:30 PM.", prefs.timeFormat24) {
-                    onPrefsChange(prefs.copy(timeFormat24 = it))
-                }
-            }
-            item {
-                SettingInfo("כוונון זמן", if (prefs.timeOffsetMinutes == 0) "מסונכרן לזמן המכשיר" else "הסטה של " + prefs.timeOffsetMinutes + " דקות")
+                SettingInfo(
+                    "כוונון זמן",
+                    if (prefs.timeOffsetMinutes == 0) "מסונכרן לזמן המכשיר" else "הסטה של " + prefs.timeOffsetMinutes + " דקות"
+                )
             }
 
             item { SettingsHeader("עיצוב", "התאם את המראה, הצפיפות והקריאה") }
-            item {
-                SettingSwitch(
-                    "מצב כהה",
-                    "ממשק כהה",
-                    prefs.dark
-                ) { onPrefsChange(prefs.copy(dark = it)) }
-            }
-            item {
-                SettingSwitch(
-                    "ניגודיות גבוהה",
-                    "טקסט ורקע עם ניגודיות חזקה",
-                    prefs.highContrast
-                ) { onPrefsChange(prefs.copy(highContrast = it)) }
-            }
-            item {
-                SettingSwitch(
-                    "טקסט גדול",
-                    "מגדיל את הטקסט ברשימת האתרים",
-                    prefs.largeText
-                ) { onPrefsChange(prefs.copy(largeText = it)) }
-            }
-            item {
-                SettingSwitch(
-                    "כרטיסים מעוגלים",
-                    "עיצוב מודרני לכרטיסי האתרים",
-                    prefs.roundedCards
-                ) { onPrefsChange(prefs.copy(roundedCards = it)) }
-            }
-            item {
-                SettingSwitch(
-                    "תצוגה קומפקטית",
-                    "מציג יותר אתרים על המסך",
-                    prefs.compact
-                ) { onPrefsChange(prefs.copy(compact = it)) }
-            }
+            item { SettingSwitch("מצב כהה", "ממשק כהה", prefs.dark) { onPrefsChange(prefs.copy(dark = it)) } }
+            item { SettingSwitch("ניגודיות גבוהה", "טקסט ורקע עם ניגודיות חזקה", prefs.highContrast) { onPrefsChange(prefs.copy(highContrast = it)) } }
+            item { SettingSwitch("טקסט גדול", "מגדיל את הטקסט ברשימת האתרים", prefs.largeText) { onPrefsChange(prefs.copy(largeText = it)) } }
+            item { SettingSwitch("כרטיסים מעוגלים", "עיצוב מודרני לכרטיסי האתרים", prefs.roundedCards) { onPrefsChange(prefs.copy(roundedCards = it)) } }
+            item { SettingSwitch("תצוגה קומפקטית", "מציג יותר אתרים על המסך", prefs.compact) { onPrefsChange(prefs.copy(compact = it)) } }
 
             item { SettingsHeader("בקשות למפתח", "שלח בקשה לאתר שאינו מאושר או דיווח על אתר") }
             item {
@@ -1444,58 +1358,111 @@ private fun SettingsScreen(
             }
 
             item { SettingsHeader("רשימת האתרים", "שליטה במה שמוצג במסך הבית") }
-            item {
-                SettingSwitch(
-                    "הצג כתובות",
-                    "מציג את הכתובת המלאה",
-                    prefs.showUrls
-                ) { onPrefsChange(prefs.copy(showUrls = it)) }
-            }
-            item {
-                SettingSwitch(
-                    "הצג קטגוריות",
-                    "מציג את קטגוריית האתר",
-                    prefs.showCategories
-                ) { onPrefsChange(prefs.copy(showCategories = it)) }
-            }
+            item { SettingSwitch("הצג כתובות", "מציג את הכתובת המלאה", prefs.showUrls) { onPrefsChange(prefs.copy(showUrls = it)) } }
+            item { SettingSwitch("הצג קטגוריות", "מציג את קטגוריית האתר", prefs.showCategories) { onPrefsChange(prefs.copy(showCategories = it)) } }
 
-            item { SettingsHeader("גלישה ובטיחות", "הגנות הגלישה נשארות פעילות") }
-            item {
-                SettingInfo(
-                    "גישה לפי המסלול",
-                    "הדפדפן מאמת את הכתובת גם בזמן ניווט פנימי."
-                )
-            }
-            item {
-                SettingInfo(
-                    "חסימת מדיה",
-                    "תמונות, וידאו ואודיו נחסמים לפי מנגנון ההגנה הקיים."
-                )
-            }
-            item {
-                SettingInfo(
-                    "מועדפים",
-                    "המועדפים נשמרים מקומית במכשיר."
-                )
-            }
+            item { SettingsHeader("גלישה ובטיחות", "מצב ההגנות הפעילות") }
+            item { SettingInfo("גישה לפי המסלול", "הדפדפן מאמת את הכתובת גם בזמן ניווט פנימי.") }
+            item { SettingInfo("חסימת מדיה", "תמונות, וידאו ואודיו נחסמים לפי מנגנון ההגנה הקיים.") }
+            item { SettingInfo("מועדפים", "המועדפים נשמרים מקומית במכשיר.") }
 
             item { SettingsHeader("אודות", "מידע על האפליקציה") }
             item {
                 ElevatedCard(Modifier.fillMaxWidth()) {
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
+                    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text("דפדפן מאושר", fontWeight = FontWeight.Bold)
-                        Text(
-                            "פותח באהבה ע\"י חייא שיאומי ממתמחים טופ",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        Text("פותח באהבה ע"י חייא שיאומי ממתמחים טופ", style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SecuritySettingsScreen(
+    prefs: BrowserPrefs,
+    route: BrowserRoute,
+    onPrefsChange: (BrowserPrefs) -> Unit,
+    onChangeRoute: () -> Unit,
+    onChangeCode: () -> Unit,
+    onDeviceOwnerInstructions: () -> Unit,
+    onWeeklyLockChange: (List<WeeklyLockWindow>) -> Unit,
+    onBack: () -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("🔐 אבטחה ומאבטח", fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "חזור")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        LazyColumn(
+            Modifier.fillMaxSize().padding(padding).padding(horizontal = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(bottom = 24.dp)
+        ) {
+            item {
+                SettingsHeader(
+                    "הגנה מרכזית",
+                    "כל ההגדרות בעמוד הזה נפתחות רק לאחר אימות קוד המנהל של תיקיית האבטחה."
+                )
+            }
+            item {
+                ElevatedCard(Modifier.fillMaxWidth()) {
+                    Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Lock, contentDescription = null)
+                        Spacer(Modifier.size(10.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(route.title + " — " + route.description, fontWeight = FontWeight.Bold)
+                            Text("מסלול הסינון הפעיל", style = MaterialTheme.typography.bodySmall)
+                        }
+                        OutlinedButton(onClick = onChangeRoute) { Text("שינוי") }
+                    }
+                }
+            }
+            item {
+                OutlinedCard(modifier = Modifier.fillMaxWidth(), onClick = onChangeCode) {
+                    Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.SwapHoriz, contentDescription = null)
+                        Spacer(Modifier.size(10.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text("קוד מנהל", fontWeight = FontWeight.SemiBold)
+                            Text("קוד אחד שמגן על תיקיית האבטחה וכל ההגדרות שבתוכה", style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                }
+            }
+
+            item { SettingsHeader("הגנת המכשיר", "הגנה ברמת Android") }
+            item {
+                val owner = DeviceManagement.isDeviceOwner(LocalContext.current)
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SettingInfo(
+                        "מצב בעל המכשיר",
+                        if (owner) "האפליקציה מוגדרת כבעלת המכשיר ואינה ניתנת להסרה רגילה"
+                        else "טרם הוגדרה כבעלת המכשיר"
+                    )
+                    OutlinedButton(onClick = onDeviceOwnerInstructions, modifier = Modifier.fillMaxWidth()) {
+                        Text("הוראות הפעלה והגדרת בעל המכשיר")
+                    }
+                }
+            }
+
+            item { SettingsHeader("הגנת הגלישה", "כל ההגנות כאן כפופות לקוד המנהל של תיקיית האבטחה") }
+            item { SettingSwitch("חסימת פתיחה באפליקציות חיצוניות", "מונע מעבר מאושר לאפליקציות אחרות.", prefs.blockExternalApps) { onPrefsChange(prefs.copy(blockExternalApps = it)) } }
+            item { SettingSwitch("חסימת חלונות קופצים", "מונע פתיחת חלונות חדשים מתוך האתר.", prefs.blockPopups) { onPrefsChange(prefs.copy(blockPopups = it)) } }
+            item { SettingSwitch("השבתת JavaScript", "הגנה מחמירה יותר; חלק מהאתרים עלולים לא לעבוד.", prefs.disableJavascript) { onPrefsChange(prefs.copy(disableJavascript = it)) } }
+            item { SettingSwitch("מניעת צילומי מסך", "מפעיל FLAG_SECURE של Android.", prefs.preventScreenshots) { onPrefsChange(prefs.copy(preventScreenshots = it)) } }
+            item { SettingSwitch("ניקוי בעת יציאה", "נקה את מצב הגלישה בעת יציאה.", prefs.clearOnExit) { onPrefsChange(prefs.copy(clearOnExit = it)) } }
+            item { WeeklyLockScheduleSetting(prefs.weeklyLockWindows, onWeeklyLockChange) }
+            item { SettingInfo("הערה", "ההגנות בתיקייה הזו ממשיכות לפעול גם אחרי יציאה מהמסך.") }
         }
     }
 }
