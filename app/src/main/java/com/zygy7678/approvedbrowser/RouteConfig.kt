@@ -21,14 +21,8 @@ fun BrowserRoute.allows(site: Site): Boolean = when (this) {
 class AccessCodeStore(context: Context) {
     private val prefs = context.getSharedPreferences("browser_access", Context.MODE_PRIVATE)
 
-    init {
-        // גרסאות קודמות יצרו אוטומטית את הקוד 2468. העדכון מסיר רק את ברירת המחדל הישנה.
-        val stored = prefs.getString("code_hash", null)
-        if (stored == sha256("2468")) {
-            prefs.edit().remove("code_hash").apply()
-        }
-    }
-
+    // בהתקנה חדשה אין קוד גישה אוטומטי. קוד קיים מגרסה קודמת נשמר כדי לא לנעול משתמש קיים.
+    
     fun hasCode(): Boolean =
         !prefs.getString("code_hash", null).isNullOrBlank()
 
