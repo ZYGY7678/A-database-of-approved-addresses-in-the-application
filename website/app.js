@@ -216,13 +216,9 @@
       } else {
         const installed = await getInstalledVersion();
         if (installed.versionCode < LATEST_VERSION_CODE) {
-          log("נמצאה גרסה " + installed.versionCode + " במכשיר. הגרסה העדכנית היא " + LATEST_VERSION_CODE + ".");
-          await installBundledApk("עדכון לגרסה העדכנית");
-          const afterUpdate = await getInstalledVersion();
-          if (afterUpdate.versionCode < LATEST_VERSION_CODE) {
-            throw new Error("העדכון הסתיים אבל הגרסה העדכנית עדיין לא מזוהה במכשיר.");
-          }
-          log("✓ האפליקציה עודכנה לגרסה " + afterUpdate.versionName + " (" + afterUpdate.versionCode + ").");
+          log("נמצאה גרסה " + installed.versionCode + " במכשיר. הגרסה העדכנית באתר היא " + LATEST_VERSION_CODE + ".");
+          log("⚠ לא מעדכן אוטומטית בשלב החיבור: אם האפליקציה היא Device Owner, Android עלול לדחות APK שנחתם במפתח אחר.");
+          log("✓ משאיר את האפליקציה הקיימת כדי לאפשר את פעולת שחרור מנהל המכשיר.");
         } else {
           log("✓ האפליקציה כבר מעודכנת לגרסה " + installed.versionName + " (" + installed.versionCode + ").");
         }
