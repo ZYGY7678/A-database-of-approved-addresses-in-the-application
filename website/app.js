@@ -13,7 +13,40 @@
   const setupBtn = document.getElementById("setup");
   const codeEl = document.getElementById("code");
   const confirmEl = document.getElementById("confirm");
+  const selectedRouteNoticeEl = document.getElementById("selectedRouteNotice");
+  const routeButtons = [...document.querySelectorAll(".route-option")];
   const APK_URL = "ApprovedBrowser.apk";
+
+  const ROUTES = {
+    ETROG: {
+      title: "אתרוג",
+      summary: "אתרים חיוניים ומאושרים בלבד"
+    },
+    HADASS: {
+      title: "הדס",
+      summary: "אתרים מאושרים + AI, בלי חדשות ופורומים"
+    },
+    LULAV: {
+      title: "לולב",
+      summary: "כל האתרים המאושרים, כולל תמונות"
+    }
+  };
+
+  let selectedRoute = "ETROG";
+
+  function selectRoute(route) {
+    if (!ROUTES[route]) return;
+    selectedRoute = route;
+    routeButtons.forEach(button => {
+      const selected = button.dataset.route === route;
+      button.classList.toggle("selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
+    });
+    if (selectedRouteNoticeEl) {
+      selectedRouteNoticeEl.innerHTML =
+        "המסלול שנבחר: <b>" + ROUTES[route].title + "</b> — " + ROUTES[route].summary;
+    }
+  }
 
   let transport = null;
   let adb = null;
@@ -294,7 +327,9 @@
       setStatus("מעביר את קוד הגישה לאפליקציה...", "מגדיר קוד");
       const encoded = base64Utf8(accessCode);
       const startResult = await runShell(
-        "am start -n " + PACKAGE + "/.MainActivity --es setup_access_code_b64 " + encoded
+        "am start -n " + PACKAGE +
+        "/.MainActivity --es setup_access_code_b64 " + encoded +
+        " --es setup_route " + selectedRoute
       );
 
       if (/error|exception|unable to/i.test(startResult)) {
@@ -304,6 +339,7 @@
       setStatus("ההגדרה הושלמה", "הושלם", true);
       setupNoticeEl.textContent = "ההגדרה הושלמה. דפדפן מאושר הופעל וקוד הגישה הוגדר.";
       log("קוד הגישה הועבר ישירות למכשיר.");
+      log("המסלול שנבחר: " + ROUTES[selectedRoute].title + ".");
       log("דפדפן מאושר הופעל.");
     } catch (error) {
       const message = normalizeError(error);
@@ -330,6 +366,10 @@
 
   document.getElementById("connect").addEventListener("click", connectDevice);
   document.getElementById("setup").addEventListener("click", setupDeviceOwner);
+  routeButtons.forEach(button => {
+    button.addEventListener("click", () => selectRoute(button.dataset.route));
+  });
+  selectRoute(selectedRoute);
 
 
   try {
