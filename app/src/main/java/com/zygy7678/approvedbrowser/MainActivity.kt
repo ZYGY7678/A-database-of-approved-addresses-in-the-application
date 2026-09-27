@@ -1482,10 +1482,13 @@ private fun SecuritySettingsScreen(
             }
 
             item { SettingsHeader("הגנת הגלישה", "כל ההגנות כאן כפופות לקוד המנהל של תיקיית האבטחה") }
-            item { SettingSwitch("הגדר כדפדפן ברירת מחדל", "מגדיר את דפדפן מאושר כמטפל הקבוע בקישורי HTTP ו־HTTPS.", prefs.defaultBrowser, enabled = deviceOwner) {
-                onPrefsChange(prefs.copy(defaultBrowser = it))
-                DeviceManagement.applyDefaultBrowserPolicy(LocalContext.current, it)
-            } }
+            item {
+                val context = LocalContext.current
+                SettingSwitch("הגדר כדפדפן ברירת מחדל", "מגדיר את דפדפן מאושר כמטפל הקבוע בקישורי HTTP ו־HTTPS.", prefs.defaultBrowser, enabled = deviceOwner) {
+                    onPrefsChange(prefs.copy(defaultBrowser = it))
+                    DeviceManagement.applyDefaultBrowserPolicy(context, it)
+                }
+            }
             item { SettingSwitch("חסימת פתיחה באפליקציות חיצוניות", "מונע מעבר מאושר לאפליקציות אחרות.", prefs.blockExternalApps, enabled = deviceOwner) { onPrefsChange(prefs.copy(blockExternalApps = it)) } }
             item { SettingSwitch("חסימת חלונות קופצים", "מונע פתיחת חלונות חדשים מתוך האתר.", prefs.blockPopups, enabled = deviceOwner) { onPrefsChange(prefs.copy(blockPopups = it)) } }
             item { SettingSwitch("השבתת JavaScript", "הגנה מחמירה יותר; חלק מהאתרים עלולים לא לעבוד.", prefs.disableJavascript, enabled = deviceOwner) { onPrefsChange(prefs.copy(disableJavascript = it)) } }
