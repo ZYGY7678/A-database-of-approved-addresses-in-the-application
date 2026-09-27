@@ -341,13 +341,18 @@
       log("בודק אם כבר מוגדר Device Owner...");
 
       const owners = await runShell("dpm list-owners");
-      // "dpm list-owners" reports owners for all users. A Profile Owner can
-      // live on a managed-profile user, so querying only user 0 is insufficient.
+      // Check the complete device-policy state. A Profile Owner may belong
+      // to a managed-profile user, and some Android builds do not print the
+      // literal words "Profile Owner" in dpm list-owners.
+      const policy = await runShell("dumpsys device_policy");
       const ownerPackages = [...owners.matchAll(/ComponentInfo\{([^/}\s]+)\/[^}]*\}/g)]
         .map(match => match[1])
         .filter(Boolean);
       const hasOurOwner = ownerPackages.includes(PACKAGE);
-      const hasProfileOwner = /profile owner/i.test(owners);
+      const hasProfileOwner =
+        /profile owner/i.test(owners) ||
+        /profileowner|profile_owner|mProfileOwner/i.test(policy) ||
+        /managed profile/i.test(policy);
 
       log("מצב בעל המכשיר: " + (ownerPackages.length ? ownerPackages.join(", ") : "לא נמצא בעל מכשיר"));
       log("בדיקת Profile Owner: " + (hasProfileOwner ? "נמצא פרופיל מנוהל" : "לא נמצא Profile Owner"));
@@ -364,6 +369,12 @@
         log("שולח את פקודת Device Owner ישירות לטלפון...");
         const result = await runShell("dpm set-device-owner " + ADMIN);
 
+        if (/already has a profile owner/i.test(result)) {
+          throw new Error(
+            "Android מדווח שכבר מוגדר Profile Owner במכשיר. אי אפשר להגדיר Device Owner במצב הזה. " +
+            "יש להסיר קודם את פרופיל העבודה/הניהול הקיים, או להשתמש במכשיר לאחר איפוס מלא."
+          );
+        }
         if (/(error|exception|failed|failure|not allowed|unknown)/i.test(result)) {
           throw new Error(result || "Android דחה את הגדרת Device Owner.");
         }
@@ -408,6 +419,7 @@
     if (/failed to fetch|networkerror|cors/i.test(raw)) return "לא ניתן להוריד את האפליקציה מהאתר. רענן את הדף ונסה שוב.";
     if (/INSTALL_FAILED|INSTALL_PARSE_FAILED|INSTALL_FAILED_VERSION_DOWNGRADE/i.test(raw)) return "Android דחה את התקנת האפליקציה. אם קיימת גרסה חתומה אחרת, הסר אותה או התקן מחדש את הגרסה הנוכחית.";
     if (/access|permission|security/i.test(raw)) return "הגישה ל־USB נחסמה. אשר את חלון ה־USB בדפדפן ואת הרשאת ניפוי ה־USB בטלפון.";
+    if (/already has a profile owner/i.test(raw)) return "Android מדווח שכבר מוגדר Profile Owner במכשיר. יש להסיר קודם את פרופיל העבודה/הניהול הקיים, או להשתמש במכשיר לאחר איפוס מלא.";
     if (/auth|unauthorized|RSA/i.test(raw)) return "הטלפון לא אישר את מפתח ה־RSA. אשר את חלון 'אפשר ניפוי USB' בטלפון ונסה שוב.";
     return raw;
   }
