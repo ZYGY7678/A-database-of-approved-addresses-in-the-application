@@ -17,7 +17,7 @@
   const confirmEl = document.getElementById("confirm");
   const selectedRouteNoticeEl = document.getElementById("selectedRouteNotice");
   const routeButtons = [...document.querySelectorAll(".route-option")];
-  const APK_URL = "https://github.com/ZYGY7678/A-database-of-approved-addresses-in-the-application/releases/download/latest/app-debug.apk";
+  const APK_URL = "./app-debug.apk";
   const LATEST_VERSION_CODE = 2;
   const LATEST_VERSION_NAME = "1.0.1";
 
