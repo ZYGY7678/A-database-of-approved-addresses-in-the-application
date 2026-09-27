@@ -8,4 +8,7 @@
     <AssemblyName>ApprovedBrowser.AdbTool</AssemblyName>
     <RootNamespace>ApprovedBrowser.AdbTool</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\ApprovedBrowser.apk" LogicalName="ApprovedBrowser.Apk" />
+  </ItemGroup>
 </Project>
