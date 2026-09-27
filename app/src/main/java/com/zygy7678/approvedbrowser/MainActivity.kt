@@ -86,6 +86,52 @@ import androidx.compose.ui.input.pointer.pointerInput
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+private data class WeeklyLockWindow(
+    val days: Set<Int>,
+    val startMinutes: Int,
+    val endMinutes: Int
+)
+
+private fun encodeWeeklyLockWindows(windows: List<WeeklyLockWindow>): String =
+    windows.joinToString(";") { window ->
+        window.days.sorted().joinToString(",") + "|" + window.startMinutes + "|" + window.endMinutes
+    }
+
+private fun decodeWeeklyLockWindows(value: String): List<WeeklyLockWindow> =
+    value.split(";").mapNotNull { item ->
+        val parts = item.split("|")
+        if (parts.size != 3) return@mapNotNull null
+        val days = parts[0].split(",").mapNotNull { it.toIntOrNull() }.filter { it in 1..7 }.toSet()
+        val start = parts[1].toIntOrNull()
+        val end = parts[2].toIntOrNull()
+        if (days.isEmpty() || start == null || end == null || start !in 0..1439 || end !in 0..1439) null
+        else WeeklyLockWindow(days, start, end)
+    }
+
+private fun isWeeklyLockActive(
+    windows: List<WeeklyLockWindow>,
+    now: java.util.Calendar = java.util.Calendar.getInstance()
+): Boolean {
+    if (windows.isEmpty()) return false
+    val day = now.get(java.util.Calendar.DAY_OF_WEEK)
+    val minutes = now.get(java.util.Calendar.HOUR_OF_DAY) * 60 + now.get(java.util.Calendar.MINUTE)
+    val previousDay = if (day == java.util.Calendar.SUNDAY) java.util.Calendar.SATURDAY else day - 1
+
+    return windows.any { window ->
+        if (window.startMinutes == window.endMinutes) {
+            day in window.days
+        } else if (window.startMinutes < window.endMinutes) {
+            day in window.days && minutes >= window.startMinutes && minutes < window.endMinutes
+        } else {
+            (day in window.days && minutes >= window.startMinutes) ||
+                (previousDay in window.days && minutes < window.endMinutes)
+        }
+    }
+}
+
+private fun formatLockMinutes(minutes: Int): String =
+    "%02d:%02d".format(minutes / 60, minutes % 60)
+
 private data class BrowserPrefs(
     val dark: Boolean = false,
     val highContrast: Boolean = false,
@@ -99,6 +145,7 @@ private data class BrowserPrefs(
     val timeFormat24: Boolean = true,
     val timeOffsetMinutes: Int = 0,
     val autoLockMinutes: Int = 0,
+    val weeklyLockWindows: List<WeeklyLockWindow> = emptyList(),
     val clearOnExit: Boolean = false,
     val blockExternalApps: Boolean = true,
     val preventScreenshots: Boolean = true,
@@ -121,6 +168,7 @@ private class PrefStore(context: Context) {
         timeFormat24 = p.getBoolean("timeFormat24", true),
         timeOffsetMinutes = p.getInt("timeOffsetMinutes", 0),
         autoLockMinutes = p.getInt("autoLockMinutes", 0),
+        weeklyLockWindows = decodeWeeklyLockWindows(p.getString("weeklyLockWindows", "") ?: ""),
         clearOnExit = p.getBoolean("clearOnExit", false),
         blockExternalApps = p.getBoolean("blockExternalApps", true),
         preventScreenshots = p.getBoolean("preventScreenshots", true),
@@ -144,6 +192,7 @@ private class PrefStore(context: Context) {
             .putBoolean("timeFormat24", v.timeFormat24)
             .putInt("timeOffsetMinutes", v.timeOffsetMinutes)
             .putInt("autoLockMinutes", v.autoLockMinutes)
+            .putString("weeklyLockWindows", encodeWeeklyLockWindows(v.weeklyLockWindows))
             .putBoolean("clearOnExit", v.clearOnExit)
             .putBoolean("blockExternalApps", v.blockExternalApps)
             .putBoolean("preventScreenshots", v.preventScreenshots)
@@ -219,16 +268,12 @@ private fun ApprovedBrowserApp(
     var routeDialog by remember { mutableStateOf(false) }
     var changeCodeDialog by remember { mutableStateOf(false) }
     var deviceOwnerInstructionsDialog by remember { mutableStateOf(false) }
-    var appLocked by remember { mutableStateOf(false) }
-    var lastActivity by remember { mutableStateOf(System.currentTimeMillis()) }
-    val activityCallback = rememberUpdatedState { lastActivity = System.currentTimeMillis() }
+    var appLocked by remember { mutableStateOf(isWeeklyLockActive(prefs.weeklyLockWindows)) }
 
-    LaunchedEffect(prefs.autoLockMinutes, lastActivity) {
-        if (prefs.autoLockMinutes > 0 && !appLocked) {
-            delay(prefs.autoLockMinutes * 60_000L)
-            if (System.currentTimeMillis() - lastActivity >= prefs.autoLockMinutes * 60_000L) {
-                appLocked = true
-            }
+    LaunchedEffect(prefs.weeklyLockWindows) {
+        while (true) {
+            appLocked = isWeeklyLockActive(prefs.weeklyLockWindows)
+            delay(15_000L)
         }
     }
     val categories = remember(availableSites) {
@@ -243,18 +288,7 @@ private fun ApprovedBrowserApp(
         }
     }
 
-    Box(
-        Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                awaitPointerEventScope {
-                    while (true) {
-                        awaitPointerEvent()
-                        activityCallback.value.invoke()
-                    }
-                }
-            }
-    ) {
+    Box(Modifier.fillMaxSize()) {
     if (settings) {
         SettingsScreen(
             prefs = prefs,
@@ -1089,8 +1123,8 @@ private fun SettingsScreen(
                 }
             }
             item {
-                AutoLockSetting(prefs.autoLockMinutes) { minutes ->
-                    onPrefsChange(prefs.copy(autoLockMinutes = minutes))
+                WeeklyLockScheduleSetting(prefs.weeklyLockWindows) { windows ->
+                    onPrefsChange(prefs.copy(weeklyLockWindows = windows))
                 }
             }
 
@@ -1248,29 +1282,147 @@ private fun SettingSwitch(
 }
 
 @Composable
-private fun AutoLockSetting(
-    selectedMinutes: Int,
-    onChange: (Int) -> Unit
+private fun WeeklyLockScheduleSetting(
+    windows: List<WeeklyLockWindow>,
+    onChange: (List<WeeklyLockWindow>) -> Unit
 ) {
+    var dialog by remember { mutableStateOf(false) }
+
     ElevatedCard(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("נעילה אוטומטית לפי זמן", fontWeight = FontWeight.SemiBold)
+            Text("נעילה לפי לוח זמנים", fontWeight = FontWeight.SemiBold)
             Text(
-                if (selectedMinutes == 0) "כבוי" else "נועל את האפליקציה לאחר $selectedMinutes דקות ללא פעילות",
+                if (windows.isEmpty()) "כבוי — האפליקציה אינה נעולה לפי שעות"
+                else "${windows.size} טווחי נעילה מוגדרים לשבוע",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                listOf(0, 5, 10, 30, 60).forEach { minutes ->
-                    FilterChip(
-                        selected = selectedMinutes == minutes,
-                        onClick = { onChange(minutes) },
-                        label = { Text(if (minutes == 0) "כבוי" else "$minutes דק׳") }
-                    )
+
+            windows.forEach { window ->
+                val daysText = window.days.sorted().joinToString(" ") { dayName(it) }
+                OutlinedCard(Modifier.fillMaxWidth()) {
+                    Row(
+                        Modifier.fillMaxWidth().padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text(daysText, fontWeight = FontWeight.SemiBold)
+                            Text(
+                                "${formatLockMinutes(window.startMinutes)} – ${formatLockMinutes(window.endMinutes)}",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                        TextButton(onClick = {
+                            onChange(windows.filterNot { it == window })
+                        }) { Text("הסר") }
+                    }
+                }
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = { dialog = true }) { Text("הוסף טווח") }
+                if (windows.isNotEmpty()) {
+                    OutlinedButton(onClick = { onChange(emptyList()) }) { Text("נקה הכול") }
                 }
             }
         }
     }
+
+    if (dialog) {
+        WeeklyLockWindowDialog(
+            onDismiss = { dialog = false },
+            onAdd = {
+                onChange(windows + it)
+                dialog = false
+            }
+        )
+    }
+}
+
+private fun dayName(day: Int): String = when (day) {
+    java.util.Calendar.SUNDAY -> "א׳"
+    java.util.Calendar.MONDAY -> "ב׳"
+    java.util.Calendar.TUESDAY -> "ג׳"
+    java.util.Calendar.WEDNESDAY -> "ד׳"
+    java.util.Calendar.THURSDAY -> "ה׳"
+    java.util.Calendar.FRIDAY -> "ו׳"
+    java.util.Calendar.SATURDAY -> "ש׳"
+    else -> "?"
+}
+
+@Composable
+private fun WeeklyLockWindowDialog(
+    onDismiss: () -> Unit,
+    onAdd: (WeeklyLockWindow) -> Unit
+) {
+    var selectedDays by remember { mutableStateOf(setOf<Int>()) }
+    var start by remember { mutableStateOf("22:00") }
+    var end by remember { mutableStateOf("07:00") }
+    var error by remember { mutableStateOf("") }
+
+    fun parseTime(value: String): Int? {
+        val parts = value.trim().split(":")
+        if (parts.size != 2) return null
+        val h = parts[0].toIntOrNull() ?: return null
+        val m = parts[1].toIntOrNull() ?: return null
+        if (h !in 0..23 || m !in 0..59) return null
+        return h * 60 + m
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("הוספת זמן נעילה") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("בחר את הימים שבהם הטווח יחול:")
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    (java.util.Calendar.SUNDAY..java.util.Calendar.SATURDAY).forEach { day ->
+                        FilterChip(
+                            selected = day in selectedDays,
+                            onClick = {
+                                selectedDays = if (day in selectedDays) selectedDays - day
+                                else selectedDays + day
+                            },
+                            label = { Text(dayName(day)) }
+                        )
+                    }
+                }
+                OutlinedTextField(
+                    value = start,
+                    onValueChange = { start = it.filter { c -> c.isDigit() || c == ':' }.take(5) },
+                    singleLine = true,
+                    label = { Text("שעת התחלה — HH:MM") }
+                )
+                OutlinedTextField(
+                    value = end,
+                    onValueChange = { end = it.filter { c -> c.isDigit() || c == ':' }.take(5) },
+                    singleLine = true,
+                    label = { Text("שעת סיום — HH:MM") }
+                )
+                Text(
+                    "אפשר להגדיר גם 22:00–07:00 — הנעילה תמשיך אוטומטית אחרי חצות.",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                if (error.isNotBlank()) {
+                    Text(error, color = MaterialTheme.colorScheme.error)
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = {
+                val startMinutes = parseTime(start)
+                val endMinutes = parseTime(end)
+                when {
+                    selectedDays.isEmpty() -> error = "בחר לפחות יום אחד"
+                    startMinutes == null || endMinutes == null -> error = "הזן שעות בפורמט HH:MM"
+                    else -> onAdd(WeeklyLockWindow(selectedDays, startMinutes, endMinutes))
+                }
+            }) { Text("הוסף") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("ביטול") }
+        }
+    )
 }
 
 @Composable
@@ -1286,7 +1438,7 @@ private fun AppLockDialog(
         title = { Text("האפליקציה ננעלה") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("זמן הנעילה האוטומטית הסתיים. הזן את קוד הגישה כדי להמשיך.")
+                Text("האפליקציה נעולה כעת לפי לוח הזמנים. הזן את קוד הגישה כדי להמשיך.")
                 OutlinedTextField(
                     value = code,
                     onValueChange = { code = it.filter(Char::isDigit).take(12); error = false },
