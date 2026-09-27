@@ -13,8 +13,8 @@ enum class BrowserRoute(
 }
 
 fun BrowserRoute.allows(site: Site): Boolean = when (this) {
-    BrowserRoute.ETROG -> !site.isAi && !site.isForum
-    BrowserRoute.HADASS -> !site.isForum
+    BrowserRoute.ETROG -> !site.isAi && !site.isForum && !site.category.contains("חדשות")
+    BrowserRoute.HADASS -> !site.isForum && !site.category.contains("חדשות")
     BrowserRoute.LULAV -> true
 }
 
