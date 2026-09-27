@@ -155,7 +155,9 @@ private data class BrowserPrefs(
     val blockExternalApps: Boolean = true,
     val preventScreenshots: Boolean = true,
     val disableJavascript: Boolean = false,
-    val blockPopups: Boolean = true
+    val blockPopups: Boolean = true,
+    val lockedPackages: Set<String> = emptySet(),
+    val protectedUninstallPackages: Set<String> = emptySet()
 )
 
 private class PrefStore(context: Context) {
@@ -179,6 +181,8 @@ private class PrefStore(context: Context) {
         preventScreenshots = p.getBoolean("preventScreenshots", true),
         disableJavascript = p.getBoolean("disableJavascript", false),
         blockPopups = p.getBoolean("blockPopups", true),
+        lockedPackages = p.getStringSet("lockedPackages", emptySet()) ?: emptySet(),
+        protectedUninstallPackages = p.getStringSet("protectedUninstallPackages", emptySet()) ?: emptySet(),
         route = runCatching {
             BrowserRoute.valueOf(p.getString("route", BrowserRoute.ETROG.name) ?: BrowserRoute.ETROG.name)
         }.getOrDefault(BrowserRoute.ETROG)
@@ -203,6 +207,8 @@ private class PrefStore(context: Context) {
             .putBoolean("preventScreenshots", v.preventScreenshots)
             .putBoolean("disableJavascript", v.disableJavascript)
             .putBoolean("blockPopups", v.blockPopups)
+            .putStringSet("lockedPackages", v.lockedPackages)
+            .putStringSet("protectedUninstallPackages", v.protectedUninstallPackages)
             .putString("route", v.route.name)
             .apply()
     }
@@ -212,6 +218,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         DeviceManagement.enforcePolicies(this)
+        val initialPrefs = PrefStore(this).load()
+        DeviceManagement.applyManagedAppPolicies(this, initialPrefs.lockedPackages, initialPrefs.protectedUninstallPackages)
 
         val setupAccessCode = intent?.getStringExtra("setup_access_code_b64")
         if (!setupAccessCode.isNullOrBlank() && DeviceManagement.isDeviceOwner(this)) {
@@ -330,6 +338,10 @@ private fun ApprovedBrowserApp(
                 onDeviceOwnerInstructions = { deviceOwnerInstructionsDialog = true },
                 onWeeklyLockChange = { windows ->
                     onPrefsChange(prefs.copy(weeklyLockWindows = windows))
+                },
+                onManagedAppsChange = { locked, protected ->
+                    onPrefsChange(prefs.copy(lockedPackages = locked, protectedUninstallPackages = protected))
+                    DeviceManagement.applyManagedAppPolicies(context, locked, protected)
                 },
                 onBack = { securityFolderOpen = false }
             )
@@ -1397,6 +1409,7 @@ private fun SecuritySettingsScreen(
     onChangeCode: () -> Unit,
     onDeviceOwnerInstructions: () -> Unit,
     onWeeklyLockChange: (List<WeeklyLockWindow>) -> Unit,
+    onManagedAppsChange: (Set<String>, Set<String>) -> Unit,
     onBack: () -> Unit
 ) {
     val deviceOwner = DeviceManagement.isDeviceOwner(LocalContext.current)
@@ -1471,6 +1484,16 @@ private fun SecuritySettingsScreen(
             item { SettingSwitch("מניעת צילומי מסך", "מפעיל FLAG_SECURE של Android.", prefs.preventScreenshots, enabled = deviceOwner) { onPrefsChange(prefs.copy(preventScreenshots = it)) } }
             item { SettingSwitch("ניקוי בעת יציאה", "נקה את מצב הגלישה בעת יציאה.", prefs.clearOnExit, enabled = deviceOwner) { onPrefsChange(prefs.copy(clearOnExit = it)) } }
             item { WeeklyLockScheduleSetting(prefs.weeklyLockWindows, onWeeklyLockChange, enabled = deviceOwner) }
+
+            item { SettingsHeader("הגנת אפליקציות", "בחירת אפליקציות אחרות לנעילה ולמניעת הסרה") }
+            item {
+                ManagedAppsSetting(
+                    lockedPackages = prefs.lockedPackages,
+                    protectedUninstallPackages = prefs.protectedUninstallPackages,
+                    enabled = deviceOwner,
+                    onChange = onManagedAppsChange
+                )
+            }
             item { SettingInfo("הערה", "ההגנות בתיקייה הזו ממשיכות לפעול גם אחרי יציאה מהמסך.") }
         }
     }
@@ -1510,6 +1533,79 @@ private fun SettingsHeader(title: String, subtitle: String) {
         )
     }
 }
+
+@Composable
+private fun ManagedAppsSetting(
+    lockedPackages: Set<String>,
+    protectedUninstallPackages: Set<String>,
+    enabled: Boolean,
+    onChange: (Set<String>, Set<String>) -> Unit
+) {
+    val context = LocalContext.current
+    var dialogOpen by remember { mutableStateOf(false) }
+    val apps = remember {
+        context.packageManager.queryIntentActivities(
+            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER),
+            PackageManager.MATCH_ALL
+        ).mapNotNull { info ->
+            val pkg = info.activityInfo.packageName
+            if (pkg == context.packageName) null
+            else ManagedApp(pkg, info.loadLabel(context.packageManager).toString())
+        }.distinctBy { it.packageName }.sortedBy { it.label.lowercase() }
+    }
+
+    ElevatedCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("נעילת אפליקציות אחרות", fontWeight = FontWeight.SemiBold)
+            Text("בחר אפליקציות שהמכשיר ימנע מהן לפעול, ואפליקציות שיחסמו להסרה.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("נעולות: ${lockedPackages.size} • מוגנות מהסרה: ${protectedUninstallPackages.size}", style = MaterialTheme.typography.bodySmall)
+            OutlinedButton(onClick = { dialogOpen = true }, enabled = enabled, modifier = Modifier.fillMaxWidth()) {
+                Text(if (enabled) "ניהול אפליקציות" else "נעול עד הגדרת בעל המכשיר")
+            }
+        }
+    }
+
+    if (dialogOpen) {
+        var localLocked by remember(lockedPackages) { mutableStateOf(lockedPackages) }
+        var localProtected by remember(protectedUninstallPackages) { mutableStateOf(protectedUninstallPackages) }
+        AlertDialog(
+            onDismissRequest = { dialogOpen = false },
+            title = { Text("ניהול אפליקציות") },
+            text = {
+                Box(Modifier.fillMaxWidth().heightIn(max = 480.dp)) {
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        items(apps) { app ->
+                            ElevatedCard(Modifier.fillMaxWidth()) {
+                                Column(Modifier.padding(10.dp)) {
+                                    Text(app.label, fontWeight = FontWeight.SemiBold)
+                                    Text(app.packageName, style = MaterialTheme.typography.bodySmall)
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                        Text("נעילה")
+                                        Switch(checked = app.packageName in localLocked, onCheckedChange = { checked ->
+                                            localLocked = if (checked) localLocked + app.packageName else localLocked - app.packageName
+                                        })
+                                    }
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                        Text("מניעת הסרה")
+                                        Switch(checked = app.packageName in localProtected, onCheckedChange = { checked ->
+                                            localProtected = if (checked) localProtected + app.packageName else localProtected - app.packageName
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = { onChange(localLocked, localProtected); dialogOpen = false }) { Text("שמור") }
+            },
+            dismissButton = { TextButton(onClick = { dialogOpen = false }) { Text("ביטול") } }
+        )
+    }
+}
+
+private data class ManagedApp(val packageName: String, val label: String)
 
 @Composable
 private fun SettingSwitch(
