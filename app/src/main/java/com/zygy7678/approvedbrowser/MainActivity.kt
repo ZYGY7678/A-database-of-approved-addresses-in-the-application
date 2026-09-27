@@ -182,6 +182,7 @@ private class PrefStore(context: Context) {
         preventScreenshots = p.getBoolean("preventScreenshots", true),
         disableJavascript = p.getBoolean("disableJavascript", false),
         blockPopups = p.getBoolean("blockPopups", true),
+        defaultBrowser = p.getBoolean("defaultBrowser", true),
         lockedPackages = p.getStringSet("lockedPackages", emptySet()) ?: emptySet(),
         protectedUninstallPackages = p.getStringSet("protectedUninstallPackages", emptySet()) ?: emptySet(),
         route = runCatching {
@@ -208,6 +209,7 @@ private class PrefStore(context: Context) {
             .putBoolean("preventScreenshots", v.preventScreenshots)
             .putBoolean("disableJavascript", v.disableJavascript)
             .putBoolean("blockPopups", v.blockPopups)
+            .putBoolean("defaultBrowser", v.defaultBrowser)
             .putStringSet("lockedPackages", v.lockedPackages)
             .putStringSet("protectedUninstallPackages", v.protectedUninstallPackages)
             .putString("route", v.route.name)
@@ -220,6 +222,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         DeviceManagement.enforcePolicies(this)
         val initialPrefs = PrefStore(this).load()
+        DeviceManagement.applyDefaultBrowserPolicy(this, initialPrefs.defaultBrowser)
         DeviceManagement.applyManagedAppPolicies(this, initialPrefs.lockedPackages, initialPrefs.protectedUninstallPackages)
 
         val setupAccessCode = intent?.getStringExtra("setup_access_code_b64")
@@ -1479,6 +1482,10 @@ private fun SecuritySettingsScreen(
             }
 
             item { SettingsHeader("הגנת הגלישה", "כל ההגנות כאן כפופות לקוד המנהל של תיקיית האבטחה") }
+            item { SettingSwitch("הגדר כדפדפן ברירת מחדל", "מגדיר את דפדפן מאושר כמטפל הקבוע בקישורי HTTP ו־HTTPS.", prefs.defaultBrowser, enabled = deviceOwner) {
+                onPrefsChange(prefs.copy(defaultBrowser = it))
+                DeviceManagement.applyDefaultBrowserPolicy(LocalContext.current, it)
+            } }
             item { SettingSwitch("חסימת פתיחה באפליקציות חיצוניות", "מונע מעבר מאושר לאפליקציות אחרות.", prefs.blockExternalApps, enabled = deviceOwner) { onPrefsChange(prefs.copy(blockExternalApps = it)) } }
             item { SettingSwitch("חסימת חלונות קופצים", "מונע פתיחת חלונות חדשים מתוך האתר.", prefs.blockPopups, enabled = deviceOwner) { onPrefsChange(prefs.copy(blockPopups = it)) } }
             item { SettingSwitch("השבתת JavaScript", "הגנה מחמירה יותר; חלק מהאתרים עלולים לא לעבוד.", prefs.disableJavascript, enabled = deviceOwner) { onPrefsChange(prefs.copy(disableJavascript = it)) } }
