@@ -341,23 +341,21 @@
       log("בודק אם כבר מוגדר Device Owner...");
 
       const owners = await runShell("dpm list-owners");
-      const profiles = await runShell("dpm list-owners --user 0").catch(() => "");
+      // "dpm list-owners" reports owners for all users. A Profile Owner can
+      // live on a managed-profile user, so querying only user 0 is insufficient.
       const ownerPackages = [...owners.matchAll(/ComponentInfo\{([^/}\s]+)\/[^}]*\}/g)]
         .map(match => match[1])
         .filter(Boolean);
-      const profilePackages = [...profiles.matchAll(/ComponentInfo\{([^/}\s]+)\/[^}]*\}/g)]
-        .map(match => match[1])
-        .filter(Boolean);
       const hasOurOwner = ownerPackages.includes(PACKAGE);
+      const hasProfileOwner = /profile owner/i.test(owners);
 
       log("מצב בעל המכשיר: " + (ownerPackages.length ? ownerPackages.join(", ") : "לא נמצא בעל מכשיר"));
-      log("בדיקת פרופיל עבודה: " + (profilePackages.length ? profilePackages.join(", ") : "לא נמצא Profile Owner"));
+      log("בדיקת Profile Owner: " + (hasProfileOwner ? "נמצא פרופיל מנוהל" : "לא נמצא Profile Owner"));
 
-      if (!hasOurOwner && profilePackages.length > 0) {
+      if (!hasOurOwner && hasProfileOwner) {
         throw new Error(
-          "לא ניתן להגדיר את האפליקציה כבעלת המכשיר כי כבר מוגדר Profile Owner: " +
-          profilePackages.join(", ") +
-          ". יש להסיר קודם את פרופיל העבודה/הניהול הקיים במכשיר."
+          "Android מדווח שכבר מוגדר Profile Owner במכשיר. אי אפשר להגדיר Device Owner במצב הזה. " +
+          "יש להסיר קודם את פרופיל העבודה/הניהול הקיים, או להשתמש במכשיר לאחר איפוס מלא."
         );
       }
 
