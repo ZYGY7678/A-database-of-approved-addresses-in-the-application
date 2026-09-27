@@ -345,17 +345,20 @@
       // to a managed-profile user, and some Android builds do not print the
       // literal words "Profile Owner" in dpm list-owners.
       const policy = await runShell("dumpsys device_policy");
+      const profileOwnerState = await runShell(
+        "dumpsys device_policy | grep -i -E \"Profile Owner|ProfileOwner|profile_owner|mProfileOwner\""
+      );
       const ownerPackages = [...owners.matchAll(/ComponentInfo\{([^/}\s]+)\/[^}]*\}/g)]
         .map(match => match[1])
         .filter(Boolean);
       const hasOurOwner = ownerPackages.includes(PACKAGE);
       const hasProfileOwner =
-        /profile owner/i.test(owners) ||
-        /profileowner|profile_owner|mProfileOwner/i.test(policy) ||
-        /managed profile/i.test(policy);
+        /profile\s*owner/i.test(owners) ||
+        /profile\s*owner|profileowner|profile_owner|mProfileOwner|managed profile/i.test(policy) ||
+        /profile\s*owner|profileowner|profile_owner|mProfileOwner/i.test(profileOwnerState);
 
       log("מצב בעל המכשיר: " + (ownerPackages.length ? ownerPackages.join(", ") : "לא נמצא בעל מכשיר"));
-      log("בדיקת Profile Owner: " + (hasProfileOwner ? "נמצא פרופיל מנוהל" : "לא נמצא Profile Owner"));
+      log("בדיקת Profile Owner: " + (hasProfileOwner ? "נמצא Profile Owner" : "לא נמצא Profile Owner"));
 
       if (!hasOurOwner && hasProfileOwner) {
         throw new Error(
@@ -417,6 +420,7 @@
     if (/operation that changes the device state is in progress|invalidstateerror/i.test(raw)) return "חיבור ה־USB עדיין מבצע פעולה קודמת. האתר ינסה שוב אוטומטית; אם השגיאה חוזרת, נתק וחבר מחדש את הטלפון.";
     if (/claim|interface/i.test(raw)) return "הממשק תפוס על ידי תוכנת ADB אחרת. סגור Android Studio, scrcpy, WebADB או תוכנת ניהול אחרת ונסה שוב.";
     if (/failed to fetch|networkerror|cors/i.test(raw)) return "לא ניתן להוריד את האפליקציה מהאתר. רענן את הדף ונסה שוב.";
+    if (/already has a profile owner|trying to set the device owner.*profile owner/i.test(raw)) return "כבר מוגדר במכשיר Profile Owner. Android לא מאפשר להגדיר Device Owner במצב הזה. יש להסיר קודם את פרופיל העבודה/הניהול הקיים, או להשתמש במכשיר לאחר איפוס מלא.";
     if (/INSTALL_FAILED|INSTALL_PARSE_FAILED|INSTALL_FAILED_VERSION_DOWNGRADE/i.test(raw)) return "Android דחה את התקנת האפליקציה. אם קיימת גרסה חתומה אחרת, הסר אותה או התקן מחדש את הגרסה הנוכחית.";
     if (/access|permission|security/i.test(raw)) return "הגישה ל־USB נחסמה. אשר את חלון ה־USB בדפדפן ואת הרשאת ניפוי ה־USB בטלפון.";
     if (/already has a profile owner/i.test(raw)) return "Android מדווח שכבר מוגדר Profile Owner במכשיר. יש להסיר קודם את פרופיל העבודה/הניהול הקיים, או להשתמש במכשיר לאחר איפוס מלא.";
