@@ -1399,6 +1399,7 @@ private fun SecuritySettingsScreen(
     onWeeklyLockChange: (List<WeeklyLockWindow>) -> Unit,
     onBack: () -> Unit
 ) {
+    val deviceOwner = DeviceManagement.isDeviceOwner(LocalContext.current)
     Scaffold(
         topBar = {
             TopAppBar(
