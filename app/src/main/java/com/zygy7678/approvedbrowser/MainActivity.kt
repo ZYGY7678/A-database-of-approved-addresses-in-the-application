@@ -279,7 +279,8 @@ private fun ApprovedBrowserApp(
     var loading by remember { mutableStateOf(false) }
 
     var accessDialog by remember { mutableStateOf(false) }
-    var settingsAccessDialog by remember { mutableStateOf(false) }
+    var sensitiveAccessDialog by remember { mutableStateOf(false) }
+    var pendingSensitiveAction by remember { mutableStateOf<(() -> Unit)?>(null) }
     var routeDialog by remember { mutableStateOf(false) }
     var changeCodeDialog by remember { mutableStateOf(false) }
     var deviceOwnerInstructionsDialog by remember { mutableStateOf(false) }
@@ -315,12 +316,13 @@ private fun ApprovedBrowserApp(
             route = route,
             onPrefsChange = onPrefsChange,
             onChangeRoute = { accessDialog = true },
-            onChangeCode = { changeCodeDialog = true },
-            onDeviceOwnerInstructions = { deviceOwnerInstructionsDialog = true },
+            onChangeCode = { pendingSensitiveAction = { changeCodeDialog = true }; sensitiveAccessDialog = true },
+            onDeviceOwnerInstructions = { pendingSensitiveAction = { deviceOwnerInstructionsDialog = true }; sensitiveAccessDialog = true },
             onWeeklyLockChange = { windows ->
                 pendingWeeklyWindows = windows
                 scheduleAccessDialog = true
             },
+            onSensitiveChange = { action -> pendingSensitiveAction = action; sensitiveAccessDialog = true },
             onBack = { settings = false }
         )
     } else {
@@ -356,7 +358,7 @@ private fun ApprovedBrowserApp(
                                     )
                                 }
                             )
-                            IconButton(onClick = { settingsAccessDialog = true }) {
+                            IconButton(onClick = { settings = true }) {
                                 Icon(Icons.Default.Settings, contentDescription = "הגדרות")
                             }
                             IconButton(onClick = { home = true }) {
@@ -510,14 +512,16 @@ private fun ApprovedBrowserApp(
         }
     }
 
-    if (settingsAccessDialog) {
+    if (sensitiveAccessDialog) {
         AccessCodeDialog(
             store = accessStore,
             onVerified = {
-                settingsAccessDialog = false
-                settings = true
+                sensitiveAccessDialog = false
+                val action = pendingSensitiveAction
+                pendingSensitiveAction = null
+                action?.invoke()
             },
-            onDismiss = { settingsAccessDialog = false }
+            onDismiss = { sensitiveAccessDialog = false; pendingSensitiveAction = null }
         )
     }
 
@@ -1073,6 +1077,7 @@ private fun SettingsScreen(
     onChangeCode: () -> Unit,
     onDeviceOwnerInstructions: () -> Unit,
     onWeeklyLockChange: (List<WeeklyLockWindow>) -> Unit,
+    onSensitiveChange: (() -> Unit) -> Unit,
     onBack: () -> Unit
 ) {
     Scaffold(
@@ -1174,27 +1179,27 @@ private fun SettingsScreen(
             item { SettingsHeader("הגנת הגלישה", "שליטה נוספת על הגלישה והגישה") }
             item {
                 SettingSwitch("חסימת פתיחה באפליקציות חיצוניות", "מונע מעבר מאושר לאפליקציות אחרות.", prefs.blockExternalApps) {
-                    onPrefsChange(prefs.copy(blockExternalApps = it))
+                    onSensitiveChange { onPrefsChange(prefs.copy(blockExternalApps = it)) }
                 }
             }
             item {
                 SettingSwitch("חסימת חלונות קופצים", "מונע פתיחת חלונות חדשים מתוך האתר.", prefs.blockPopups) {
-                    onPrefsChange(prefs.copy(blockPopups = it))
+                    onSensitiveChange { onPrefsChange(prefs.copy(blockPopups = it)) }
                 }
             }
             item {
                 SettingSwitch("השבתת JavaScript", "הגנה מחמירה יותר; חלק מהאתרים עלולים לא לעבוד.", prefs.disableJavascript) {
-                    onPrefsChange(prefs.copy(disableJavascript = it))
+                    onSensitiveChange { onPrefsChange(prefs.copy(disableJavascript = it)) }
                 }
             }
             item {
                 SettingSwitch("מניעת צילומי מסך", "מפעיל FLAG_SECURE של Android.", prefs.preventScreenshots) {
-                    onPrefsChange(prefs.copy(preventScreenshots = it))
+                    onSensitiveChange { onPrefsChange(prefs.copy(preventScreenshots = it)) }
                 }
             }
             item {
                 SettingSwitch("ניקוי בעת יציאה", "נקה את מצב הגלישה בעת יציאה.", prefs.clearOnExit) {
-                    onPrefsChange(prefs.copy(clearOnExit = it))
+                    onSensitiveChange { onPrefsChange(prefs.copy(clearOnExit = it)) }
                 }
             }
             item {
