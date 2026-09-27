@@ -170,7 +170,7 @@
       const android = await runShell("getprop ro.build.version.release");
       const packagePath = await runShell("pm path " + PACKAGE);
 
-      if (!packagePath || !packagePath.includes("package:" + "")) {
+      if (!packagePath || !/^package:/.test(packagePath.trim())) {
         throw new Error("האפליקציה לא מותקנת בטלפון. התקן קודם את דפדפן מאושר ואז חזור לכאן.");
       }
 
