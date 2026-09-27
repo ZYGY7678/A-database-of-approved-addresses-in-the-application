@@ -498,6 +498,7 @@ private fun ApprovedBrowserApp(
                                 sitesProvider = {
                                     sites.filter { routeState.value.allows(it) }
                                 },
+                                allowImages = routeState.value == BrowserRoute.LULAV,
                                 onBlockedNavigation = { blocked = true },
                                 onPageStateChanged = { currentUrl, isLoading ->
                                     if (!currentUrl.isNullOrBlank()) {
