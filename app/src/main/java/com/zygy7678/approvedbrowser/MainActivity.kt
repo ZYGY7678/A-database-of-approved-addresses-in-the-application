@@ -1288,7 +1288,6 @@ private fun ChangeAccessCodeDialog(
     onSaved: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    var oldCode by remember { mutableStateOf("") }
     var newCode by remember { mutableStateOf("") }
     var error by remember { mutableStateOf("") }
     val hasExistingCode = store.hasCode()
@@ -1299,19 +1298,12 @@ private fun ChangeAccessCodeDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    if (hasExistingCode) "קוד המנהל מגן על כל הגדרות האבטחה שבתיקיית האבטחה."
-                    else "לא מוגדר כרגע קוד גישה. הגדר קוד אחד שיגן על כל הגדרות האבטחה."
+                    if (hasExistingCode) {
+                        "אתה כבר בתוך תיקיית האבטחה, לכן אין צורך להזין את הקוד שוב. קבע כאן קוד חדש שמגן על הכניסה לתיקיית האבטחה."
+                    } else {
+                        "לא מוגדר כרגע קוד גישה. הגדר קוד אחד שיגן על הכניסה לתיקיית האבטחה."
+                    }
                 )
-                if (hasExistingCode) {
-                    OutlinedTextField(
-                        value = oldCode,
-                        onValueChange = { oldCode = it.filter(Char::isDigit).take(12) },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                        visualTransformation = PasswordVisualTransformation(),
-                        label = { Text("קוד נוכחי") }
-                    )
-                }
                 OutlinedTextField(
                     value = newCode,
                     onValueChange = {
@@ -1330,14 +1322,13 @@ private fun ChangeAccessCodeDialog(
         confirmButton = {
             Button(onClick = {
                 when {
-                    hasExistingCode && !store.verify(oldCode) -> error = "הקוד הנוכחי שגוי"
                     !allowNoExistingCode && !hasExistingCode -> error = "יש להגדיר קוד מנהל"
                     newCode.length < 4 -> error = "הקוד החדש קצר מדי"
                     !store.changeCode(newCode) -> error = "לא ניתן לשמור את הקוד"
                     else -> onSaved()
                 }
             }) {
-                Text(if (hasExistingCode) "שמור" else "הגדר קוד")
+                Text(if (hasExistingCode) "שמור קוד חדש" else "הגדר קוד")
             }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("ביטול") } }
