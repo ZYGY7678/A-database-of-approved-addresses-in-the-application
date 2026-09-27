@@ -108,6 +108,31 @@ object DeviceManagement {
         }
     }
 
+    /**
+     * Releases this app as Device Owner from inside the Device Owner itself.
+     * This is intentionally separate from ADB's remove-active-admin command,
+     * which rejects non-test admins on Android.
+     */
+    fun releaseDeviceOwner(context: Context): Boolean {
+        val dpm = context.getSystemService(DevicePolicyManager::class.java) ?: return false
+        if (!dpm.isDeviceOwnerApp(context.packageName)) return false
+
+        val admin = adminComponent(context)
+        val activity = context as? android.app.Activity
+
+        runCatching {
+            dpm.clearPackagePersistentPreferredActivities(admin, context.packageName)
+        }
+        runCatching {
+            activity?.stopLockTask()
+        }
+
+        return runCatching {
+            dpm.clearDeviceOwnerApp(context.packageName)
+            !dpm.isDeviceOwnerApp(context.packageName)
+        }.getOrDefault(false)
+    }
+
     fun startKioskIfPossible(context: Context) {
         if (!isDeviceOwner(context)) return
         enforcePolicies(context)
