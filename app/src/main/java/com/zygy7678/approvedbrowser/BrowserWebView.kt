@@ -39,10 +39,15 @@ class BrowserWebViewClient(
     }
     private fun emptyResponse() = WebResourceResponse("text/plain", "UTF-8", ByteArrayInputStream(ByteArray(0)))
 }
-fun configureApprovedWebView(webView: WebView) {
+
+fun configureApprovedWebView(
+    webView: WebView,
+    disableJavascript: Boolean = false,
+    blockPopups: Boolean = true
+) {
     webView.setBackgroundColor(Color.WHITE)
     webView.settings.apply {
-        javaScriptEnabled = true
+        javaScriptEnabled = !disableJavascript
         domStorageEnabled = true
         loadsImagesAutomatically = false
         blockNetworkImage = true
@@ -51,7 +56,7 @@ fun configureApprovedWebView(webView: WebView) {
         allowContentAccess = false
         javaScriptCanOpenWindowsAutomatically = false
         mediaPlaybackRequiresUserGesture = true
-        setSupportMultipleWindows(false)
+        setSupportMultipleWindows(!blockPopups)
         safeBrowsingEnabled = true
         builtInZoomControls = true
         displayZoomControls = false
