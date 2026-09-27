@@ -34,16 +34,32 @@ object DeviceManagement {
             dpm.setLockTaskFeatures(admin, 0)
         }
 
-        // Make this app the persistent handler for web links.
-        // The WebView still applies the whitelist before loading the URL.
+        applyDefaultBrowserPolicy(context, true)
+    }
+
+    fun applyDefaultBrowserPolicy(context: Context, enabled: Boolean) {
+        val dpm = context.getSystemService(DevicePolicyManager::class.java) ?: return
+        if (!dpm.isDeviceOwnerApp(context.packageName)) return
+
+        val admin = adminComponent(context)
+        val activity = ComponentName(context, MainActivity::class.java)
         val webFilter = IntentFilter(Intent.ACTION_VIEW).apply {
             addCategory(Intent.CATEGORY_DEFAULT)
             addCategory(Intent.CATEGORY_BROWSABLE)
             addDataScheme("http")
             addDataScheme("https")
         }
-        runCatching {
-            dpm.addPersistentPreferredActivity(admin, webFilter, activity)
+
+        if (enabled) {
+            runCatching {
+                dpm.addPersistentPreferredActivity(admin, webFilter, activity)
+            }
+            suspendKnownBrowsers(context, dpm, admin)
+        } else {
+            runCatching {
+                dpm.clearPackagePersistentPreferredActivities(admin, context.packageName)
+            }
+            unsuspendKnownBrowsers(context, dpm, admin)
         }
     }
 
@@ -78,6 +94,32 @@ object DeviceManagement {
                     admin,
                     browserPackages.toTypedArray(),
                     true
+                )
+            }
+        }
+    }
+
+    private fun unsuspendKnownBrowsers(
+        context: Context,
+        dpm: DevicePolicyManager,
+        admin: ComponentName
+    ) {
+        val pm = context.packageManager
+        val probes = listOf(
+            Intent(Intent.ACTION_VIEW, android.net.Uri.parse("http://example.com")),
+            Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://example.com"))
+        )
+        val browserPackages = probes.flatMap { intent ->
+            pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+                .map { it.activityInfo.packageName }
+        }.filter { it != context.packageName }.distinct()
+
+        if (browserPackages.isNotEmpty()) {
+            runCatching {
+                dpm.setPackagesSuspended(
+                    admin,
+                    browserPackages.toTypedArray(),
+                    false
                 )
             }
         }
