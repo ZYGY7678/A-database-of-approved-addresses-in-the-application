@@ -353,13 +353,13 @@
       accounts.push({ name: cleanName || "(ללא שם)", type: cleanType || "(סוג לא ידוע)" });
     };
 
-    for (const match of output.matchAll(/Account\\s*\\{\\s*name=([^,}]+),\\s*type=([^}]+)\\}/g)) {
+    for (const match of output.matchAll(/Account\s*\{\s*name=([^,}]+),\s*type=([^}]+)\}/g)) {
       addAccount(match[1], match[2]);
     }
 
     // Some Android builds print accounts in a compact form:
     // Account {name=..., type=...}. Keep a second parser for spacing variants.
-    for (const match of output.matchAll(/name=([^,\\n}]+),\\s*type=([^\\n}]+)/g)) {
+    for (const match of output.matchAll(/name=([^,\n}]+),\s*type=([^\n}]+)/g)) {
       addAccount(match[1], match[2]);
     }
 
