@@ -222,8 +222,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         DeviceManagement.enforcePolicies(this)
         val initialPrefs = PrefStore(this).load()
-        DeviceManagement.applyDefaultBrowserPolicy(this, initialPrefs.defaultBrowser)
         DeviceManagement.applyManagedAppPolicies(this, initialPrefs.lockedPackages, initialPrefs.protectedUninstallPackages)
+        DeviceManagement.applyDefaultBrowserPolicy(this, initialPrefs.defaultBrowser)
 
         val setupAccessCode = intent?.getStringExtra("setup_access_code_b64")
         if (!setupAccessCode.isNullOrBlank() && DeviceManagement.isDeviceOwner(this)) {
