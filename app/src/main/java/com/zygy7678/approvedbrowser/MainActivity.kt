@@ -301,6 +301,10 @@ private fun ApprovedBrowserApp(
             onChangeRoute = { accessDialog = true },
             onChangeCode = { changeCodeDialog = true },
             onDeviceOwnerInstructions = { deviceOwnerInstructionsDialog = true },
+            onWeeklyLockChange = { windows ->
+                pendingWeeklyWindows = windows
+                scheduleAccessDialog = true
+            },
             onBack = { settings = false }
         )
     } else {
@@ -1043,6 +1047,7 @@ private fun SettingsScreen(
     onChangeRoute: () -> Unit,
     onChangeCode: () -> Unit,
     onDeviceOwnerInstructions: () -> Unit,
+    onWeeklyLockChange: (List<WeeklyLockWindow>) -> Unit,
     onBack: () -> Unit
 ) {
     Scaffold(
@@ -1168,10 +1173,7 @@ private fun SettingsScreen(
                 }
             }
             item {
-                WeeklyLockScheduleSetting(prefs.weeklyLockWindows) { windows ->
-                    pendingWeeklyWindows = windows
-                    scheduleAccessDialog = true
-                }
+                WeeklyLockScheduleSetting(prefs.weeklyLockWindows, onWeeklyLockChange)
             }
 
             item { SettingsHeader("זמן ותאריך", "שעון פנימי לתצוגה באפליקציה") }
