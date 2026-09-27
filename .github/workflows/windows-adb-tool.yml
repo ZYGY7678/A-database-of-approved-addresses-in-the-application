@@ -1,0 +1,33 @@
+name: Build Windows ADB Tool
+on:
+  push:
+    paths:
+      - "desktop/**"
+      - ".github/workflows/windows-adb-tool.yml"
+  workflow_dispatch:
+jobs:
+  build-windows-tool:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Publish EXE
+        run: >
+          dotnet publish desktop/ApprovedBrowser.AdbTool/ApprovedBrowser.AdbTool.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:DebugType=None
+          -p:DebugSymbols=false
+          -o desktop/dist
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: ApprovedBrowser-ADB-Tool-win-x64
+          path: desktop/dist/*
