@@ -22,6 +22,16 @@ class BrowserWebViewClient(
         ".mp3", ".wav", ".ogg", ".m4a"
     )
 
+    private val imageExtensions = listOf(
+        ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".avif", ".svg", ".ico"
+    )
+
+    // Images are intentionally allowed only in the approved forums.
+    private val imageEnabledHosts = setOf(
+        "mitmachim.top",
+        "prog.co.il"
+    )
+
     override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
         onPageStateChanged(url, true)
     }
@@ -54,21 +64,33 @@ class BrowserWebViewClient(
     ): WebResourceResponse? {
         val requestUrl = request?.url ?: return null
         val path = requestUrl.path?.lowercase() ?: ""
+        val mainHost = runCatching {
+            URI(view?.url ?: "").host?.lowercase()
+        }.getOrNull().orEmpty()
 
-        // Keep the existing protection against direct audio/video files.
-        // Images, CSS, JavaScript, fonts, XHR/fetch and CDN resources are
-        // otherwise allowed like a normal Chromium/WebView page.
+        // Keep direct audio/video files blocked.
         if (blockedMediaExtensions.any(path::endsWith)) {
             return emptyResponse()
         }
 
-        // Do not filter images by hostname. Modern sites often serve images
-        // from CDNs, image proxies, signed URLs or different subdomains.
-        // Blocking those resources makes approved sites look broken.
-        //
-        // The security boundary remains the top-level navigation check above:
-        // a resource may load for an approved page, but navigation to an
-        // unapproved HTTP(S) page is still blocked.
+        // Images are intentionally allowed only inside the approved forums.
+        // Other site resources such as CSS, JavaScript, fonts, APIs and CDNs
+        // remain available so the approved site itself can load normally.
+        val accept = request?.requestHeaders
+            ?.entries
+            ?.firstOrNull { it.key.equals("Accept", ignoreCase = true) }
+            ?.value
+            ?.lowercase()
+            .orEmpty()
+
+        val looksLikeImage =
+            imageExtensions.any(path::endsWith) ||
+            accept.contains("image/")
+
+        if (looksLikeImage && !isImageEnabledHost(mainHost)) {
+            return emptyResponse()
+        }
+
         return super.shouldInterceptRequest(view, request)
     }
 
