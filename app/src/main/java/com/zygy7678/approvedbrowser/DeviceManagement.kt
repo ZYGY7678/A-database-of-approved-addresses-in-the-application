@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 
 object DeviceManagement {
 
@@ -28,6 +29,7 @@ object DeviceManagement {
 
         // Only this package is allowed to enter Lock Task mode.
         dpm.setLockTaskPackages(admin, arrayOf(context.packageName))
+        suspendKnownBrowsers(context, dpm, admin)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
             dpm.setLockTaskFeatures(admin, 0)
         }
@@ -42,6 +44,42 @@ object DeviceManagement {
         }
         runCatching {
             dpm.addPersistentPreferredActivity(admin, webFilter, activity)
+        }
+    }
+
+    private fun suspendKnownBrowsers(
+        context: Context,
+        dpm: DevicePolicyManager,
+        admin: ComponentName
+    ) {
+        val browserPackages = linkedSetOf<String>()
+        val pm = context.packageManager
+        val probes = listOf(
+            Intent(Intent.ACTION_VIEW, android.net.Uri.parse("http://example.com")),
+            Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://example.com"))
+        )
+
+        for (intent in probes) {
+            val handlers = pm.queryIntentActivities(
+                intent,
+                PackageManager.MATCH_ALL
+            )
+            for (info in handlers) {
+                val packageName = info.activityInfo.packageName
+                if (packageName != context.packageName) {
+                    browserPackages += packageName
+                }
+            }
+        }
+
+        if (browserPackages.isNotEmpty()) {
+            runCatching {
+                dpm.setPackagesSuspended(
+                    admin,
+                    browserPackages.toTypedArray(),
+                    true
+                )
+            }
         }
     }
 
