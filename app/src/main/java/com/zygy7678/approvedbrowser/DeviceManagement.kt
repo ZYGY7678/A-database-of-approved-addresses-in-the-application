@@ -27,12 +27,9 @@ object DeviceManagement {
         // A device owner cannot be uninstalled by the normal user.
         dpm.setUninstallBlocked(admin, context.packageName, true)
 
-        // Only this package is allowed to enter Lock Task mode.
-        dpm.setLockTaskPackages(admin, arrayOf(context.packageName))
+        // Deliberately do not configure Lock Task / kiosk mode here.
+        // The Android navigation buttons (Home / Back / Overview) must remain usable.
         suspendKnownBrowsers(context, dpm, admin)
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-            dpm.setLockTaskFeatures(admin, 0)
-        }
 
         // Make this app the persistent handler for web links.
         // The WebView still applies the whitelist before loading the URL.
@@ -124,6 +121,15 @@ object DeviceManagement {
             dpm.clearPackagePersistentPreferredActivities(admin, context.packageName)
         }
         runCatching {
+            dpm.setUninstallBlocked(admin, context.packageName, false)
+        }
+        runCatching {
+            dpm.setLockTaskPackages(admin, emptyArray())
+        }
+        runCatching {
+            dpm.setLockTaskFeatures(admin, 0)
+        }
+        runCatching {
             activity?.stopLockTask()
         }
 
@@ -131,15 +137,6 @@ object DeviceManagement {
             dpm.clearDeviceOwnerApp(context.packageName)
             !dpm.isDeviceOwnerApp(context.packageName)
         }.getOrDefault(false)
-    }
-
-    fun startKioskIfPossible(context: Context) {
-        if (!isDeviceOwner(context)) return
-        enforcePolicies(context)
-        val activity = context as? android.app.Activity ?: return
-        if (!activity.isInLockTaskModeCompat()) {
-            activity.startLockTask()
-        }
     }
 
     fun isKioskActive(context: Context): Boolean =
