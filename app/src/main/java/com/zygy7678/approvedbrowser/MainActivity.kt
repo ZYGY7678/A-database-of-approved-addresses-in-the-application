@@ -189,6 +189,15 @@ private fun ApprovedBrowserApp(
     val accessStore = remember { AccessCodeStore(context) }
     val favoriteStore = remember { FavoriteStore(context) }
 
+    val route = prefs.route
+    val routeState = rememberUpdatedState(route)
+    val availableSites = remember(sites, route) {
+        sites.filter(route::allows)
+    }
+    val initialAllowedUrl = remember(initialExternalUrl, availableSites) {
+        initialExternalUrl?.takeIf { WhitelistRepository.isAllowed(it, availableSites) }
+    }
+
     var favorites by remember { mutableStateOf(favoriteStore.load()) }
     var url by remember { mutableStateOf(initialAllowedUrl ?: "") }
     var address by remember { mutableStateOf(initialAllowedUrl ?: initialExternalUrl.orEmpty()) }
@@ -204,15 +213,6 @@ private fun ApprovedBrowserApp(
     var accessDialog by remember { mutableStateOf(false) }
     var routeDialog by remember { mutableStateOf(false) }
     var changeCodeDialog by remember { mutableStateOf(false) }
-
-    val route = prefs.route
-    val routeState = rememberUpdatedState(route)
-    val availableSites = remember(sites, route) {
-        sites.filter(route::allows)
-    }
-    val initialAllowedUrl = remember(initialExternalUrl, availableSites) {
-        initialExternalUrl?.takeIf { WhitelistRepository.isAllowed(it, availableSites) }
-    }
     val categories = remember(availableSites) {
         listOf("מועדפים", "הכול") + availableSites.map { it.category }.distinct()
     }
