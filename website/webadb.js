@@ -128,7 +128,6 @@
 		let m = new Adb.Message("CNXN", version_used, MAX_PAYLOAD, "" + banner + "\0");
 		return this.getDevice({ classCode: 255, subclassCode: 66, protocolCode: 1 })
 			.then(match => new Adb.WebUSB.Device(this, match))
-			.then(adb => this.reset().then(() => adb))
 			.then(adb => m.send_receive(adb)
 				.then((function do_auth_response(response) {
 					if (response.cmd != "AUTH" || response.arg0 != AUTH_TOKEN)
