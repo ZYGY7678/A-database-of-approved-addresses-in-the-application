@@ -2,6 +2,8 @@ package com.zygy7678.approvedbrowser
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
 import android.view.WindowManager
@@ -10,6 +12,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -277,6 +280,8 @@ private fun ApprovedBrowserApp(
     var query by remember { mutableStateOf("") }
     var webView by remember { mutableStateOf<WebView?>(null) }
     var loading by remember { mutableStateOf(false) }
+    var selectedSiteForAction by remember { mutableStateOf<Site?>(null) }
+    var siteRequestDialog by remember { mutableStateOf(false) }
 
     var accessDialog by remember { mutableStateOf(false) }
     var sensitiveAccessDialog by remember { mutableStateOf(false) }
@@ -318,6 +323,7 @@ private fun ApprovedBrowserApp(
             onChangeRoute = { accessDialog = true },
             onChangeCode = { pendingSensitiveAction = { changeCodeDialog = true }; sensitiveAccessDialog = true },
             onDeviceOwnerInstructions = { pendingSensitiveAction = { deviceOwnerInstructionsDialog = true }; sensitiveAccessDialog = true },
+            onSiteRequest = { siteRequestDialog = true },
             onWeeklyLockChange = { windows ->
                 pendingWeeklyWindows = windows
                 scheduleAccessDialog = true
@@ -462,7 +468,8 @@ private fun ApprovedBrowserApp(
                         },
                         onToggleFavorite = { site ->
                             favorites = favoriteStore.toggle(siteKey(site))
-                        }
+                        },
+                        onLongPressSite = { site -> selectedSiteForAction = site }
                     )
                 }
             } else {
@@ -583,6 +590,49 @@ private fun ApprovedBrowserApp(
         DeviceOwnerInstructionsDialog(onDismiss = { deviceOwnerInstructionsDialog = false })
     }
 
+    selectedSiteForAction?.let { site ->
+        SiteActionDialog(
+            site = site,
+            onDismiss = { selectedSiteForAction = null },
+            onReport = {
+                selectedSiteForAction = null
+                openDeveloperIssue(
+                    context = context,
+                    type = "תלונה על אתר מאושר",
+                    title = site.name,
+                    url = site.url,
+                    reason = "המשתמש דיווח על בעיה באתר מאושר וביקש מהמפתח לבדוק את האתר."
+                )
+            },
+            onRemovalRequest = {
+                selectedSiteForAction = null
+                openDeveloperIssue(
+                    context = context,
+                    type = "בקשה להסרת אתר מאושר",
+                    title = site.name,
+                    url = site.url,
+                    reason = "המשתמש מבקש לבדוק את האתר ולהסיר אותו מרשימת האתרים המאושרים."
+                )
+            }
+        )
+    }
+
+    if (siteRequestDialog) {
+        SiteRequestDialog(
+            onDismiss = { siteRequestDialog = false },
+            onSubmit = { title, url, reason ->
+                siteRequestDialog = false
+                openDeveloperIssue(
+                    context = context,
+                    type = "בקשת אישור אתר חדש",
+                    title = title,
+                    url = url,
+                    reason = reason
+                )
+            }
+        )
+    }
+
     if (appLocked) {
         AppLockDialog(
             store = accessStore,
@@ -606,7 +656,8 @@ private fun HomeScreen(
     pagerState: PagerState,
     onSelectCategory: (Int) -> Unit,
     onOpenSite: (Site) -> Unit,
-    onToggleFavorite: (Site) -> Unit
+    onToggleFavorite: (Site) -> Unit,
+    onLongPressSite: (Site) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val sitesByCategory = remember(availableSites) {
@@ -671,10 +722,14 @@ private fun HomeScreen(
 
             val pageSites by remember(pageName, availableSites, sitesByCategory, favorites, query) {
                 derivedStateOf {
-                    val source = when (pageName) {
-                        "מועדפים" -> availableSites.filter { siteKey(it) in favorites }
-                        "הכול" -> availableSites
-                        else -> sitesByCategory[pageName].orEmpty()
+                    val source = if (query.isNotBlank()) {
+                        availableSites
+                    } else {
+                        when (pageName) {
+                            "מועדפים" -> availableSites.filter { siteKey(it) in favorites }
+                            "הכול" -> availableSites
+                            else -> sitesByCategory[pageName].orEmpty()
+                        }
                     }
                     if (query.isBlank()) {
                         source
@@ -802,7 +857,8 @@ private fun HomeScreen(
                         largeText = prefs.largeText,
                         rounded = prefs.roundedCards,
                         onOpen = { onOpenSite(site) },
-                        onToggleFavorite = { onToggleFavorite(site) }
+                        onToggleFavorite = { onToggleFavorite(site) },
+                        onLongPress = { onLongPressSite(site) }
                     )
                 }
             }
@@ -819,11 +875,16 @@ private fun SiteCard(
     largeText: Boolean,
     rounded: Boolean,
     onOpen: () -> Unit,
-    onToggleFavorite: () -> Unit
+    onToggleFavorite: () -> Unit,
+    onLongPress: () -> Unit
 ) {
     ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onOpen,
+        modifier = Modifier
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = onOpen,
+                onLongClick = onLongPress
+            ),
         shape = if (rounded) {
             RoundedCornerShape(18.dp)
         } else {
@@ -885,6 +946,118 @@ private fun SiteCard(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun SiteActionDialog(
+    site: Site,
+    onDismiss: () -> Unit,
+    onReport: () -> Unit,
+    onRemovalRequest: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("פעולות עבור ${site.name}") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(site.url, style = MaterialTheme.typography.bodySmall)
+                Text("בחר מה לשלוח למפתח לגבי האתר הזה:")
+            }
+        },
+        confirmButton = {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Button(onClick = onReport, modifier = Modifier.fillMaxWidth()) {
+                    Text("תלונה למפתח")
+                }
+                OutlinedButton(onClick = onRemovalRequest, modifier = Modifier.fillMaxWidth()) {
+                    Text("בקשה להסרת האתר")
+                }
+                TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
+                    Text("ביטול")
+                }
+            }
+        }
+    )
+}
+
+@Composable
+private fun SiteRequestDialog(
+    onDismiss: () -> Unit,
+    onSubmit: (String, String, String) -> Unit
+) {
+    var title by remember { mutableStateOf("") }
+    var url by remember { mutableStateOf("https://") }
+    var reason by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("בקשת אישור אתר") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("הזן אתר שאינו מופיע ברשימת האתרים המאושרים. הבקשה תיפתח למפתח עם הפרטים שמילאת.")
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("שם האתר") }
+                )
+                OutlinedTextField(
+                    value = url,
+                    onValueChange = { url = it },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("כתובת האתר") }
+                )
+                OutlinedTextField(
+                    value = reason,
+                    onValueChange = { reason = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 3,
+                    label = { Text("למה האתר נדרש?") }
+                )
+                if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error)
+            }
+        },
+        confirmButton = {
+            Button(onClick = {
+                when {
+                    title.trim().isBlank() -> error = "הזן שם אתר"
+                    !url.trim().startsWith("http://") && !url.trim().startsWith("https://") -> error = "הכתובת חייבת להתחיל ב־http:// או https://"
+                    else -> onSubmit(title.trim(), url.trim(), reason.trim())
+                }
+            }) { Text("שלח למפתח") }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("ביטול") } }
+    )
+}
+
+private fun openDeveloperIssue(
+    context: Context,
+    type: String,
+    title: String,
+    url: String,
+    reason: String
+) {
+    val issueTitle = "[$type] $title"
+    val body = """
+בקשה שנשלחה מתוך דפדפן מאושר
+
+סוג: $type
+שם האתר: $title
+כתובת: $url
+
+פרטים:
+$reason
+
+נא לבדוק את האתר והבקשה.
+""".trimIndent()
+    val issueUrl = "https://github.com/ZYGY7678/A-database-of-approved-addresses-in-the-application/issues/new" +
+        "?title=${Uri.encode(issueTitle)}&body=${Uri.encode(body)}"
+    runCatching {
+        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(issueUrl)))
     }
 }
 
@@ -1076,6 +1249,7 @@ private fun SettingsScreen(
     onChangeRoute: () -> Unit,
     onChangeCode: () -> Unit,
     onDeviceOwnerInstructions: () -> Unit,
+    onSiteRequest: () -> Unit,
     onWeeklyLockChange: (List<WeeklyLockWindow>) -> Unit,
     onSensitiveChange: (() -> Unit) -> Unit,
     onBack: () -> Unit
@@ -1256,6 +1430,15 @@ private fun SettingsScreen(
                     "מציג יותר אתרים על המסך",
                     prefs.compact
                 ) { onPrefsChange(prefs.copy(compact = it)) }
+            }
+
+            item { SettingsHeader("בקשות למפתח", "שלח בקשה לאתר שאינו מאושר או דיווח על אתר") }
+            item {
+                OutlinedButton(onClick = onSiteRequest, modifier = Modifier.fillMaxWidth()) {
+                    Icon(Icons.Default.Search, contentDescription = null)
+                    Spacer(Modifier.size(8.dp))
+                    Text("בקשת אישור לאתר שלא ברשימה")
+                }
             }
 
             item { SettingsHeader("רשימת האתרים", "שליטה במה שמוצג במסך הבית") }
