@@ -64,6 +64,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -282,6 +283,9 @@ private fun ApprovedBrowserApp(
     val categories = remember(availableSites) {
         listOf("מועדפים", "הכול") + availableSites.map { it.category }.distinct()
     }
+    val sitesByCategory = remember(availableSites) {
+        availableSites.groupBy { it.category }
+    }
 
     BackHandler(enabled = !home || settings) {
         when {
@@ -430,10 +434,7 @@ private fun ApprovedBrowserApp(
                         query = query,
                         onQueryChange = { query = it },
                         pagerState = pagerState,
-                        onSelectCategory = { index ->
-                            // The category strip and swipe pager stay synchronized.
-                            // HorizontalPager is the standard Compose horizontal paging component.
-                        },
+                        onSelectCategory = { /* Pager selection is handled by the tab click itself. */ },
                         onOpenSite = { site ->
                             url = site.url
                             address = site.url
@@ -610,7 +611,12 @@ private fun HomeScreen(
             categories.forEachIndexed { index, name ->
                 Tab(
                     selected = pagerState.currentPage == index,
-                    onClick = { onSelectCategory(index); scope.launch { pagerState.animateScrollToPage(index) } },
+                    onClick = {
+                        onSelectCategory(index)
+                        if (pagerState.currentPage != index) {
+                            scope.launch { pagerState.animateScrollToPage(index) }
+                        }
+                    },
                     text = {
                         Text(
                             if (name == "מועדפים") "★ מועדפים" else name,
@@ -632,14 +638,22 @@ private fun HomeScreen(
         ) { page ->
             val pageName = categories[page]
 
-            val pageSites = when (pageName) {
-                "מועדפים" -> availableSites.filter { siteKey(it) in favorites }
-                "הכול" -> availableSites
-                else -> availableSites.filter { it.category == pageName }
-            }.filter {
-                query.isBlank() ||
-                    it.name.contains(query, ignoreCase = true) ||
-                    it.url.contains(query, ignoreCase = true)
+            val pageSites by remember(pageName, availableSites, sitesByCategory, favorites, query) {
+                derivedStateOf {
+                    val source = when (pageName) {
+                        "מועדפים" -> availableSites.filter { siteKey(it) in favorites }
+                        "הכול" -> availableSites
+                        else -> sitesByCategory[pageName].orEmpty()
+                    }
+                    if (query.isBlank()) {
+                        source
+                    } else {
+                        source.filter {
+                            it.name.contains(query, ignoreCase = true) ||
+                                it.url.contains(query, ignoreCase = true)
+                        }
+                    }
+                }
             }
 
             LazyColumn(
