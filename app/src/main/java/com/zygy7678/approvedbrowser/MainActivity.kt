@@ -3,6 +3,7 @@ package com.zygy7678.approvedbrowser
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.util.Base64
 import android.view.WindowManager
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
@@ -205,6 +206,19 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         DeviceManagement.enforcePolicies(this)
+
+        val setupAccessCode = intent?.getStringExtra("setup_access_code_b64")
+        if (!setupAccessCode.isNullOrBlank() && DeviceManagement.isDeviceOwner(this)) {
+            runCatching {
+                val decoded = String(
+                    Base64.decode(setupAccessCode, Base64.DEFAULT),
+                    Charsets.UTF_8
+                )
+                AccessCodeStore(this).provisionFromSetup(decoded)
+            }
+            intent.removeExtra("setup_access_code_b64")
+        }
+
         val externalUrl = intent?.data?.toString()
         val store = PrefStore(this)
 
