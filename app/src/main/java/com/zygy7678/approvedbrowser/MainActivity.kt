@@ -92,14 +92,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private fun goToAndroidHome(context: Context) {
-    runCatching {
-        context.startActivity(
-            Intent(Intent.ACTION_MAIN)
-                .addCategory(Intent.CATEGORY_HOME)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        )
-    }
+private fun exitApp(context: Context) {
+    (context as? ComponentActivity)?.finishAndRemoveTask()
 }
 
 private fun launchSelfUninstall(context: Context): Boolean =
@@ -376,7 +370,7 @@ private fun ApprovedBrowserApp(
                     if (released) {
                         val uninstallLaunched = launchSelfUninstall(context)
                         if (!uninstallLaunched) {
-                            goToAndroidHome(context)
+                            exitApp(context)
                         }
                         (context as? ComponentActivity)?.finishAndRemoveTask()
                     }
@@ -447,8 +441,8 @@ private fun ApprovedBrowserApp(
                             IconButton(onClick = { home = true }) {
                                 Icon(Icons.Default.Home, contentDescription = "דף הבית באפליקציה")
                             }
-                            IconButton(onClick = { goToAndroidHome(context) }) {
-                                Icon(Icons.Default.Close, contentDescription = "צא למסך הבית של המכשיר")
+                            IconButton(onClick = { exitApp(context) }) {
+                                Icon(Icons.Default.Close, contentDescription = "יציאה מהאפליקציה")
                             }
 
                             val view = webView
@@ -1387,12 +1381,12 @@ private fun SettingsScreen(
             }
             item {
                 OutlinedButton(
-                    onClick = { goToAndroidHome(context) },
+                    onClick = { exitApp(context) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(Icons.Default.Close, contentDescription = null)
                     Spacer(Modifier.size(8.dp))
-                    Text("צא למסך הבית של המכשיר")
+                    Text("יציאה מהאפליקציה")
                 }
             }
             item {
