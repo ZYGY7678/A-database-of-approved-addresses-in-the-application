@@ -259,9 +259,10 @@
       log("החיבור הצליח: " + (model || "Android") + " • Android " + (android || "?"));
       log("האפליקציה נמצאה במכשיר.");
 
-      setStatus("בודק מנהל מכשיר...", "בודק");
+      setStatus("בודק מנהל מכשיר וחשבונות...", "בודק");
       const ownerInfo = await inspectDevicePolicy();
-      if (!ownerInfo.hasAnyOwner) {
+      const accountInfo = await inspectAccounts();
+      if (!ownerInfo.hasAnyOwner && !accountInfo.hasAccounts) {
         setStatus("מחובר • מנהל מכשיר: לא נמצא", "מחובר", true);
       } else if (ownerInfo.deviceOwner) {
         setStatus("מחובר • Device Owner: " + ownerInfo.deviceOwner, "מנהל נמצא", true);
@@ -334,6 +335,49 @@
     log("✓ דפדפן מאושר הותקן בהצלחה.");
   }
 
+  async function inspectAccounts() {
+    // Android's set-device-owner precondition rejects devices that already
+    // contain accounts. "dumpsys account" exposes the account name/type
+    // without changing anything on the device.
+    const output = await runShell("dumpsys account");
+    const accounts = [];
+    const seen = new Set();
+
+    const addAccount = (name, type) => {
+      const cleanName = String(name || "").trim();
+      const cleanType = String(type || "").trim();
+      if (!cleanName && !cleanType) return;
+      const key = cleanName + "\\0" + cleanType;
+      if (seen.has(key)) return;
+      seen.add(key);
+      accounts.push({ name: cleanName || "(ללא שם)", type: cleanType || "(סוג לא ידוע)" });
+    };
+
+    for (const match of output.matchAll(/Account\\s*\\{\\s*name=([^,}]+),\\s*type=([^}]+)\\}/g)) {
+      addAccount(match[1], match[2]);
+    }
+
+    // Some Android builds print accounts in a compact form:
+    // Account {name=..., type=...}. Keep a second parser for spacing variants.
+    for (const match of output.matchAll(/name=([^,\\n}]+),\\s*type=([^\\n}]+)/g)) {
+      addAccount(match[1], match[2]);
+    }
+
+    if (!accounts.length) {
+      log("חשבונות Android: לא נמצאו חשבונות.");
+      return { accounts: [], hasAccounts: false };
+    }
+
+    log("חשבונות Android שנמצאו (" + accounts.length + "):");
+    accounts.forEach((account, index) => {
+      log("  " + (index + 1) + ". " + account.name + "  [" + account.type + "]");
+    });
+    log("⚠ קיימים חשבונות במכשיר. Android עלול לחסום הגדרת Device Owner בגלל החשבונות האלה.");
+    log("ℹ Android לא מציין איזה חשבון יחיד גרם לחסימה — התנאי הוא שקיים חשבון במכשיר.");
+
+    return { accounts, hasAccounts: true };
+  }
+
   async function inspectDevicePolicy() {
     const owners = await runShell("dpm list-owners");
     const policy = await runShell("dumpsys device_policy");
@@ -402,6 +446,7 @@
       log("בודק אם כבר מוגדר Device Owner...");
 
       const ownerInfo = await inspectDevicePolicy();
+      const accountInfo = await inspectAccounts();
       const hasOurOwner = ownerInfo.hasOurDeviceOwner || ownerInfo.hasOurProfileOwner;
       const hasProfileOwner = ownerInfo.profiles.length > 0;
 
@@ -409,6 +454,17 @@
         throw new Error(
           "Android מדווח שכבר מוגדר Profile Owner במכשיר. אי אפשר להגדיר Device Owner במצב הזה. " +
           "יש להסיר קודם את פרופיל העבודה/הניהול הקיים, או להשתמש במכשיר לאחר איפוס מלא."
+        );
+      }
+
+      if (!hasOurOwner && accountInfo.hasAccounts) {
+        const accountList = accountInfo.accounts
+          .map(account => account.name + " [" + account.type + "]")
+          .join(", ");
+        throw new Error(
+          "לא ניתן להגדיר Device Owner כי קיימים חשבונות במכשיר. " +
+          "החשבונות שנמצאו: " + accountList + ". " +
+          "Android לא מציין חשבון יחיד כאשם — עצם קיום החשבונות חוסם את ההגדרה."
         );
       }
 
@@ -469,6 +525,7 @@
     if (/INSTALL_FAILED|INSTALL_PARSE_FAILED|INSTALL_FAILED_VERSION_DOWNGRADE/i.test(raw)) return "Android דחה את התקנת האפליקציה. אם קיימת גרסה חתומה אחרת, הסר אותה או התקן מחדש את הגרסה הנוכחית.";
     if (/access|permission|security/i.test(raw)) return "הגישה ל־USB נחסמה. אשר את חלון ה־USB בדפדפן ואת הרשאת ניפוי ה־USB בטלפון.";
     if (/already has a profile owner/i.test(raw)) return "Android מדווח שכבר מוגדר Profile Owner במכשיר. יש להסיר קודם את פרופיל העבודה/הניהול הקיים, או להשתמש במכשיר לאחר איפוס מלא.";
+    if (/already.*accounts|there are already some accounts on the device|set the device owner because there are already some accounts/i.test(raw)) return "Android חוסם את הגדרת Device Owner כי קיימים חשבונות במכשיר. בדוק ביומן את רשימת החשבונות; Android לא מציין חשבון יחיד כאשם, אלא חוסם כאשר קיימים חשבונות.";
     if (/auth|unauthorized|RSA/i.test(raw)) return "הטלפון לא אישר את מפתח ה־RSA. אשר את חלון 'אפשר ניפוי USB' בטלפון ונסה שוב.";
     return raw;
   }
