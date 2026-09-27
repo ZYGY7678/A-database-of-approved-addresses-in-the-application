@@ -73,6 +73,13 @@ class BrowserWebViewClient(
             return emptyResponse()
         }
 
+        // Never interfere with the main HTML document itself. This is important
+        // because some sites advertise image formats in the HTML request's
+        // Accept header even though the response is HTML.
+        if (request?.isForMainFrame == true) {
+            return super.shouldInterceptRequest(view, request)
+        }
+
         // Images are intentionally allowed only inside the approved forums.
         // Other site resources such as CSS, JavaScript, fonts, APIs and CDNs
         // remain available so the approved site itself can load normally.
@@ -83,9 +90,13 @@ class BrowserWebViewClient(
             ?.lowercase()
             .orEmpty()
 
+        // Do not use a broad "Accept contains image/" check: normal HTML
+        // navigation requests commonly advertise image formats too. Only treat
+        // the request as an image when the URL has an image extension or the
+        // Accept header explicitly starts with an image MIME type.
         val looksLikeImage =
             imageExtensions.any(path::endsWith) ||
-            accept.contains("image/")
+            (accept.startsWith("image/") && !accept.contains("text/html"))
 
         if (looksLikeImage && !isImageEnabledHost(mainHost)) {
             return emptyResponse()
