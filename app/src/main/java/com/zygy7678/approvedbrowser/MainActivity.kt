@@ -265,6 +265,7 @@ private fun ApprovedBrowserApp(
     var loading by remember { mutableStateOf(false) }
 
     var accessDialog by remember { mutableStateOf(false) }
+    var settingsAccessDialog by remember { mutableStateOf(false) }
     var routeDialog by remember { mutableStateOf(false) }
     var changeCodeDialog by remember { mutableStateOf(false) }
     var deviceOwnerInstructionsDialog by remember { mutableStateOf(false) }
@@ -334,7 +335,7 @@ private fun ApprovedBrowserApp(
                                     )
                                 }
                             )
-                            IconButton(onClick = { settings = true }) {
+                            IconButton(onClick = { settingsAccessDialog = true }) {
                                 Icon(Icons.Default.Settings, contentDescription = "הגדרות")
                             }
                             IconButton(onClick = { home = true }) {
@@ -489,6 +490,17 @@ private fun ApprovedBrowserApp(
                 )
             }
         }
+    }
+
+    if (settingsAccessDialog) {
+        AccessCodeDialog(
+            store = accessStore,
+            onVerified = {
+                settingsAccessDialog = false
+                settings = true
+            },
+            onDismiss = { settingsAccessDialog = false }
+        )
     }
 
     if (accessDialog) {
@@ -1041,7 +1053,7 @@ private fun SettingsScreen(
             item {
                 SettingsHeader(
                     "מסלולים",
-                    "המסלול קובע אילו קבוצות של אתרים זמינות. שינוי דורש קוד גישה."
+                    "הגדרות הסינון והגישה למכשיר מוגנות בקוד גישה."
                 )
             }
 
@@ -1100,7 +1112,7 @@ private fun SettingsScreen(
                 }
             }
 
-            item { SettingsHeader("ניהול המכשיר", "הגנה ברמת Android — פעילה לאחר הגדרת האפליקציה כבעלת המכשיר") }
+            item { SettingsHeader("הגנת המכשיר", "הגנה ברמת Android — פעילה לאחר הגדרת האפליקציה כבעלת המכשיר") }
             item {
                 val owner = DeviceManagement.isDeviceOwner(LocalContext.current)
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1114,7 +1126,7 @@ private fun SettingsScreen(
                 }
             }
 
-            item { SettingsHeader("אבטחה מתקדמת", "שליטה נוספת על הגלישה והגישה") }
+            item { SettingsHeader("הגנת הגלישה", "שליטה נוספת על הגלישה והגישה") }
             item {
                 SettingSwitch("חסימת פתיחה באפליקציות חיצוניות", "מונע מעבר מאושר לאפליקציות אחרות.", prefs.blockExternalApps) {
                     onPrefsChange(prefs.copy(blockExternalApps = it))
