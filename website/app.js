@@ -269,13 +269,6 @@
   document.getElementById("connect").addEventListener("click", connectDevice);
   document.getElementById("setup").addEventListener("click", setupDeviceOwner);
 
-  document.getElementById("download").addEventListener("click", () => {
-    window.open(
-      "https://github.com/ZYGY7678/A-database-of-approved-addresses-in-the-application/tree/main/desktop/ApprovedBrowser.AdbTool",
-      "_blank",
-      "noopener"
-    );
-  });
 
   try {
     ensureWebUsb();
