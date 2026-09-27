@@ -341,10 +341,17 @@
       log("בודק אם כבר מוגדר Device Owner...");
 
       const owners = await runShell("dpm list-owners");
-      const hasOurOwner = owners.includes(PACKAGE);
+      // dpm list-owners may print informational text even when no owner exists.
+      // Only a real ComponentInfo package is evidence of an existing owner.
+      const ownerPackages = [...owners.matchAll(/ComponentInfo\\{([^/}\\s]+)\\/[^}]*\\}/g)]
+        .map(match => match[1])
+        .filter(Boolean);
+      const hasOurOwner = ownerPackages.includes(PACKAGE);
 
-      if (!hasOurOwner && owners.trim()) {
-        throw new Error("כבר מוגדר במכשיר בעל מכשיר אחר. לא אשנה את הבעלות הקיימת.");
+      log("מצב בעל המכשיר: " + (ownerPackages.length ? ownerPackages.join(", ") : "לא נמצא בעל מכשיר"));
+
+      if (!hasOurOwner && ownerPackages.length > 0) {
+        throw new Error("כבר מוגדר במכשיר בעל מכשיר אחר: " + ownerPackages.join(", "));
       }
 
       if (!hasOurOwner) {
