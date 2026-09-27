@@ -178,14 +178,49 @@
     try {
       ensureWebUsb();
       log("מבקש הרשאת USB למכשיר Android...");
-      transport = await window.Adb.open("WebUSB");
+      log("שלב 1/4: בחירת התקן USB...");
+      log("שלב 2/4: פתיחת ממשק ה־ADB. עדיין לא מתבצעת התקנת APK.");
 
-      if (!transport || !transport.isAdb()) {
-        throw new Error("המכשיר שנבחר אינו מופיע כממשק ADB. ודא שניפוי USB מופעל.");
+      // Chromium can report InvalidStateError while WebUSB is finishing
+      // open/configure/claim on the selected Android interface. In that
+      // situation retry the complete transport open, not a later file transfer.
+      let openError = null;
+      for (let attempt = 1; attempt <= 4; attempt++) {
+        try {
+          if (attempt > 1) {
+            setStatus("מאתחל את חיבור ה־USB מחדש (" + attempt + "/4)...", "מנסה שוב");
+            log("ה־USB עדיין במעבר מצב. ממתין לפני ניסיון " + attempt + "...");
+            await new Promise(resolve => setTimeout(resolve, 1200));
+          }
+          transport = await window.Adb.open("WebUSB");
+          openError = null;
+          break;
+        } catch (error) {
+          openError = error;
+          const raw = String(error?.message || error || "");
+          const transient = /operation that changes the device state is in progress|invalidstateerror|interface state change is in progress/i.test(raw);
+          log("פתיחת ADB נכשלה בניסיון " + attempt + ": " + raw);
+          if (!transient || attempt === 4) throw error;
+          try {
+            await transport?.close?.();
+          } catch (_) {}
+          transport = null;
+        }
       }
 
-      setStatus("מתחבר ל־ADB וממתין לאישור בטלפון...", "ממתין לאישור");
-      log("נמצא ממשק ADB. אם מופיע בטלפון חלון 'אפשר ניפוי USB', אשר אותו.");
+      if (openError) throw openError;
+
+      if (!transport || !transport.isAdb()) {
+        throw new Error("המכשיר נבחר אך ממשק ה־ADB לא נפתח. ודא שניפוי USB מופעל ונסה שוב.");
+      }
+
+      setStatus("ממשק ADB נפתח. ממתין לאישור RSA בטלפון...", "ממתין לאישור");
+      log("שלב 3/4: ממשק ADB נפתח בהצלחה.");
+      log("כעת Android אמור להציג בקשת 'אפשר ניפוי USB' אם המחשב עדיין לא אושר.");
+
+      transport.device.addEventListener?.("connect", () => {
+        log("WebUSB דיווח על חיבור התקן.");
+      });
 
       transport.device.addEventListener?.("disconnect", () => {
         connected = false;
@@ -197,9 +232,10 @@
 
       adb = await transport.connectAdb("host::", () => {
         setStatus("אשר את מפתח ה־RSA בטלפון...", "נדרש אישור");
-        log("Android ביקש אישור RSA. אשר את המחשב בטלפון ואז ההתקנה תוכל להמשיך.");
+        log("שלב 4/4: Android ביקש אישור RSA. אשר את המחשב בטלפון ואז ההתקנה תוכל להמשיך.");
       });
 
+      log("חיבור ADB נפתח. בודק עכשיו את Android...");
       const model = await runShell("getprop ro.product.model");
       const android = await runShell("getprop ro.build.version.release");
       let packagePath = await runShell("pm path " + PACKAGE);
