@@ -9,8 +9,10 @@
   const badgeEl = document.getElementById("deviceBadge");
   const noticeEl = document.getElementById("browserNotice");
   const setupNoticeEl = document.getElementById("setupNotice");
+  const removeOwnerNoticeEl = document.getElementById("removeOwnerNotice");
   const connectBtn = document.getElementById("connect");
   const setupBtn = document.getElementById("setup");
+  const removeOwnerBtn = document.getElementById("removeOwner");
   const codeEl = document.getElementById("code");
   const confirmEl = document.getElementById("confirm");
   const selectedRouteNoticeEl = document.getElementById("selectedRouteNotice");
@@ -18,21 +20,16 @@
   const APK_URL = "ApprovedBrowser.apk";
 
   const ROUTES = {
-    ETROG: {
-      title: "אתרוג",
-      summary: "אתרים חיוניים ומאושרים בלבד"
-    },
-    HADASS: {
-      title: "הדס",
-      summary: "אתרים מאושרים + AI, בלי חדשות ופורומים"
-    },
-    LULAV: {
-      title: "לולב",
-      summary: "כל האתרים המאושרים, כולל תמונות"
-    }
+    ETROG: { title: "אתרוג", summary: "אתרים חיוניים ומאושרים בלבד" },
+    HADASS: { title: "הדס", summary: "אתרים מאושרים + AI, בלי חדשות ופורומים" },
+    LULAV: { title: "לולב", summary: "כל האתרים המאושרים, כולל תמונות" }
   };
 
   let selectedRoute = "ETROG";
+  let transport = null;
+  let adb = null;
+  let connected = false;
+  let busy = false;
 
   function selectRoute(route) {
     if (!ROUTES[route]) return;
@@ -48,19 +45,12 @@
     }
   }
 
-  let transport = null;
-  let adb = null;
-  let connected = false;
-  let busy = false;
-
   function setLog(message, append = false) {
     logEl.textContent = append && logEl.textContent ? logEl.textContent + "\n" + message : message;
     logEl.scrollTop = logEl.scrollHeight;
   }
 
-  function log(message) {
-    setLog(message, true);
-  }
+  function log(message) { setLog(message, true); }
 
   function setStatus(text, badge = "ממתין לחיבור", ok = false) {
     statusEl.textContent = text;
@@ -82,24 +72,20 @@
     busy = value;
     connectBtn.disabled = value;
     setupBtn.disabled = value || !connected;
+    removeOwnerBtn.disabled = value || !connected;
     connectBtn.textContent = value ? "מתחבר..." : (connected ? "חבר מחדש" : "חבר את הטלפון ב־USB");
   }
 
   function ensureWebUsb() {
-    if (!window.isSecureContext) {
-      throw new Error("האתר חייב להיפתח ב־HTTPS");
-    }
-    if (!("usb" in navigator)) {
-      throw new Error("הדפדפן הזה לא תומך ב־WebUSB. השתמש ב־Chrome או Edge במחשב.");
-    }
-    if (typeof window.Adb === "undefined") {
-      throw new Error("רכיב חיבור ה־ADB לא נטען. רענן את הדף ונסה שוב.");
-    }
+    if (!window.isSecureContext) throw new Error("האתר חייב להיפתח ב־HTTPS");
+    if (!(("usb") in navigator)) throw new Error("הדפדפן הזה לא תומך ב־WebUSB. השתמש ב־Chrome או Edge במחשב.");
+    if (typeof window.Adb === "undefined") throw new Error("רכיב חיבור ה־ADB לא נטען. רענן את הדף ונסה שוב.");
   }
 
   async function closeConnection() {
     connected = false;
     setupBtn.disabled = true;
+    removeOwnerBtn.disabled = true;
     const oldTransport = transport;
     transport = null;
     adb = null;
@@ -118,7 +104,6 @@
     try {
       while (!closed) {
         const response = await stream.receive();
-
         if (response.cmd === "WRTE") {
           if (response.data) {
             output += decoder.decode(
@@ -129,23 +114,17 @@
           await stream.send("OKAY");
           continue;
         }
-
         if (response.cmd === "CLSE") {
           await stream.send("OKAY").catch(() => {});
           closed = true;
           continue;
         }
-
-        if (response.cmd === "OKAY") {
-          continue;
-        }
-
+        if (response.cmd === "OKAY") continue;
         throw new Error("תגובה לא צפויה מ־ADB: " + response.cmd);
       }
     } finally {
       try { await stream.close(); } catch (_) {}
     }
-
     return output.trim();
   }
 
@@ -158,18 +137,13 @@
 
   function validateCode() {
     const value = codeEl.value;
-    if (!/^\d{4,12}$/.test(value)) {
-      throw new Error("קוד הגישה חייב להכיל 4–12 ספרות.");
-    }
-    if (value !== confirmEl.value) {
-      throw new Error("קודי הגישה אינם זהים.");
-    }
+    if (!/^\d{4,12}$/.test(value)) throw new Error("קוד הגישה חייב להכיל 4–12 ספרות.");
+    if (value !== confirmEl.value) throw new Error("קודי הגישה אינם זהים.");
     return value;
   }
 
   async function connectDevice() {
     if (busy) return;
-
     clearNotice();
     setBusy(true);
     await closeConnection();
@@ -181,9 +155,6 @@
       log("שלב 1/4: בחירת התקן USB...");
       log("שלב 2/4: פתיחת ממשק ה־ADB. עדיין לא מתבצעת התקנת APK.");
 
-      // Chromium can report InvalidStateError while WebUSB is finishing
-      // open/configure/claim on the selected Android interface. In that
-      // situation retry the complete transport open, not a later file transfer.
       let openError = null;
       for (let attempt = 1; attempt <= 4; attempt++) {
         try {
@@ -201,15 +172,11 @@
           const transient = /operation that changes the device state is in progress|invalidstateerror|interface state change is in progress/i.test(raw);
           log("פתיחת ADB נכשלה בניסיון " + attempt + ": " + raw);
           if (!transient || attempt === 4) throw error;
-          try {
-            await transport?.close?.();
-          } catch (_) {}
+          try { await transport?.close?.(); } catch (_) {}
           transport = null;
         }
       }
-
       if (openError) throw openError;
-
       if (!transport || !transport.isAdb()) {
         throw new Error("המכשיר נבחר אך ממשק ה־ADB לא נפתח. ודא שניפוי USB מופעל ונסה שוב.");
       }
@@ -218,14 +185,11 @@
       log("שלב 3/4: ממשק ADB נפתח בהצלחה.");
       log("כעת Android אמור להציג בקשת 'אפשר ניפוי USB' אם המחשב עדיין לא אושר.");
 
-      transport.device.addEventListener?.("connect", () => {
-        log("WebUSB דיווח על חיבור התקן.");
-      });
-
       transport.device.addEventListener?.("disconnect", () => {
         connected = false;
         adb = null;
         setupBtn.disabled = true;
+        removeOwnerBtn.disabled = true;
         setStatus("הטלפון נותק", "נותק");
         log("החיבור ל־USB נותק.");
       });
@@ -249,13 +213,11 @@
       }
 
       connected = true;
-      setStatus(
-        "מחובר: " + (model || "Android") + " • Android " + (android || "?"),
-        "מחובר",
-        true
-      );
+      setStatus("מחובר: " + (model || "Android") + " • Android " + (android || "?"), "מחובר", true);
       setupBtn.disabled = false;
+      removeOwnerBtn.disabled = false;
       setupNoticeEl.textContent = "המכשיר מחובר. הזן קוד גישה ולחץ על הכפתור כדי לבצע את ההגדרה ישירות דרך הדפדפן.";
+      removeOwnerNoticeEl.textContent = "המכשיר מחובר. הכפתור ינסה להסיר רק את מנהל המכשיר של האפליקציה שלנו, ללא איפוס.";
       log("החיבור הצליח: " + (model || "Android") + " • Android " + (android || "?"));
       log("האפליקציה נמצאה במכשיר.");
 
@@ -278,6 +240,7 @@
     } finally {
       setBusy(false);
       setupBtn.disabled = !connected;
+      removeOwnerBtn.disabled = !connected;
     }
   }
 
@@ -288,13 +251,8 @@
     if (!response.ok) throw new Error("לא ניתן להוריד את קובץ האפליקציה מהאתר.");
     const apkBlob = await response.blob();
     if (!apkBlob.size) throw new Error("קובץ ה־APK שהתקבל ריק.");
-
     log("מעביר את האפליקציה לטלפון דרך USB...");
 
-    // Chromium can briefly keep WebUSB in a device-state transition after
-    // an ADB stream/configuration change. webadb.js is archived and older
-    // Chromium versions were less strict here, so serialize the sync start
-    // and retry only this transient InvalidStateError.
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
     const remotePath = "/data/local/tmp/ApprovedBrowser.apk";
     let lastError = null;
@@ -323,22 +281,16 @@
         }
       }
     }
-
     if (lastError) throw lastError;
 
     log("מתקין את דפדפן מאושר במכשיר...");
     const result = await runShell("pm install -r -t " + remotePath);
-    if (!/success/i.test(result)) {
-      throw new Error(result || "Android דחה את התקנת האפליקציה.");
-    }
+    if (!/success/i.test(result)) throw new Error(result || "Android דחה את התקנת האפליקציה.");
     await runShell("rm -f " + remotePath);
     log("✓ דפדפן מאושר הותקן בהצלחה.");
   }
 
   async function inspectAccounts() {
-    // Android's set-device-owner precondition rejects devices that already
-    // contain accounts. "dumpsys account" exposes the account name/type
-    // without changing anything on the device.
     const output = await runShell("dumpsys account");
     const accounts = [];
     const seen = new Set();
@@ -347,7 +299,7 @@
       const cleanName = String(name || "").trim();
       const cleanType = String(type || "").trim();
       if (!cleanName && !cleanType) return;
-      const key = cleanName + "\\0" + cleanType;
+      const key = cleanName + "\0" + cleanType;
       if (seen.has(key)) return;
       seen.add(key);
       accounts.push({ name: cleanName || "(ללא שם)", type: cleanType || "(סוג לא ידוע)" });
@@ -356,9 +308,6 @@
     for (const match of output.matchAll(/Account\s*\{\s*name=([^,}]+),\s*type=([^}]+)\}/g)) {
       addAccount(match[1], match[2]);
     }
-
-    // Some Android builds print accounts in a compact form:
-    // Account {name=..., type=...}. Keep a second parser for spacing variants.
     for (const match of output.matchAll(/name=([^,\n}]+),\s*type=([^\n}]+)/g)) {
       addAccount(match[1], match[2]);
     }
@@ -369,12 +318,9 @@
     }
 
     log("חשבונות Android שנמצאו (" + accounts.length + "):");
-    accounts.forEach((account, index) => {
-      log("  " + (index + 1) + ". " + account.name + "  [" + account.type + "]");
-    });
+    accounts.forEach((account, index) => log("  " + (index + 1) + ". " + account.name + "  [" + account.type + "]"));
     log("⚠ קיימים חשבונות במכשיר. Android עלול לחסום הגדרת Device Owner בגלל החשבונות האלה.");
     log("ℹ Android לא מציין איזה חשבון יחיד גרם לחסימה — התנאי הוא שקיים חשבון במכשיר.");
-
     return { accounts, hasAccounts: true };
   }
 
@@ -384,8 +330,7 @@
 
     const components = [...new Set(
       [...owners.matchAll(/ComponentInfo\{([^/}\s]+)\/[^}]*\}/g)]
-        .map(match => match[1])
-        .filter(Boolean)
+        .map(match => match[1]).filter(Boolean)
     )];
 
     const deviceOwnerMatch = policy.match(
@@ -407,16 +352,10 @@
     } else {
       if (deviceOwner) log("Device Owner: " + deviceOwner);
       if (profiles.length) log("Profile Owner: " + profiles.join(", "));
-      if (!deviceOwner && !profiles.length && components.length) {
-        log("Android דיווח על מנהל/בעלים: " + components.join(", "));
-      }
-      if (deviceOwner === PACKAGE) {
-        log("✓ האפליקציה שלנו היא Device Owner.");
-      } else if (profiles.includes(PACKAGE)) {
-        log("⚠ האפליקציה שלנו היא Profile Owner, לא Device Owner.");
-      } else {
-        log("⚠ קיים מנהל אחר במכשיר.");
-      }
+      if (!deviceOwner && !profiles.length && components.length) log("Android דיווח על מנהל/בעלים: " + components.join(", "));
+      if (deviceOwner === PACKAGE) log("✓ האפליקציה שלנו היא Device Owner.");
+      else if (profiles.includes(PACKAGE)) log("⚠ האפליקציה שלנו היא Profile Owner, לא Device Owner.");
+      else log("⚠ קיים מנהל אחר במכשיר.");
     }
 
     return {
@@ -427,6 +366,70 @@
       hasOurDeviceOwner: deviceOwner === PACKAGE,
       hasOurProfileOwner: profiles.includes(PACKAGE)
     };
+  }
+
+  async function removeOurDeviceOwner() {
+    if (busy || !connected) return;
+
+    const confirmed = window.confirm(
+      "פעולה זו תנסה להסיר את מנהל המכשיר של האפליקציה שלנו בלבד.\n\n" +
+      "היא לא מבצעת איפוס מפעל ולא מוחקת את חשבון Google.\n\nלהמשיך?"
+    );
+    if (!confirmed) return;
+
+    busy = true;
+    connectBtn.disabled = true;
+    setupBtn.disabled = true;
+    removeOwnerBtn.disabled = true;
+
+    try {
+      setStatus("בודק את מנהל המכשיר...", "בודק");
+      log("בודק לפני ההסרה איזה מנהל מוגדר במכשיר...");
+      const ownerInfo = await inspectDevicePolicy();
+
+      if (ownerInfo.deviceOwner !== PACKAGE && !ownerInfo.hasOurProfileOwner) {
+        throw new Error(
+          "האפליקציה שלנו לא מזוהה כרגע כ־Device Owner או Profile Owner. לא בוצע שינוי."
+        );
+      }
+
+      log("נמצא מנהל של האפליקציה שלנו. מנסה להסיר אותו דרך ADB...");
+      setStatus("מסיר את מנהל המכשיר...", "מסיר");
+
+      let result = await runShell("dpm remove-active-admin --user 0 " + ADMIN);
+
+      if (/(unknown|error|exception|failed|failure|not allowed)/i.test(result)) {
+        log("ניסיון ראשון לא הצליח: " + (result || "(ללא פלט)"));
+        log("מנסה שוב ללא ציון משתמש...");
+        result = await runShell("dpm remove-active-admin " + ADMIN);
+      }
+
+      if (/(unknown|error|exception|failed|failure|not allowed)/i.test(result)) {
+        throw new Error(result || "Android לא אפשר להסיר את מנהל המכשיר דרך הפקודה הזו.");
+      }
+
+      const after = await inspectDevicePolicy();
+      if (after.deviceOwner === PACKAGE || after.hasOurProfileOwner) {
+        throw new Error(
+          "הפקודה הסתיימה אבל Android עדיין מדווח שהאפליקציה היא מנהל. לא ניתן לשחרר אותה בדרך הזו."
+        );
+      }
+
+      setStatus("המכשיר שוחרר", "הושלם", true);
+      removeOwnerNoticeEl.textContent = "מנהל המכשיר של האפליקציה הוסר. עכשיו אפשר לנסות לחזור למסך הבית או להסיר את האפליקציה.";
+      log("✓ מנהל המכשיר של האפליקציה הוסר.");
+      log("לא בוצע איפוס מפעל.");
+    } catch (error) {
+      const message = normalizeError(error);
+      setStatus("לא ניתן לשחרר את המכשיר", "שגיאה");
+      removeOwnerNoticeEl.textContent = message;
+      log("שגיאה בשחרור המכשיר: " + message);
+    } finally {
+      busy = false;
+      connectBtn.disabled = false;
+      setupBtn.disabled = !connected;
+      removeOwnerBtn.disabled = !connected;
+    }
   }
 
   async function setupDeviceOwner() {
@@ -444,7 +447,6 @@
     try {
       setStatus("בודק מצב בעל המכשיר...", "בודק");
       log("בודק אם כבר מוגדר Device Owner...");
-
       const ownerInfo = await inspectDevicePolicy();
       const accountInfo = await inspectAccounts();
       const hasOurOwner = ownerInfo.hasOurDeviceOwner || ownerInfo.hasOurProfileOwner;
@@ -458,9 +460,7 @@
       }
 
       if (!hasOurOwner && accountInfo.hasAccounts) {
-        const accountList = accountInfo.accounts
-          .map(account => account.name + " [" + account.type + "]")
-          .join(", ");
+        const accountList = accountInfo.accounts.map(account => account.name + " [" + account.type + "]").join(", ");
         throw new Error(
           "לא ניתן להגדיר Device Owner כי קיימים חשבונות במכשיר. " +
           "החשבונות שנמצאו: " + accountList + ". " +
@@ -472,16 +472,10 @@
         setStatus("מגדיר את האפליקציה כבעלת המכשיר...", "מתקין");
         log("שולח את פקודת Device Owner ישירות לטלפון...");
         const result = await runShell("dpm set-device-owner " + ADMIN);
-
         if (/already has a profile owner/i.test(result)) {
-          throw new Error(
-            "Android מדווח שכבר מוגדר Profile Owner במכשיר. אי אפשר להגדיר Device Owner במצב הזה. " +
-            "יש להסיר קודם את פרופיל העבודה/הניהול הקיים, או להשתמש במכשיר לאחר איפוס מלא."
-          );
+          throw new Error("Android מדווח שכבר מוגדר Profile Owner במכשיר. אי אפשר להגדיר Device Owner במצב הזה. יש להסיר קודם את פרופיל העבודה/הניהול הקיים, או להשתמש במכשיר לאחר איפוס מלא.");
         }
-        if (/(error|exception|failed|failure|not allowed|unknown)/i.test(result)) {
-          throw new Error(result || "Android דחה את הגדרת Device Owner.");
-        }
+        if (/(error|exception|failed|failure|not allowed|unknown)/i.test(result)) throw new Error(result || "Android דחה את הגדרת Device Owner.");
         log("פקודת Device Owner הסתיימה.");
       } else {
         log("האפליקציה כבר מוגדרת כבעלת המכשיר.");
@@ -490,14 +484,9 @@
       setStatus("מעביר את קוד הגישה לאפליקציה...", "מגדיר קוד");
       const encoded = base64Utf8(accessCode);
       const startResult = await runShell(
-        "am start -n " + PACKAGE +
-        "/.MainActivity --es setup_access_code_b64 " + encoded +
-        " --es setup_route " + selectedRoute
+        "am start -n " + PACKAGE + "/.MainActivity --es setup_access_code_b64 " + encoded + " --es setup_route " + selectedRoute
       );
-
-      if (/error|exception|unable to/i.test(startResult)) {
-        throw new Error(startResult || "לא הצלחתי להפעיל את האפליקציה.");
-      }
+      if (/error|exception|unable to/i.test(startResult)) throw new Error(startResult || "לא הצלחתי להפעיל את האפליקציה.");
 
       setStatus("ההגדרה הושלמה", "הושלם", true);
       setupNoticeEl.textContent = "ההגדרה הושלמה. דפדפן מאושר הופעל וקוד הגישה הוגדר.";
@@ -512,6 +501,7 @@
     } finally {
       setBusy(false);
       setupBtn.disabled = !connected;
+      removeOwnerBtn.disabled = !connected;
     }
   }
 
@@ -524,7 +514,6 @@
     if (/already has a profile owner|trying to set the device owner.*profile owner/i.test(raw)) return "כבר מוגדר במכשיר Profile Owner. Android לא מאפשר להגדיר Device Owner במצב הזה. יש להסיר קודם את פרופיל העבודה/הניהול הקיים, או להשתמש במכשיר לאחר איפוס מלא.";
     if (/INSTALL_FAILED|INSTALL_PARSE_FAILED|INSTALL_FAILED_VERSION_DOWNGRADE/i.test(raw)) return "Android דחה את התקנת האפליקציה. אם קיימת גרסה חתומה אחרת, הסר אותה או התקן מחדש את הגרסה הנוכחית.";
     if (/access|permission|security/i.test(raw)) return "הגישה ל־USB נחסמה. אשר את חלון ה־USB בדפדפן ואת הרשאת ניפוי ה־USB בטלפון.";
-    if (/already has a profile owner/i.test(raw)) return "Android מדווח שכבר מוגדר Profile Owner במכשיר. יש להסיר קודם את פרופיל העבודה/הניהול הקיים, או להשתמש במכשיר לאחר איפוס מלא.";
     if (/already.*accounts|there are already some accounts on the device|set the device owner because there are already some accounts/i.test(raw)) return "Android חוסם את הגדרת Device Owner כי קיימים חשבונות במכשיר. בדוק ביומן את רשימת החשבונות; Android לא מציין חשבון יחיד כאשם, אלא חוסם כאשר קיימים חשבונות.";
     if (/auth|unauthorized|RSA/i.test(raw)) return "הטלפון לא אישר את מפתח ה־RSA. אשר את חלון 'אפשר ניפוי USB' בטלפון ונסה שוב.";
     return raw;
@@ -532,11 +521,9 @@
 
   document.getElementById("connect").addEventListener("click", connectDevice);
   document.getElementById("setup").addEventListener("click", setupDeviceOwner);
-  routeButtons.forEach(button => {
-    button.addEventListener("click", () => selectRoute(button.dataset.route));
-  });
+  document.getElementById("removeOwner").addEventListener("click", removeOurDeviceOwner);
+  routeButtons.forEach(button => button.addEventListener("click", () => selectRoute(button.dataset.route)));
   selectRoute(selectedRoute);
-
 
   try {
     ensureWebUsb();
