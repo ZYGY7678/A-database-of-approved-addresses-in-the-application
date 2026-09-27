@@ -11,6 +11,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.13"
+      - name: Build Android APK
+        run: |
+          gradle assembleDebug
+          mkdir -p desktop/ApprovedBrowser.AdbTool/Assets
+          cp app/build/outputs/apk/debug/app-debug.apk desktop/ApprovedBrowser.AdbTool/Assets/ApprovedBrowser.apk
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -31,3 +45,8 @@ jobs:
         with:
           name: ApprovedBrowser-ADB-Tool-win-x64
           path: desktop/dist/*
+      - name: Upload bundled APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ApprovedBrowser-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
