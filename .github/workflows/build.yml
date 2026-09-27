@@ -1,4 +1,6 @@
 name: Build APK
+permissions:
+  contents: write
 on:
   workflow_dispatch:
   push:
@@ -20,3 +22,9 @@ jobs:
         with:
           name: ApprovedBrowser-debug
           path: app/build/outputs/apk/debug/app-debug.apk
+      - name: Publish latest APK release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --yes || true
+          gh release create latest app/build/outputs/apk/debug/app-debug.apk --title "Approved Browser latest" --notes "Latest browser installer APK"
