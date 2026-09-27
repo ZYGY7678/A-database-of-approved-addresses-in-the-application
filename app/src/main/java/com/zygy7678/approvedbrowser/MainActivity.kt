@@ -1555,7 +1555,6 @@ private fun SecuritySettingsScreen(
             }
         }
     }
-}
 
 private fun formatAppTime(format24: Boolean, offsetMinutes: Int): String {
     val calendar = java.util.Calendar.getInstance().apply {
