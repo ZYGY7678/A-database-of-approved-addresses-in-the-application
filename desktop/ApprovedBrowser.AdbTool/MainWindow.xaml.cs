@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -37,9 +39,22 @@ public partial class MainWindow : Window
             var installed = await RunAdbAsync("shell pm path " + PackageName);
             if (installed.ExitCode != 0 || string.IsNullOrWhiteSpace(installed.Output))
             {
-                AppendLog("✕ האפליקציה אינה מותקנת במכשיר");
-                MessageBox.Show("לא נמצאה האפליקציה במכשיר. התקן קודם את קובץ ה־APK ואז נסה שוב.", "האפליקציה לא נמצאה", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+                AppendLog("! האפליקציה אינה מותקנת — מתקין אותה מתוך כלי המחשב...");
+                var apkPath = await ExtractBundledApkAsync();
+                try
+                {
+                    var installCommand = "install -r -t \"" + apkPath + "\"";
+                    var install = await RunAdbAsync(installCommand);
+                    if (install.ExitCode != 0 || !((install.Output + install.Error).Contains("Success", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        AppendLog("✕ התקנת האפליקציה נכשלה");
+                        if (!string.IsNullOrWhiteSpace(install.Error)) AppendLog(install.Error.Trim());
+                        MessageBox.Show(string.IsNullOrWhiteSpace(install.Error) ? "התקנת האפליקציה נכשלה." : install.Error.Trim(), "שגיאת התקנה", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    AppendLog("✓ האפליקציה הותקנה בהצלחה מתוך כלי המחשב");
+                }
+                finally { try { File.Delete(apkPath); } catch { } }
             }
 
             AppendLog("> בודק בעל מכשיר קיים...");
@@ -133,6 +148,16 @@ public partial class MainWindow : Window
         {
             SetBusy(false);
         }
+    }
+
+    private static async Task<string> ExtractBundledApkAsync()
+    {
+        await using var input = Assembly.GetExecutingAssembly().GetManifestResourceStream("ApprovedBrowser.Apk")
+            ?? throw new InvalidOperationException("קובץ ה־APK לא נכלל בכלי המחשב.");
+        var path = Path.Combine(Path.GetTempPath(), "ApprovedBrowser-" + Guid.NewGuid().ToString("N") + ".apk");
+        await using var output = File.Create(path);
+        await input.CopyToAsync(output);
+        return path;
     }
 
     private static async Task<AdbResult> RunAdbAsync(string arguments){var psi=new ProcessStartInfo{FileName="adb",Arguments=arguments,UseShellExecute=false,RedirectStandardOutput=true,RedirectStandardError=true,CreateNoWindow=true,StandardOutputEncoding=Encoding.UTF8,StandardErrorEncoding=Encoding.UTF8};using var p=new Process{StartInfo=psi};p.Start();var o=p.StandardOutput.ReadToEndAsync();var e=p.StandardError.ReadToEndAsync();await p.WaitForExitAsync();return new AdbResult(p.ExitCode,await o,await e);}
