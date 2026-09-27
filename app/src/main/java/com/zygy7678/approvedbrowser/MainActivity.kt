@@ -650,14 +650,15 @@ private fun ApprovedBrowserApp(
     if (siteRequestDialog) {
         SiteRequestDialog(
             onDismiss = { siteRequestDialog = false },
-            onSubmit = { title, url, reason ->
+            onSubmit = { title, url, reason, contact ->
                 siteRequestDialog = false
                 if (openDeveloperIssue(
                         context = context,
                         type = "בקשת אישור אתר חדש",
                         title = title,
                         url = url,
-                        reason = reason
+                        reason = reason,
+                        contact = contact
                     )
                 ) requestThanksDialog = true
             }
@@ -724,7 +725,7 @@ private fun HomeScreen(
                     }
                 }
             },
-            placeholder = { Text("חיפוש בכל האתרים — שם, כתובת או קטגוריה") }
+            placeholder = { Text("חיפוש ברשימת האתרים — שם, כתובת, דומיין או קטגוריה") }
         )
 
         if (query.isNotBlank()) {
@@ -740,7 +741,7 @@ private fun HomeScreen(
                         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                     ) {
                         Column(Modifier.padding(16.dp)) {
-                            Text("תוצאות חיפוש בכל האתרים", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                            Text("תוצאות חיפוש ברשימת האתרים", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                             Text(
                                 searchResults.size.toString() + " אתרים נמצאו",
                                 style = MaterialTheme.typography.bodySmall,
@@ -758,7 +759,7 @@ private fun HomeScreen(
                             ) {
                                 Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(42.dp))
                                 Spacer(Modifier.height(8.dp))
-                                Text("לא נמצאו אתרים", fontWeight = FontWeight.SemiBold)
+                                Text("לא נמצאו אתרים ברשימה", fontWeight = FontWeight.SemiBold)
                                 Text("נסה שם אתר, כתובת, דומיין או קטגוריה אחרת.", style = MaterialTheme.typography.bodySmall)
                             }
                         }
@@ -1012,11 +1013,12 @@ private fun SiteActionDialog(
 @Composable
 private fun SiteRequestDialog(
     onDismiss: () -> Unit,
-    onSubmit: (String, String, String) -> Unit
+    onSubmit: (String, String, String, String) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
     var url by remember { mutableStateOf("https://") }
     var reason by remember { mutableStateOf("") }
+    var contact by remember { mutableStateOf("") }
     var error by remember { mutableStateOf("") }
 
     AlertDialog(
@@ -1046,6 +1048,14 @@ private fun SiteRequestDialog(
                     minLines = 3,
                     label = { Text("למה האתר נדרש?") }
                 )
+                OutlinedTextField(
+                    value = contact,
+                    onValueChange = { contact = it },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("פרטי קשר להודעה מהמפתח (אופציונלי)") },
+                    placeholder = { Text("לדוגמה: שם משתמש ב־GitHub או כתובת קשר") }
+                )
                 if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error)
             }
         },
@@ -1054,7 +1064,7 @@ private fun SiteRequestDialog(
                 when {
                     title.trim().isBlank() -> error = "הזן שם אתר"
                     !url.trim().startsWith("http://") && !url.trim().startsWith("https://") -> error = "הכתובת חייבת להתחיל ב־http:// או https://"
-                    else -> onSubmit(title.trim(), url.trim(), reason.trim())
+                    else -> onSubmit(title.trim(), url.trim(), reason.trim(), contact.trim())
                 }
             }) { Text("שלח למפתח") }
         },
@@ -1067,7 +1077,8 @@ private fun openDeveloperIssue(
     type: String,
     title: String,
     url: String,
-    reason: String
+    reason: String,
+    contact: String = ""
 ): Boolean {
     val issueTitle = "[$type] $title"
     val body = """
@@ -1079,6 +1090,9 @@ private fun openDeveloperIssue(
 
 פרטים:
 $reason
+
+פרטי קשר להודעה מהמפתח:
+${contact.ifBlank { "לא נמסרו" }}
 
 נא לבדוק את האתר והבקשה.
 """.trimIndent()
