@@ -1393,7 +1393,7 @@ private fun SettingsScreen(
                 ElevatedCard(Modifier.fillMaxWidth()) {
                     Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text("דפדפן מאושר", fontWeight = FontWeight.Bold)
-                        Text("פותח באהבה ע"י חייא שיאומי ממתמחים טופ", style = MaterialTheme.typography.bodyMedium)
+                        Text("פותח באהבה ע״י חייא שיאומי ממתמחים טופ", style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }
