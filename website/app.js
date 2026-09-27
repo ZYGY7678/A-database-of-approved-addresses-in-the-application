@@ -258,6 +258,16 @@
       setupNoticeEl.textContent = "המכשיר מחובר. הזן קוד גישה ולחץ על הכפתור כדי לבצע את ההגדרה ישירות דרך הדפדפן.";
       log("החיבור הצליח: " + (model || "Android") + " • Android " + (android || "?"));
       log("האפליקציה נמצאה במכשיר.");
+
+      setStatus("בודק מנהל מכשיר...", "בודק");
+      const ownerInfo = await inspectDevicePolicy();
+      if (!ownerInfo.hasAnyOwner) {
+        setStatus("מחובר • מנהל מכשיר: לא נמצא", "מחובר", true);
+      } else if (ownerInfo.deviceOwner) {
+        setStatus("מחובר • Device Owner: " + ownerInfo.deviceOwner, "מנהל נמצא", true);
+      } else if (ownerInfo.profiles.length) {
+        setStatus("מחובר • Profile Owner: " + ownerInfo.profiles.join(", "), "מנהל נמצא", true);
+      }
     } catch (error) {
       await closeConnection();
       setStatus("לא ניתן להתחבר", "שגיאה");
@@ -324,6 +334,57 @@
     log("✓ דפדפן מאושר הותקן בהצלחה.");
   }
 
+  async function inspectDevicePolicy() {
+    const owners = await runShell("dpm list-owners");
+    const policy = await runShell("dumpsys device_policy");
+
+    const components = [...new Set(
+      [...owners.matchAll(/ComponentInfo\{([^/}\s]+)\/[^}]*\}/g)]
+        .map(match => match[1])
+        .filter(Boolean)
+    )];
+
+    const deviceOwnerMatch = policy.match(
+      /Device Owner[^\n]*[\s\S]{0,500}?admin=ComponentInfo\{([^/}\s]+)\/[^}]*\}/i
+    );
+    const profileOwners = [];
+    const profileRegex = /Profile Owner[^\n]*?[\s\S]{0,500}?admin=ComponentInfo\{([^/}\s]+)\/[^}]*\}/gi;
+    let match;
+    while ((match = profileRegex.exec(policy)) !== null) {
+      if (match[1]) profileOwners.push(match[1]);
+    }
+
+    const deviceOwner = deviceOwnerMatch?.[1] || null;
+    const profiles = [...new Set(profileOwners)];
+    const hasAnyOwner = Boolean(deviceOwner || profiles.length || components.length);
+
+    if (!hasAnyOwner) {
+      log("מנהל מכשיר: לא נמצא Device Owner או Profile Owner.");
+    } else {
+      if (deviceOwner) log("Device Owner: " + deviceOwner);
+      if (profiles.length) log("Profile Owner: " + profiles.join(", "));
+      if (!deviceOwner && !profiles.length && components.length) {
+        log("Android דיווח על מנהל/בעלים: " + components.join(", "));
+      }
+      if (deviceOwner === PACKAGE) {
+        log("✓ האפליקציה שלנו היא Device Owner.");
+      } else if (profiles.includes(PACKAGE)) {
+        log("⚠ האפליקציה שלנו היא Profile Owner, לא Device Owner.");
+      } else {
+        log("⚠ קיים מנהל אחר במכשיר.");
+      }
+    }
+
+    return {
+      deviceOwner,
+      profiles,
+      components,
+      hasAnyOwner,
+      hasOurDeviceOwner: deviceOwner === PACKAGE,
+      hasOurProfileOwner: profiles.includes(PACKAGE)
+    };
+  }
+
   async function setupDeviceOwner() {
     if (busy || !connected) return;
 
@@ -340,25 +401,9 @@
       setStatus("בודק מצב בעל המכשיר...", "בודק");
       log("בודק אם כבר מוגדר Device Owner...");
 
-      const owners = await runShell("dpm list-owners");
-      // Check the complete device-policy state. A Profile Owner may belong
-      // to a managed-profile user, and some Android builds do not print the
-      // literal words "Profile Owner" in dpm list-owners.
-      const policy = await runShell("dumpsys device_policy");
-      const profileOwnerState = await runShell(
-        "dumpsys device_policy | grep -i -E \"Profile Owner|ProfileOwner|profile_owner|mProfileOwner\""
-      );
-      const ownerPackages = [...owners.matchAll(/ComponentInfo\{([^/}\s]+)\/[^}]*\}/g)]
-        .map(match => match[1])
-        .filter(Boolean);
-      const hasOurOwner = ownerPackages.includes(PACKAGE);
-      const hasProfileOwner =
-        /profile\s*owner/i.test(owners) ||
-        /profile\s*owner|profileowner|profile_owner|mProfileOwner|managed profile/i.test(policy) ||
-        /profile\s*owner|profileowner|profile_owner|mProfileOwner/i.test(profileOwnerState);
-
-      log("מצב בעל המכשיר: " + (ownerPackages.length ? ownerPackages.join(", ") : "לא נמצא בעל מכשיר"));
-      log("בדיקת Profile Owner: " + (hasProfileOwner ? "נמצא Profile Owner" : "לא נמצא Profile Owner"));
+      const ownerInfo = await inspectDevicePolicy();
+      const hasOurOwner = ownerInfo.hasOurDeviceOwner || ownerInfo.hasOurProfileOwner;
+      const hasProfileOwner = ownerInfo.profiles.length > 0;
 
       if (!hasOurOwner && hasProfileOwner) {
         throw new Error(
