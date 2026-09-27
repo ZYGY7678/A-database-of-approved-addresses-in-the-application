@@ -1529,13 +1529,12 @@ private fun DeviceOwnerInstructionsDialog(onDismiss: () -> Unit) {
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("1. התקן את קובץ ה־APK במכשיר.")
-                Text("2. פתח את האפליקציה ואפשר לה הרשאות אם Android מציג בקשה.")
-                Text("3. להפעלה מלאה של ההגנה, יש להגדיר את האפליקציה כ־Device Owner.")
-                Text("4. חבר את המכשיר למחשב והפעל USB debugging.")
-                Text("5. במחשב, כשה־ADB מזהה את המכשיר, הרץ:")
-                Text("adb shell dpm set-device-owner com.zygy7678.approvedbrowser/.ApprovedBrowserDeviceAdminReceiver")
-                Text("6. פתח מחדש את האפליקציה ובדוק בהגדרות → ניהול המכשיר שהסטטוס השתנה ל־בעל המכשיר.")
-                Text("חשוב: הגדרת Device Owner מיועדת למכשיר שמנוהל/מוכן לכך. Android עשוי לדחות את הפקודה אם המכשיר כבר מוגדר או מנוהל.")
+                Text("2. חבר את המכשיר למחשב והפעל USB debugging.")
+                Text("3. פתח את כלי ADB במחשב ובדוק שהמכשיר מופיע כמחובר.")
+                Text("4. בכלי ADB בחר קוד גישה בן 4–12 ספרות ואשר אותו.")
+                Text("5. לחץ על „הגדר בעל מכשיר + קוד גישה“. הכלי יבדוק שהאפליקציה מותקנת ושאין בעל מכשיר אחר.")
+                Text("6. לאחר הגדרת בעל המכשיר, הכלי יעביר את קוד הגישה לאפליקציה והיא תשמור אותו כ־SHA-256.")
+                Text("חשוב: Android עשוי לדחות הגדרת Device Owner אם המכשיר כבר מנוהל או אינו במצב המתאים להגדרה. אם כבר קיים בעל מכשיר אחר, הכלי יעצור ולא יחליף אותו.")
             }
         },
         confirmButton = {
