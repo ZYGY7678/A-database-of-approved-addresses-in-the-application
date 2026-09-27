@@ -59,7 +59,7 @@
 	};
 
 	Adb.WebUSB.Transport.prototype.reset = function() {
-		this.device.reset();
+		return this.device.reset();
 	};
 
 	Adb.WebUSB.Transport.prototype.send = function(ep, data) {
