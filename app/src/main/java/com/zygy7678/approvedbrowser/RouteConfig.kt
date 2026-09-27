@@ -20,16 +20,22 @@ fun BrowserRoute.allows(site: Site): Boolean = when (this) {
 
 class AccessCodeStore(context: Context) {
     private val prefs = context.getSharedPreferences("browser_access", Context.MODE_PRIVATE)
-    private val defaultHash = sha256("2468")
 
     init {
-        if (!prefs.contains("code_hash")) {
-            prefs.edit().putString("code_hash", defaultHash).apply()
+        // גרסאות קודמות יצרו אוטומטית את הקוד 2468. העדכון מסיר רק את ברירת המחדל הישנה.
+        val stored = prefs.getString("code_hash", null)
+        if (stored == sha256("2468")) {
+            prefs.edit().remove("code_hash").apply()
         }
     }
 
-    fun verify(code: String): Boolean =
-        code.isNotBlank() && sha256(code) == prefs.getString("code_hash", defaultHash)
+    fun hasCode(): Boolean =
+        !prefs.getString("code_hash", null).isNullOrBlank()
+
+    fun verify(code: String): Boolean {
+        val stored = prefs.getString("code_hash", null)
+        return hasCode() && code.isNotBlank() && stored == sha256(code)
+    }
 
     fun changeCode(newCode: String): Boolean {
         if (!newCode.matches(Regex("\\d{4,12}"))) return false
@@ -37,11 +43,8 @@ class AccessCodeStore(context: Context) {
         return true
     }
 
-    fun provisionFromSetup(newCode: String): Boolean {
-        if (!newCode.matches(Regex("\\d{4,12}"))) return false
-        prefs.edit().putString("code_hash", sha256(newCode)).apply()
-        return true
-    }
+    fun provisionFromSetup(newCode: String): Boolean =
+        changeCode(newCode)
 
     private fun sha256(value: String): String {
         val bytes = MessageDigest.getInstance("SHA-256")
