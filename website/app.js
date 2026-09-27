@@ -434,7 +434,8 @@
           const afterDirect = await inspectDevicePolicy();
           if (afterDirect.deviceOwner !== PACKAGE && !afterDirect.hasOurProfileOwner) {
             setStatus("המכשיר שוחרר", "הושלם", true);
-            removeOwnerNoticeEl.textContent = "מנהל המכשיר הוסר. עכשיו אפשר למחוק את האפליקציה.";\n            log("✓ מנהל המכשיר הוסר בלי התקנת APK חדש.");
+            removeOwnerNoticeEl.textContent = "מנהל המכשיר הוסר. עכשיו אפשר למחוק את האפליקציה.";
+            log("✓ מנהל המכשיר הוסר בלי התקנת APK חדש.");
             return;
           }
         }
