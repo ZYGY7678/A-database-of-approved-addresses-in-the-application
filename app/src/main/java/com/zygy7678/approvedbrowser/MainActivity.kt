@@ -1662,7 +1662,7 @@ private fun WeeklyLockWindowDialog(
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(vertical = 2.dp, end = 4.dp)
+                    contentPadding = PaddingValues(top = 2.dp, bottom = 2.dp, end = 4.dp)
                 ) {
                     item {
                         Text(
