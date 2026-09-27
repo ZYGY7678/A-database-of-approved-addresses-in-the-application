@@ -343,7 +343,7 @@
       const owners = await runShell("dpm list-owners");
       // dpm list-owners may print informational text even when no owner exists.
       // Only a real ComponentInfo package is evidence of an existing owner.
-      const ownerPackages = [...owners.matchAll(/ComponentInfo\\{([^/}\\s]+)\\/[^}]*\\}/g)]
+      const ownerPackages = [...owners.matchAll(/ComponentInfo\{([^/}\s]+)\/[^}]*\}/g)]
         .map(match => match[1])
         .filter(Boolean);
       const hasOurOwner = ownerPackages.includes(PACKAGE);
