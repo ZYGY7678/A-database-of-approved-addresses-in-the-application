@@ -17,7 +17,7 @@
   const confirmEl = document.getElementById("confirm");
   const selectedRouteNoticeEl = document.getElementById("selectedRouteNotice");
   const routeButtons = [...document.querySelectorAll(".route-option")];
-  const APK_URL = "https://cdn.jsdelivr.net/gh/ZYGY7678/A-database-of-approved-addresses-in-the-application@882d95f5d7fcd757116a7c29e7c6a0cdf709f440/website/app-debug.apk";
+  const APK_URL = "https://cdn.jsdelivr.net/gh/ZYGY7678/A-database-of-approved-addresses-in-the-application@654f1b0b08d5f138b1d2f26bc52c5ef0ebcbd0aa/website/app-debug.apk";
   const LATEST_VERSION_CODE = 3;
   const LATEST_VERSION_NAME = "1.0.2";
 
