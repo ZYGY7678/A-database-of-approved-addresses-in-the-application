@@ -63,6 +63,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -79,6 +80,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.input.pointer.awaitPointerEvent
+import androidx.compose.ui.input.pointer.awaitPointerEventScope
+import androidx.compose.ui.input.pointer.pointerInput
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private data class BrowserPrefs(
@@ -213,6 +218,19 @@ private fun ApprovedBrowserApp(
     var accessDialog by remember { mutableStateOf(false) }
     var routeDialog by remember { mutableStateOf(false) }
     var changeCodeDialog by remember { mutableStateOf(false) }
+    var deviceOwnerInstructionsDialog by remember { mutableStateOf(false) }
+    var appLocked by remember { mutableStateOf(false) }
+    var lastActivity by remember { mutableStateOf(System.currentTimeMillis()) }
+    val activityCallback = rememberUpdatedState { lastActivity = System.currentTimeMillis() }
+
+    LaunchedEffect(prefs.autoLockMinutes, lastActivity) {
+        if (prefs.autoLockMinutes > 0 && !appLocked) {
+            delay(prefs.autoLockMinutes * 60_000L)
+            if (System.currentTimeMillis() - lastActivity >= prefs.autoLockMinutes * 60_000L) {
+                appLocked = true
+            }
+        }
+    }
     val categories = remember(availableSites) {
         listOf("מועדפים", "הכול") + availableSites.map { it.category }.distinct()
     }
@@ -225,6 +243,18 @@ private fun ApprovedBrowserApp(
         }
     }
 
+    Box(
+        Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        awaitPointerEvent()
+                        activityCallback.value.invoke()
+                    }
+                }
+            }
+    ) {
     if (settings) {
         SettingsScreen(
             prefs = prefs,
@@ -232,6 +262,7 @@ private fun ApprovedBrowserApp(
             onPrefsChange = onPrefsChange,
             onChangeRoute = { accessDialog = true },
             onChangeCode = { changeCodeDialog = true },
+            onDeviceOwnerInstructions = { deviceOwnerInstructionsDialog = true },
             onBack = { settings = false }
         )
     } else {
@@ -459,6 +490,21 @@ private fun ApprovedBrowserApp(
             onSaved = { changeCodeDialog = false },
             onDismiss = { changeCodeDialog = false }
         )
+    }
+
+    if (deviceOwnerInstructionsDialog) {
+        DeviceOwnerInstructionsDialog(onDismiss = { deviceOwnerInstructionsDialog = false })
+    }
+
+    if (appLocked) {
+        AppLockDialog(
+            store = accessStore,
+            onUnlocked = {
+                appLocked = false
+                lastActivity = System.currentTimeMillis()
+            }
+        )
+    }
     }
 }
 
@@ -917,6 +963,7 @@ private fun SettingsScreen(
     onPrefsChange: (BrowserPrefs) -> Unit,
     onChangeRoute: () -> Unit,
     onChangeCode: () -> Unit,
+    onDeviceOwnerInstructions: () -> Unit,
     onBack: () -> Unit
 ) {
     Scaffold(
@@ -1004,10 +1051,15 @@ private fun SettingsScreen(
             item { SettingsHeader("ניהול המכשיר", "הגנה ברמת Android — פעילה לאחר הגדרת האפליקציה כבעלת המכשיר") }
             item {
                 val owner = DeviceManagement.isDeviceOwner(LocalContext.current)
-                SettingInfo(
-                    "מצב הגנה על האפליקציה",
-                    if (owner) "האפליקציה מוגדרת כבעלת המכשיר ואינה ניתנת להסרה רגילה" else "טרם הוגדרה כבעלת המכשיר"
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SettingInfo(
+                        "מצב הגנה על האפליקציה",
+                        if (owner) "האפליקציה מוגדרת כבעלת המכשיר ואינה ניתנת להסרה רגילה" else "טרם הוגדרה כבעלת המכשיר"
+                    )
+                    OutlinedButton(onClick = onDeviceOwnerInstructions, modifier = Modifier.fillMaxWidth()) {
+                        Text("הוראות הפעלה והגדרת בעל המכשיר")
+                    }
+                }
             }
 
             item { SettingsHeader("אבטחה מתקדמת", "שליטה נוספת על הגלישה והגישה") }
@@ -1037,7 +1089,9 @@ private fun SettingsScreen(
                 }
             }
             item {
-                SettingInfo("נעילה אוטומטית", if (prefs.autoLockMinutes == 0) "כבוי" else "נעילה לאחר " + prefs.autoLockMinutes + " דקות ללא פעילות")
+                AutoLockSetting(prefs.autoLockMinutes) { minutes ->
+                    onPrefsChange(prefs.copy(autoLockMinutes = minutes))
+                }
             }
 
             item { SettingsHeader("זמן ותאריך", "שעון פנימי לתצוגה באפליקציה") }
@@ -1191,6 +1245,89 @@ private fun SettingSwitch(
             Switch(checked = checked, onCheckedChange = onChange)
         }
     }
+}
+
+@Composable
+private fun AutoLockSetting(
+    selectedMinutes: Int,
+    onChange: (Int) -> Unit
+) {
+    ElevatedCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("נעילה אוטומטית לפי זמן", fontWeight = FontWeight.SemiBold)
+            Text(
+                if (selectedMinutes == 0) "כבוי" else "נועל את האפליקציה לאחר $selectedMinutes דקות ללא פעילות",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                listOf(0, 5, 10, 30, 60).forEach { minutes ->
+                    FilterChip(
+                        selected = selectedMinutes == minutes,
+                        onClick = { onChange(minutes) },
+                        label = { Text(if (minutes == 0) "כבוי" else "$minutes דק׳") }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AppLockDialog(
+    store: AccessCodeStore,
+    onUnlocked: () -> Unit
+) {
+    var code by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = {},
+        title = { Text("האפליקציה ננעלה") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("זמן הנעילה האוטומטית הסתיים. הזן את קוד הגישה כדי להמשיך.")
+                OutlinedTextField(
+                    value = code,
+                    onValueChange = { code = it.filter(Char::isDigit).take(12); error = false },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                    visualTransformation = PasswordVisualTransformation(),
+                    label = { Text("קוד גישה") },
+                    isError = error
+                )
+                if (error) Text("קוד שגוי", color = MaterialTheme.colorScheme.error)
+            }
+        },
+        confirmButton = {
+            Button(onClick = {
+                if (store.verify(code)) onUnlocked() else error = true
+            }) { Text("פתיחה") }
+        }
+    )
+}
+
+@Composable
+private fun DeviceOwnerInstructionsDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("הפעלת האפליקציה ובעל המכשיר") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("1. התקן את קובץ ה־APK במכשיר.")
+                Text("2. פתח את האפליקציה ואפשר לה הרשאות אם Android מציג בקשה.")
+                Text("3. להפעלה מלאה של ההגנה, יש להגדיר את האפליקציה כ־Device Owner.")
+                Text("4. חבר את המכשיר למחשב והפעל USB debugging.")
+                Text("5. במחשב, כשה־ADB מזהה את המכשיר, הרץ:")
+                Text("adb shell dpm set-device-owner com.zygy7678.approvedbrowser/.ApprovedBrowserDeviceAdminReceiver")
+                Text("6. פתח מחדש את האפליקציה ובדוק בהגדרות → ניהול המכשיר שהסטטוס השתנה ל־בעל המכשיר.")
+                Text("חשוב: הגדרת Device Owner מיועדת למכשיר שמנוהל/מוכן לכך. Android עשוי לדחות את הפקודה אם המכשיר כבר מוגדר או מנוהל.")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text("סגור") }
+        }
+    )
 }
 
 @Composable
