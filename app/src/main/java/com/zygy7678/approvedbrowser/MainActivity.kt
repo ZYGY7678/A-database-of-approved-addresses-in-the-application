@@ -1288,6 +1288,24 @@ private fun SettingsScreen(
                     "המועדפים נשמרים מקומית במכשיר."
                 )
             }
+
+            item { SettingsHeader("אודות", "מידע על האפליקציה") }
+            item {
+                ElevatedCard(Modifier.fillMaxWidth()) {
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text("דפדפן מאושר", fontWeight = FontWeight.Bold)
+                        Text(
+                            "פותח באהבה ע"י חייא שיאומי ממתמחים טופ",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -1446,11 +1464,22 @@ private fun WeeklyLockWindowDialog(
         onDismissRequest = onDismiss,
         title = { Text("הוספת זמן נעילה") },
         text = {
-            Box(Modifier.fillMaxWidth().heightIn(max = 360.dp)) {
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 180.dp, max = 320.dp)
+            ) {
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                     contentPadding = PaddingValues(vertical = 2.dp, end = 4.dp)
                 ) {
+                    item {
+                        Text(
+                            "בחר ימים ושעות לנעילה",
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
                     item { Text("בחר את הימים שבהם הטווח יחול:") }
                     item {
                         LazyRow(
@@ -1494,7 +1523,7 @@ private fun WeeklyLockWindowDialog(
                     }
                     item {
                         Text(
-                            "אפשר גם 22:00–07:00 — הנעילה תמשיך אוטומטית אחרי חצות.",
+                            "אפשר גם 22:00–07:00 — הנעילה תמשיך אוטומטית אחרי חצות. אם המסך קטן, ניתן לגלול בתוך החלון.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
