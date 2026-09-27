@@ -3,6 +3,8 @@ package com.zygy7678.approvedbrowser
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 
 object DeviceManagement {
 
@@ -19,14 +21,27 @@ object DeviceManagement {
         if (!dpm.isDeviceOwnerApp(context.packageName)) return
 
         val admin = adminComponent(context)
+        val activity = ComponentName(context, MainActivity::class.java)
 
         // A device owner cannot be uninstalled by the normal user.
         dpm.setUninstallBlocked(admin, context.packageName, true)
 
-        // Kiosk mode: only this app is allowed to remain in Lock Task.
+        // Only this package is allowed to enter Lock Task mode.
         dpm.setLockTaskPackages(admin, arrayOf(context.packageName))
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
             dpm.setLockTaskFeatures(admin, 0)
+        }
+
+        // Make this app the persistent handler for web links.
+        // The WebView still applies the whitelist before loading the URL.
+        val webFilter = IntentFilter(Intent.ACTION_VIEW).apply {
+            addCategory(Intent.CATEGORY_DEFAULT)
+            addCategory(Intent.CATEGORY_BROWSABLE)
+            addDataScheme("http")
+            addDataScheme("https")
+        }
+        runCatching {
+            dpm.addPersistentPreferredActivity(admin, webFilter, activity)
         }
     }
 
