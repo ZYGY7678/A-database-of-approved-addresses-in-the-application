@@ -268,6 +268,8 @@ private fun ApprovedBrowserApp(
     var routeDialog by remember { mutableStateOf(false) }
     var changeCodeDialog by remember { mutableStateOf(false) }
     var deviceOwnerInstructionsDialog by remember { mutableStateOf(false) }
+    var scheduleAccessDialog by remember { mutableStateOf(false) }
+    var pendingWeeklyWindows by remember { mutableStateOf<List<WeeklyLockWindow>?>(null) }
     var appLocked by remember { mutableStateOf(isWeeklyLockActive(prefs.weeklyLockWindows)) }
 
     LaunchedEffect(prefs.weeklyLockWindows) {
@@ -518,6 +520,23 @@ private fun ApprovedBrowserApp(
         )
     }
 
+    if (scheduleAccessDialog) {
+        AccessCodeDialog(
+            store = accessStore,
+            onVerified = {
+                pendingWeeklyWindows?.let { windows ->
+                    onPrefsChange(prefs.copy(weeklyLockWindows = windows))
+                }
+                pendingWeeklyWindows = null
+                scheduleAccessDialog = false
+            },
+            onDismiss = {
+                pendingWeeklyWindows = null
+                scheduleAccessDialog = false
+            }
+        )
+    }
+
     if (changeCodeDialog) {
         ChangeAccessCodeDialog(
             store = accessStore,
@@ -535,7 +554,6 @@ private fun ApprovedBrowserApp(
             store = accessStore,
             onUnlocked = {
                 appLocked = false
-                lastActivity = System.currentTimeMillis()
             }
         )
     }
@@ -1124,7 +1142,8 @@ private fun SettingsScreen(
             }
             item {
                 WeeklyLockScheduleSetting(prefs.weeklyLockWindows) { windows ->
-                    onPrefsChange(prefs.copy(weeklyLockWindows = windows))
+                    pendingWeeklyWindows = windows
+                    scheduleAccessDialog = true
                 }
             }
 
