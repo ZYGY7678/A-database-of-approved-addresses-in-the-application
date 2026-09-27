@@ -13,6 +13,7 @@ import java.net.URI
 
 class BrowserWebViewClient(
     private val sitesProvider: () -> List<Site>,
+    private val allowImages: Boolean,
     private val onBlockedNavigation: () -> Unit,
     private val onPageStateChanged: (String?, Boolean) -> Unit
 ) : WebViewClient() {
@@ -98,7 +99,7 @@ class BrowserWebViewClient(
             imageExtensions.any(path::endsWith) ||
             (accept.startsWith("image/") && !accept.contains("text/html"))
 
-        if (looksLikeImage && !isImageEnabledHost(mainHost)) {
+        if (looksLikeImage && (!allowImages || !isImageEnabledHost(mainHost))) {
             return emptyResponse()
         }
 
@@ -106,6 +107,7 @@ class BrowserWebViewClient(
     }
 
     private fun isImageEnabledHost(host: String): Boolean {
+        if (allowImages) return true
         val normalized = host.removePrefix("www.")
         return imageEnabledHosts.any {
             normalized == it || normalized.endsWith(".$it")
