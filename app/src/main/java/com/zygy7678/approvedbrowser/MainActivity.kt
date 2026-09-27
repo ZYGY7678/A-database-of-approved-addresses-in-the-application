@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
@@ -612,13 +613,19 @@ private fun HomeScreen(
             value = query,
             onValueChange = onQueryChange,
             singleLine = true,
+            maxLines = 1,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            leadingIcon = {
-                Icon(Icons.Default.Search, contentDescription = "חיפוש")
+                .padding(horizontal = 10.dp, vertical = 6.dp),
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "חיפוש") },
+            trailingIcon = {
+                if (query.isNotBlank()) {
+                    IconButton(onClick = { onQueryChange("") }) {
+                        Icon(Icons.Default.Close, contentDescription = "נקה חיפוש")
+                    }
+                }
             },
-            placeholder = { Text("חיפוש באתרים המאושרים") }
+            placeholder = { Text("חיפוש באתר, כתובת או קטגוריה") }
         )
 
         ScrollableTabRow(
@@ -667,9 +674,12 @@ private fun HomeScreen(
                     if (query.isBlank()) {
                         source
                     } else {
+                        val normalizedQuery = query.trim().lowercase()
                         source.filter {
-                            it.name.contains(query, ignoreCase = true) ||
-                                it.url.contains(query, ignoreCase = true)
+                            val haystack = listOf(it.name, it.url, it.host, it.category)
+                                .joinToString(" ")
+                                .lowercase()
+                            normalizedQuery.isBlank() || haystack.contains(normalizedQuery)
                         }
                     }
                 }
@@ -1527,19 +1537,40 @@ private fun DeviceOwnerInstructionsDialog(onDismiss: () -> Unit) {
         onDismissRequest = onDismiss,
         title = { Text("הפעלת האפליקציה ובעל המכשיר") },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("1. התקן את קובץ ה־APK במכשיר.")
-                Text("2. חבר את המכשיר למחשב והפעל USB debugging.")
-                Text("3. פתח את כלי ADB במחשב ובדוק שהמכשיר מופיע כמחובר.")
-                Text("4. בכלי ADB בחר קוד גישה בן 4–12 ספרות ואשר אותו.")
-                Text("5. לחץ על „הגדר בעל מכשיר + קוד גישה“. הכלי יבדוק שהאפליקציה מותקנת ושאין בעל מכשיר אחר.")
-                Text("6. לאחר הגדרת בעל המכשיר, הכלי יעביר את קוד הגישה לאפליקציה והיא תשמור אותו כ־SHA-256.")
-                Text("חשוב: Android עשוי לדחות הגדרת Device Owner אם המכשיר כבר מנוהל או אינו במצב המתאים להגדרה. אם כבר קיים בעל מכשיר אחר, הכלי יעצור ולא יחליף אותו.")
+            Box(Modifier.heightIn(max = 430.dp)) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = PaddingValues(end = 4.dp)
+                ) {
+                    item { Text("הכנה לפני ההגדרה", fontWeight = FontWeight.Bold) }
+                    item { Text("• התקן את קובץ ה־APK של דפדפן מאושר במכשיר.") }
+                    item { Text("• פתח את הגדרות Android → חשבונות (או סיסמאות וחשבונות).") }
+                    item { Text("• הסר מהמכשיר את חשבונות Google הקיימים לפני ניסיון ההגדרה. במכשירים רבים Android לא מאפשר להגדיר Device Owner כאשר כבר קיים חשבון משתמש מנוהל או חשבון Google.") }
+                    item { Text("• ודא שהמכשיר אינו מנוהל כבר על ידי אפליקציית ניהול אחרת.") }
+                    item { Text("• הפעל אפשרויות למפתחים ו־USB debugging.") }
+                    item { Text("הגדרה מהמחשב", fontWeight = FontWeight.Bold) }
+                    item { Text("1. חבר את הטלפון למחשב באמצעות USB ואשר בטלפון את חלון הרשאת ניפוי ה־USB אם הוא מופיע.") }
+                    item { Text("2. הפעל את כלי Approved Browser ADB במחשב.") }
+                    item { Text("3. ודא שהכלי מציג שהמכשיר מחובר.") }
+                    item { Text("4. בחר קוד גישה חדש בן 4–12 ספרות והקלד אותו גם בשדה האימות.") }
+                    item { Text("5. לחץ על „הגדר בעל מכשיר + קוד גישה“. הכלי יבדוק שהאפליקציה מותקנת ושאין בעל מכשיר אחר.") }
+                    item { Text("6. אשר את הפעולה. הכלי יריץ את פקודת ADB ויגדיר את דפדפן מאושר כבעל המכשיר.") }
+                    item { Text("7. לאחר מכן הכלי יעביר את קוד הגישה לאפליקציה. האפליקציה תשמור רק גיבוב SHA-256 של הקוד.") }
+                    item { Text("אם ההגדרה נכשלת", fontWeight = FontWeight.Bold) }
+                    item { Text("• בדוק שחשבון Google הוסר מהמכשיר.") }
+                    item { Text("• בדוק שאין כבר Device Owner או אפליקציית ניהול אחרת.") }
+                    item { Text("• בדוק שה־USB debugging מאושר ושהמכשיר מופיע כ־connected בכלי.") }
+                    item { Text("• אם המכשיר כבר הוגדר בעבר כמכשיר מנוהל, ייתכן שיהיה צורך באיפוס למצב מתאים לפני הגדרת בעל מכשיר חדש.") }
+                    item {
+                        Text(
+                            "חשוב: הגדרת Device Owner היא הגדרה ברמת Android ויכולה לשנות את יכולת המשתמש להסיר את האפליקציה ולנהל את המכשיר. בצע אותה רק במכשיר שנועד לכך.",
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
             }
         },
-        confirmButton = {
-            TextButton(onClick = onDismiss) { Text("סגור") }
-        }
+        confirmButton = { TextButton(onClick = onDismiss) { Text("סגור") } }
     )
 }
 
