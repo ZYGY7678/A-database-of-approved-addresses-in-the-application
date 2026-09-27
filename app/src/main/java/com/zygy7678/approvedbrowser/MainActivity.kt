@@ -338,15 +338,7 @@ private fun ApprovedBrowserApp(
                 prefs = prefs,
                 securityHasCode = accessStore.hasCode(),
                 onPrefsChange = onPrefsChange,
-                onOpenSecurity = {
-                    if (accessStore.hasCode()) {
-                        pendingSensitiveAction = { securityFolderOpen = true }
-                        sensitiveAccessDialog = true
-                    } else {
-                        pendingSensitiveAction = { securityFolderOpen = true }
-                        changeCodeDialog = true
-                    }
-                },
+                onOpenSecurity = { securityFolderOpen = true },
                 onSiteRequest = { siteRequestDialog = true },
                 onBack = { settings = false }
             )
@@ -1297,6 +1289,8 @@ private fun SettingsScreen(
     onSiteRequest: () -> Unit,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
+    val deviceOwner = DeviceManagement.isDeviceOwner(context)
     Scaffold(
         topBar = {
             TopAppBar(
@@ -1425,7 +1419,7 @@ private fun SecuritySettingsScreen(
             item {
                 SettingsHeader(
                     "הגנה מרכזית",
-                    "כל ההגדרות בעמוד הזה נפתחות רק לאחר אימות קוד המנהל של תיקיית האבטחה."
+                    if (deviceOwner) "המכשיר מוגדר כבעל־מכשיר — הגדרות האבטחה זמינות לשינוי." else "תצוגה מקדימה בלבד. ההגדרות נעולות עד שהאפליקציה תוגדר כבעלת המכשיר."
                 )
             }
             item {
@@ -1437,12 +1431,12 @@ private fun SecuritySettingsScreen(
                             Text(route.title + " — " + route.description, fontWeight = FontWeight.Bold)
                             Text("מסלול הסינון הפעיל", style = MaterialTheme.typography.bodySmall)
                         }
-                        OutlinedButton(onClick = onChangeRoute) { Text("שינוי") }
+                        OutlinedButton(onClick = onChangeRoute, enabled = deviceOwner) { Text(if (deviceOwner) "שינוי" else "נעול") }
                     }
                 }
             }
             item {
-                OutlinedCard(modifier = Modifier.fillMaxWidth(), onClick = onChangeCode) {
+                OutlinedCard(modifier = Modifier.fillMaxWidth(), onClick = onChangeCode, enabled = deviceOwner) {
                     Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.SwapHoriz, contentDescription = null)
                         Spacer(Modifier.size(10.dp))
@@ -1470,12 +1464,12 @@ private fun SecuritySettingsScreen(
             }
 
             item { SettingsHeader("הגנת הגלישה", "כל ההגנות כאן כפופות לקוד המנהל של תיקיית האבטחה") }
-            item { SettingSwitch("חסימת פתיחה באפליקציות חיצוניות", "מונע מעבר מאושר לאפליקציות אחרות.", prefs.blockExternalApps) { onPrefsChange(prefs.copy(blockExternalApps = it)) } }
-            item { SettingSwitch("חסימת חלונות קופצים", "מונע פתיחת חלונות חדשים מתוך האתר.", prefs.blockPopups) { onPrefsChange(prefs.copy(blockPopups = it)) } }
-            item { SettingSwitch("השבתת JavaScript", "הגנה מחמירה יותר; חלק מהאתרים עלולים לא לעבוד.", prefs.disableJavascript) { onPrefsChange(prefs.copy(disableJavascript = it)) } }
-            item { SettingSwitch("מניעת צילומי מסך", "מפעיל FLAG_SECURE של Android.", prefs.preventScreenshots) { onPrefsChange(prefs.copy(preventScreenshots = it)) } }
-            item { SettingSwitch("ניקוי בעת יציאה", "נקה את מצב הגלישה בעת יציאה.", prefs.clearOnExit) { onPrefsChange(prefs.copy(clearOnExit = it)) } }
-            item { WeeklyLockScheduleSetting(prefs.weeklyLockWindows, onWeeklyLockChange) }
+            item { SettingSwitch("חסימת פתיחה באפליקציות חיצוניות", "מונע מעבר מאושר לאפליקציות אחרות.", prefs.blockExternalApps, enabled = deviceOwner) { onPrefsChange(prefs.copy(blockExternalApps = it)) } }
+            item { SettingSwitch("חסימת חלונות קופצים", "מונע פתיחת חלונות חדשים מתוך האתר.", prefs.blockPopups, enabled = deviceOwner) { onPrefsChange(prefs.copy(blockPopups = it)) } }
+            item { SettingSwitch("השבתת JavaScript", "הגנה מחמירה יותר; חלק מהאתרים עלולים לא לעבוד.", prefs.disableJavascript, enabled = deviceOwner) { onPrefsChange(prefs.copy(disableJavascript = it)) } }
+            item { SettingSwitch("מניעת צילומי מסך", "מפעיל FLAG_SECURE של Android.", prefs.preventScreenshots, enabled = deviceOwner) { onPrefsChange(prefs.copy(preventScreenshots = it)) } }
+            item { SettingSwitch("ניקוי בעת יציאה", "נקה את מצב הגלישה בעת יציאה.", prefs.clearOnExit, enabled = deviceOwner) { onPrefsChange(prefs.copy(clearOnExit = it)) } }
+            item { WeeklyLockScheduleSetting(prefs.weeklyLockWindows, onWeeklyLockChange, enabled = deviceOwner) }
             item { SettingInfo("הערה", "ההגנות בתיקייה הזו ממשיכות לפעול גם אחרי יציאה מהמסך.") }
         }
     }
@@ -1521,6 +1515,7 @@ private fun SettingSwitch(
     title: String,
     subtitle: String,
     checked: Boolean,
+    enabled: Boolean = true,
     onChange: (Boolean) -> Unit
 ) {
     ElevatedCard(Modifier.fillMaxWidth()) {
@@ -1538,7 +1533,7 @@ private fun SettingSwitch(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            Switch(checked = checked, onCheckedChange = onChange)
+            Switch(checked = checked, enabled = enabled, onCheckedChange = onChange)
         }
     }
 }
@@ -1546,13 +1541,15 @@ private fun SettingSwitch(
 @Composable
 private fun WeeklyLockScheduleSetting(
     windows: List<WeeklyLockWindow>,
-    onChange: (List<WeeklyLockWindow>) -> Unit
+    onChange: (List<WeeklyLockWindow>) -> Unit,
+    enabled: Boolean = true
 ) {
     var dialog by remember { mutableStateOf(false) }
 
     ElevatedCard(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("נעילה לפי לוח זמנים", fontWeight = FontWeight.SemiBold)
+            if (!enabled) Text("נעול עד הגדרת בעל המכשיר", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(
                 if (windows.isEmpty()) "כבוי — האפליקציה אינה נעולה לפי שעות"
                 else "${windows.size} טווחי נעילה מוגדרים לשבוע",
