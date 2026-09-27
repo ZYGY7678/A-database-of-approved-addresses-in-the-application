@@ -153,6 +153,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         DeviceManagement.enforcePolicies(this)
+        val externalUrl = intent?.data?.toString()
         val store = PrefStore(this)
 
         setContent {
@@ -164,6 +165,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 ApprovedBrowserApp(
                     prefs = prefs,
+                    initialExternalUrl = externalUrl,
                     onPrefsChange = {
                         prefs = it
                         store.save(it)
@@ -179,6 +181,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun ApprovedBrowserApp(
     prefs: BrowserPrefs,
+    initialExternalUrl: String?,
     onPrefsChange: (BrowserPrefs) -> Unit
 ) {
     val context = LocalContext.current
@@ -187,11 +190,13 @@ private fun ApprovedBrowserApp(
     val favoriteStore = remember { FavoriteStore(context) }
 
     var favorites by remember { mutableStateOf(favoriteStore.load()) }
-    var url by remember { mutableStateOf("") }
-    var address by remember { mutableStateOf("") }
-    var home by remember { mutableStateOf(true) }
+    var url by remember { mutableStateOf(initialAllowedUrl ?: "") }
+    var address by remember { mutableStateOf(initialAllowedUrl ?: initialExternalUrl.orEmpty()) }
+    var home by remember { mutableStateOf(initialAllowedUrl == null) }
     var settings by remember { mutableStateOf(false) }
-    var blocked by remember { mutableStateOf(false) }
+    var blocked by remember {
+        mutableStateOf(initialExternalUrl != null && initialAllowedUrl == null)
+    }
     var query by remember { mutableStateOf("") }
     var webView by remember { mutableStateOf<WebView?>(null) }
     var loading by remember { mutableStateOf(false) }
@@ -204,6 +209,9 @@ private fun ApprovedBrowserApp(
     val routeState = rememberUpdatedState(route)
     val availableSites = remember(sites, route) {
         sites.filter(route::allows)
+    }
+    val initialAllowedUrl = remember(initialExternalUrl, availableSites) {
+        initialExternalUrl?.takeIf { WhitelistRepository.isAllowed(it, availableSites) }
     }
     val categories = remember(availableSites) {
         listOf("מועדפים", "הכול") + availableSites.map { it.category }.distinct()
