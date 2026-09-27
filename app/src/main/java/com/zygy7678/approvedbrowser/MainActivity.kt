@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -1445,38 +1446,62 @@ private fun WeeklyLockWindowDialog(
         onDismissRequest = onDismiss,
         title = { Text("הוספת זמן נעילה") },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("בחר את הימים שבהם הטווח יחול:")
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    (java.util.Calendar.SUNDAY..java.util.Calendar.SATURDAY).forEach { day ->
-                        FilterChip(
-                            selected = day in selectedDays,
-                            onClick = {
-                                selectedDays = if (day in selectedDays) selectedDays - day
-                                else selectedDays + day
-                            },
-                            label = { Text(dayName(day)) }
+            Box(Modifier.fillMaxWidth().heightIn(max = 360.dp)) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = PaddingValues(vertical = 2.dp, end = 4.dp)
+                ) {
+                    item { Text("בחר את הימים שבהם הטווח יחול:") }
+                    item {
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            items(java.util.Calendar.SUNDAY..java.util.Calendar.SATURDAY) { day ->
+                                FilterChip(
+                                    selected = day in selectedDays,
+                                    onClick = {
+                                        selectedDays = if (day in selectedDays) {
+                                            selectedDays - day
+                                        } else {
+                                            selectedDays + day
+                                        }
+                                    },
+                                    label = { Text(dayName(day)) }
+                                )
+                            }
+                        }
+                    }
+                    item {
+                        OutlinedTextField(
+                            value = start,
+                            onValueChange = { start = it.filter { c -> c.isDigit() || c == ':' }.take(5) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("שעת התחלה — HH:MM") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
                     }
-                }
-                OutlinedTextField(
-                    value = start,
-                    onValueChange = { start = it.filter { c -> c.isDigit() || c == ':' }.take(5) },
-                    singleLine = true,
-                    label = { Text("שעת התחלה — HH:MM") }
-                )
-                OutlinedTextField(
-                    value = end,
-                    onValueChange = { end = it.filter { c -> c.isDigit() || c == ':' }.take(5) },
-                    singleLine = true,
-                    label = { Text("שעת סיום — HH:MM") }
-                )
-                Text(
-                    "אפשר להגדיר גם 22:00–07:00 — הנעילה תמשיך אוטומטית אחרי חצות.",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                if (error.isNotBlank()) {
-                    Text(error, color = MaterialTheme.colorScheme.error)
+                    item {
+                        OutlinedTextField(
+                            value = end,
+                            onValueChange = { end = it.filter { c -> c.isDigit() || c == ':' }.take(5) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("שעת סיום — HH:MM") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        )
+                    }
+                    item {
+                        Text(
+                            "אפשר גם 22:00–07:00 — הנעילה תמשיך אוטומטית אחרי חצות.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    if (error.isNotBlank()) {
+                        item { Text(error, color = MaterialTheme.colorScheme.error) }
+                    }
                 }
             }
         },
@@ -1491,9 +1516,7 @@ private fun WeeklyLockWindowDialog(
                 }
             }) { Text("הוסף") }
         },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("ביטול") }
-        }
+        dismissButton = { TextButton(onClick = onDismiss) { Text("ביטול") } }
     )
 }
 
