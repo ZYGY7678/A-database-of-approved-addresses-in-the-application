@@ -17,7 +17,9 @@
   const confirmEl = document.getElementById("confirm");
   const selectedRouteNoticeEl = document.getElementById("selectedRouteNotice");
   const routeButtons = [...document.querySelectorAll(".route-option")];
-  const APK_URL = "ApprovedBrowser.apk";
+  const APK_URL = "https://github.com/ZYGY7678/A-database-of-approved-addresses-in-the-application/releases/download/latest/app-debug.apk";
+  const LATEST_VERSION_CODE = 2;
+  const LATEST_VERSION_NAME = "1.0.1";
 
   const ROUTES = {
     ETROG: { title: "אתרוג", summary: "אתרים חיוניים ומאושרים בלבד" },
@@ -205,10 +207,24 @@
       let packagePath = await runShell("pm path " + PACKAGE);
 
       if (!packagePath || !/^package:/.test(packagePath.trim())) {
-        await installBundledApk();
+        log("האפליקציה לא מותקנת. מתקין את הגרסה העדכנית...");
+        await installBundledApk("התקנה ראשונית");
         packagePath = await runShell("pm path " + PACKAGE);
         if (!packagePath || !/^package:/.test(packagePath.trim())) {
           throw new Error("התקנת דפדפן מאושר הסתיימה ללא זיהוי החבילה במכשיר.");
+        }
+      } else {
+        const installed = await getInstalledVersion();
+        if (installed.versionCode < LATEST_VERSION_CODE) {
+          log("נמצאה גרסה " + installed.versionCode + " במכשיר. הגרסה העדכנית היא " + LATEST_VERSION_CODE + ".");
+          await installBundledApk("עדכון לגרסה העדכנית");
+          const afterUpdate = await getInstalledVersion();
+          if (afterUpdate.versionCode < LATEST_VERSION_CODE) {
+            throw new Error("העדכון הסתיים אבל הגרסה העדכנית עדיין לא מזוהה במכשיר.");
+          }
+          log("✓ האפליקציה עודכנה לגרסה " + afterUpdate.versionName + " (" + afterUpdate.versionCode + ").");
+        } else {
+          log("✓ האפליקציה כבר מעודכנת לגרסה " + installed.versionName + " (" + installed.versionCode + ").");
         }
       }
 
@@ -216,10 +232,10 @@
       setStatus("מחובר: " + (model || "Android") + " • Android " + (android || "?"), "מחובר", true);
       setupBtn.disabled = false;
       removeOwnerBtn.disabled = false;
-      setupNoticeEl.textContent = "המכשיר מחובר. הזן קוד גישה ולחץ על הכפתור כדי לבצע את ההגדרה ישירות דרך הדפדפן.";
+      setupNoticeEl.textContent = "המכשיר מחובר והאפליקציה נבדקה/עודכנה לגרסה העדכנית. הזן קוד גישה ולחץ על הכפתור כדי לבצע את ההגדרה.";
       removeOwnerNoticeEl.textContent = "המכשיר מחובר. הכפתור ינסה להסיר רק את מנהל המכשיר של האפליקציה שלנו, ללא איפוס.";
       log("החיבור הצליח: " + (model || "Android") + " • Android " + (android || "?"));
-      log("האפליקציה נמצאה במכשיר.");
+      log("האפליקציה נמצאה במכשיר ונבדקה מול הגרסה העדכנית.");
 
       setStatus("בודק מנהל מכשיר וחשבונות...", "בודק");
       const ownerInfo = await inspectDevicePolicy();
@@ -244,9 +260,19 @@
     }
   }
 
-  async function installBundledApk() {
-    setStatus("מוריד את האפליקציה...", "מתקין");
-    log("האפליקציה לא נמצאה במכשיר. מוריד את ה־APK מהאתר...");
+  async function getInstalledVersion() {
+    const output = await runShell("dumpsys package " + PACKAGE);
+    const codeMatch = output.match(/versionCode=(\d+)/);
+    const nameMatch = output.match(/versionName=([^\s]+)/);
+    const versionCode = codeMatch ? Number(codeMatch[1]) : NaN;
+    const versionName = nameMatch ? nameMatch[1] : "לא ידוע";
+    if (!Number.isFinite(versionCode)) throw new Error("לא הצלחתי לקרוא את גרסת האפליקציה המותקנת.");
+    return { versionCode, versionName };
+  }
+
+  async function installBundledApk(reason = "התקנה") {
+    setStatus(reason + "...", "מתקין");
+    log(reason + ": מוריד את ה־APK העדכני מהאתר...");
     const response = await fetch(APK_URL, { cache: "no-store" });
     if (!response.ok) throw new Error("לא ניתן להוריד את קובץ האפליקציה מהאתר.");
     const apkBlob = await response.blob();
@@ -287,7 +313,7 @@
     const result = await runShell("pm install -r -t " + remotePath);
     if (!/success/i.test(result)) throw new Error(result || "Android דחה את התקנת האפליקציה.");
     await runShell("rm -f " + remotePath);
-    log("✓ דפדפן מאושר הותקן בהצלחה.");
+    log("✓ דפדפן מאושר הותקן/עודכן בהצלחה.");
   }
 
   async function inspectAccounts() {
