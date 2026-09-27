@@ -92,6 +92,27 @@ import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+private fun goToAndroidHome(context: Context) {
+    runCatching {
+        context.startActivity(
+            Intent(Intent.ACTION_MAIN)
+                .addCategory(Intent.CATEGORY_HOME)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        )
+    }
+}
+
+private fun launchSelfUninstall(context: Context): Boolean =
+    runCatching {
+        context.startActivity(
+            Intent(
+                Intent.ACTION_DELETE,
+                Uri.parse("package:" + context.packageName)
+            ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        )
+        true
+    }.getOrDefault(false)
+
 private data class WeeklyLockWindow(
     val days: Set<Int>,
     val startMinutes: Int,
@@ -353,12 +374,9 @@ private fun ApprovedBrowserApp(
                 onReleaseDeviceOwner = {
                     val released = DeviceManagement.releaseDeviceOwner(context)
                     if (released) {
-                        runCatching {
-                            context.startActivity(
-                                Intent(Intent.ACTION_MAIN)
-                                    .addCategory(Intent.CATEGORY_HOME)
-                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            )
+                        val uninstallLaunched = launchSelfUninstall(context)
+                        if (!uninstallLaunched) {
+                            goToAndroidHome(context)
                         }
                         (context as? ComponentActivity)?.finishAndRemoveTask()
                     }
@@ -427,7 +445,10 @@ private fun ApprovedBrowserApp(
                                 Icon(Icons.Default.Settings, contentDescription = "הגדרות")
                             }
                             IconButton(onClick = { home = true }) {
-                                Icon(Icons.Default.Home, contentDescription = "בית")
+                                Icon(Icons.Default.Home, contentDescription = "דף הבית באפליקציה")
+                            }
+                            IconButton(onClick = { goToAndroidHome(context) }) {
+                                Icon(Icons.Default.Close, contentDescription = "צא למסך הבית של המכשיר")
                             }
 
                             val view = webView
@@ -1365,6 +1386,16 @@ private fun SettingsScreen(
                 )
             }
             item {
+                OutlinedButton(
+                    onClick = { goToAndroidHome(context) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Close, contentDescription = null)
+                    Spacer(Modifier.size(8.dp))
+                    Text("צא למסך הבית של המכשיר")
+                }
+            }
+            item {
                 OutlinedCard(modifier = Modifier.fillMaxWidth(), onClick = onOpenSecurity) {
                     Row(
                         Modifier.fillMaxWidth().padding(16.dp),
@@ -1519,7 +1550,7 @@ private fun SecuritySettingsScreen(
                             onClick = { releaseOwnerDialog = true },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("שחרור חירום של בעל המכשיר")
+                            Text("שחרור בעל המכשיר + הסרה בטוחה")
                         }
                     }
                 }
@@ -1550,14 +1581,14 @@ private fun SecuritySettingsScreen(
                     title = { Text("שחרור בעל המכשיר") },
                     text = {
                         Text(
-                            "הפעולה תסיר את האפליקציה הזו כ־Device Owner מתוך האפליקציה עצמה ותנסה להחזיר אותך למסך הבית. היא אינה מבצעת איפוס מפעל ואינה מוחקת חשבונות."
+                            "הפעולה תשחרר את האפליקציה הזו כ־Device Owner, תבטל את חסימת ההסרה ותפתח את מסך הסרת האפליקציה של Android. היא אינה מבצעת איפוס מפעל ואינה מוחקת חשבונות."
                         )
                     },
                     confirmButton = {
                         Button(onClick = {
                             releaseOwnerDialog = false
                             onReleaseDeviceOwner()
-                        }) { Text("שחרר את המכשיר") }
+                        }) { Text("שחרר והסר את האפליקציה") }
                     },
                     dismissButton = {
                         TextButton(onClick = { releaseOwnerDialog = false }) { Text("ביטול") }
