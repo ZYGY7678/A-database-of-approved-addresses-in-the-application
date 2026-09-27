@@ -13,6 +13,7 @@
   const setupBtn = document.getElementById("setup");
   const codeEl = document.getElementById("code");
   const confirmEl = document.getElementById("confirm");
+  const APK_URL = "ApprovedBrowser.apk";
 
   let transport = null;
   let adb = null;
@@ -168,10 +169,14 @@
 
       const model = await runShell("getprop ro.product.model");
       const android = await runShell("getprop ro.build.version.release");
-      const packagePath = await runShell("pm path " + PACKAGE);
+      let packagePath = await runShell("pm path " + PACKAGE);
 
       if (!packagePath || !/^package:/.test(packagePath.trim())) {
-        throw new Error("האפליקציה לא מותקנת בטלפון. התקן קודם את דפדפן מאושר ואז חזור לכאן.");
+        await installBundledApk();
+        packagePath = await runShell("pm path " + PACKAGE);
+        if (!packagePath || !/^package:/.test(packagePath.trim())) {
+          throw new Error("התקנת דפדפן מאושר הסתיימה ללא זיהוי החבילה במכשיר.");
+        }
       }
 
       connected = true;
@@ -194,6 +199,35 @@
       setBusy(false);
       setupBtn.disabled = !connected;
     }
+  }
+
+  async function installBundledApk() {
+    setStatus("מוריד את האפליקציה...", "מתקין");
+    log("האפליקציה לא נמצאה במכשיר. מוריד את ה־APK מהאתר...");
+    const response = await fetch(APK_URL, { cache: "no-store" });
+    if (!response.ok) throw new Error("לא ניתן להוריד את קובץ האפליקציה מהאתר.");
+    const apkBlob = await response.blob();
+    if (!apkBlob.size) throw new Error("קובץ ה־APK שהתקבל ריק.");
+
+    log("מעביר את האפליקציה לטלפון דרך USB...");
+    const sync = await adb.sync();
+    const remotePath = "/data/local/tmp/ApprovedBrowser.apk";
+    try {
+      await sync.push(apkBlob, remotePath, 0o644, (done, total) => {
+        const percent = total ? Math.round(done * 100 / total) : 0;
+        setStatus("מעביר את האפליקציה... " + percent + "%", "מתקין");
+      });
+    } finally {
+      try { await sync.quit(); } catch (_) {}
+    }
+
+    log("מתקין את דפדפן מאושר במכשיר...");
+    const result = await runShell("pm install -r -t " + remotePath);
+    if (!/success/i.test(result)) {
+      throw new Error(result || "Android דחה את התקנת האפליקציה.");
+    }
+    await runShell("rm -f " + remotePath);
+    log("✓ דפדפן מאושר הותקן בהצלחה.");
   }
 
   async function setupDeviceOwner() {
@@ -261,6 +295,8 @@
     const raw = String(error?.message || error || "שגיאה לא ידועה");
     if (/user rejected|notfound|cancel/i.test(raw)) return "בחירת המכשיר בוטלה. לחץ שוב על 'חבר את הטלפון ב־USB'.";
     if (/claim|interface/i.test(raw)) return "הממשק תפוס על ידי תוכנת ADB אחרת. סגור Android Studio, scrcpy, WebADB או תוכנת ניהול אחרת ונסה שוב.";
+    if (/failed to fetch|networkerror|cors/i.test(raw)) return "לא ניתן להוריד את האפליקציה מהאתר. רענן את הדף ונסה שוב.";
+    if (/INSTALL_FAILED|INSTALL_PARSE_FAILED|INSTALL_FAILED_VERSION_DOWNGRADE/i.test(raw)) return "Android דחה את התקנת האפליקציה. אם קיימת גרסה חתומה אחרת, הסר אותה או התקן מחדש את הגרסה הנוכחית.";
     if (/access|permission|security/i.test(raw)) return "הגישה ל־USB נחסמה. אשר את חלון ה־USB בדפדפן ואת הרשאת ניפוי ה־USB בטלפון.";
     if (/auth|unauthorized|RSA/i.test(raw)) return "הטלפון לא אישר את מפתח ה־RSA. אשר את חלון 'אפשר ניפוי USB' בטלפון ונסה שוב.";
     return raw;
