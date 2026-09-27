@@ -1,0 +1,50 @@
+name: Build Device Owner release agent
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "tools/release-agent/**"
+      - ".github/workflows/release-agent.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install NDK
+        run: sdkmanager "ndk;27.2.12479018"
+
+      - name: Build agent
+        run: |
+          "$ANDROID_HOME/cmake/3.22.1/bin/cmake"             -S tools/release-agent             -B tools/release-agent/build-arm64             -DANDROID_ABI=arm64-v8a             -DANDROID_PLATFORM=android-26             -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake"
+          "$ANDROID_HOME/cmake/3.22.1/bin/cmake" --build tools/release-agent/build-arm64 --config Release
+
+          "$ANDROID_HOME/cmake/3.22.1/bin/cmake"             -S tools/release-agent             -B tools/release-agent/build-arm             -DANDROID_ABI=armeabi-v7a             -DANDROID_PLATFORM=android-26             -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake"
+          "$ANDROID_HOME/cmake/3.22.1/bin/cmake" --build tools/release-agent/build-arm --config Release
+
+      - name: Publish agents
+        run: |
+          mkdir -p website/agent
+          cp tools/release-agent/build-arm64/libreleaseowner.so website/agent/libreleaseowner-arm64-v8a.so
+          cp tools/release-agent/build-arm/libreleaseowner.so website/agent/libreleaseowner-armeabi-v7a.so
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add website/agent
+          if git diff --cached --quiet; then
+            echo "Agent binaries are already current"
+          else
+            git commit -m "Publish Device Owner release agent"
+            git push origin HEAD:main
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ApprovedBrowser-release-agent
+          path: website/agent/*.so
