@@ -1567,7 +1567,7 @@ private fun AppLockDialog(
         title = { Text("האפליקציה ננעלה") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("האפליקציה נעולה כעת לפי לוח הזמנים. הזן את קוד הגישה כדי להמשיך.")
+                Text("האפליקציה נעולה כעת לפי לוח הזמנים. הזן את קוד הגישה כדי לפתוח את האפליקציה ולהמשיך.")
                 OutlinedTextField(
                     value = code,
                     onValueChange = { code = it.filter(Char::isDigit).take(12); error = false },
@@ -1583,7 +1583,7 @@ private fun AppLockDialog(
         confirmButton = {
             Button(onClick = {
                 if (store.verify(code)) onUnlocked() else error = true
-            }) { Text("פתיחה") }
+            }) { Text("הזן קוד ופתח את האפליקציה") }
         }
     )
 }
