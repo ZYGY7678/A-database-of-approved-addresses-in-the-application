@@ -634,7 +634,8 @@ private fun HomeScreen(
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(horizontal = 8.dp)
+            contentPadding = PaddingValues(horizontal = 8.dp),
+            beyondViewportPageCount = 0
         ) { page ->
             val pageName = categories[page]
 
