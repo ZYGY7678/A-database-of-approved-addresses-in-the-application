@@ -419,7 +419,34 @@
         );
       }
 
-      log("נמצא מנהל של האפליקציה שלנו. מנסה להסיר אותו דרך ADB...");
+      log("נמצא מנהל של האפליקציה שלנו.");
+      log("בודק קודם אם Android מאפשר להריץ פקודה בשם ה־UID של האפליקציה הקיימת, בלי להתקין APK חדש...");
+      let runAsId = "";
+      try {
+        runAsId = await runShell("run-as " + PACKAGE + " id");
+        log("run-as: " + (runAsId || "(ללא פלט)"));
+      } catch (error) {
+        log("run-as לא זמין: " + String(error?.message || error || ""));
+      }
+      try {
+        const policyHelp = await runShell("run-as " + PACKAGE + " cmd device_policy help");
+        log("פקודות device_policy מתוך UID האפליקציה:\n" + (policyHelp || "(ללא פלט)"));
+        if (/clear[-_ ]device[-_ ]owner|remove[-_ ]device[-_ ]owner/i.test(policyHelp)) {
+          log("נמצאה פקודת שחרור רשמית דרך cmd device_policy. מנסה אותה...");
+          const clearResult = await runShell("run-as " + PACKAGE + " cmd device_policy clear-device-owner " + PACKAGE);
+          log("תוצאת שחרור: " + (clearResult || "(ללא פלט)"));
+          const afterDirect = await inspectDevicePolicy();
+          if (afterDirect.deviceOwner !== PACKAGE && !afterDirect.hasOurProfileOwner) {
+            setStatus("המכשיר שוחרר", "הושלם", true);
+            removeOwnerNoticeEl.textContent = "מנהל המכשיר הוסר. עכשיו אפשר למחוק את האפליקציה.";\n            log("✓ מנהל המכשיר הוסר בלי התקנת APK חדש.");
+            return;
+          }
+        }
+      } catch (error) {
+        log("בדיקת cmd device_policy לא הצליחה: " + String(error?.message || error || ""));
+      }
+
+      log("מנסה את פקודת ADB הרגילה...");
       setStatus("מסיר את מנהל המכשיר...", "מסיר");
 
       let result = await runShell("dpm remove-active-admin --user 0 " + ADMIN);
