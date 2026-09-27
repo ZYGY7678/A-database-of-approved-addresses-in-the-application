@@ -152,6 +152,7 @@ private class PrefStore(context: Context) {
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        DeviceManagement.enforcePolicies(this)
         val store = PrefStore(this)
 
         setContent {
@@ -990,6 +991,15 @@ private fun SettingsScreen(
                         }
                     }
                 }
+            }
+
+            item { SettingsHeader("ניהול המכשיר", "הגנה ברמת Android — פעילה לאחר הגדרת האפליקציה כבעלת המכשיר") }
+            item {
+                val owner = DeviceManagement.isDeviceOwner(LocalContext.current)
+                SettingInfo(
+                    "מצב הגנה על האפליקציה",
+                    if (owner) "האפליקציה מוגדרת כבעלת המכשיר ואינה ניתנת להסרה רגילה" else "טרם הוגדרה כבעלת המכשיר"
+                )
             }
 
             item { SettingsHeader("אבטחה מתקדמת", "שליטה נוספת על הגלישה והגישה") }
