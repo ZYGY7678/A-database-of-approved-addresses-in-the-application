@@ -32,7 +32,13 @@ class AccessCodeStore(context: Context) {
         code.isNotBlank() && sha256(code) == prefs.getString("code_hash", defaultHash)
 
     fun changeCode(newCode: String): Boolean {
-        if (newCode.length < 4) return false
+        if (!newCode.matches(Regex("\\d{4,12}"))) return false
+        prefs.edit().putString("code_hash", sha256(newCode)).apply()
+        return true
+    }
+
+    fun provisionFromSetup(newCode: String): Boolean {
+        if (!newCode.matches(Regex("\\d{4,12}"))) return false
         prefs.edit().putString("code_hash", sha256(newCode)).apply()
         return true
     }
