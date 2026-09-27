@@ -210,16 +210,41 @@
     if (!apkBlob.size) throw new Error("קובץ ה־APK שהתקבל ריק.");
 
     log("מעביר את האפליקציה לטלפון דרך USB...");
-    const sync = await adb.sync();
+
+    // Chromium can briefly keep WebUSB in a device-state transition after
+    // an ADB stream/configuration change. webadb.js is archived and older
+    // Chromium versions were less strict here, so serialize the sync start
+    // and retry only this transient InvalidStateError.
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
     const remotePath = "/data/local/tmp/ApprovedBrowser.apk";
-    try {
-      await sync.push(apkBlob, remotePath, 0o644, (done, total) => {
-        const percent = total ? Math.round(done * 100 / total) : 0;
-        setStatus("מעביר את האפליקציה... " + percent + "%", "מתקין");
-      });
-    } finally {
-      try { await sync.quit(); } catch (_) {}
+    let lastError = null;
+
+    for (let attempt = 1; attempt <= 4; attempt++) {
+      let sync = null;
+      try {
+        await sleep(attempt === 1 ? 350 : 750);
+        sync = await adb.sync();
+        await sync.push(apkBlob, remotePath, 0o644, (done, total) => {
+          const percent = total ? Math.round(done * 100 / total) : 0;
+          setStatus("מעביר את האפליקציה... " + percent + "%", "מתקין");
+        });
+        lastError = null;
+        break;
+      } catch (error) {
+        lastError = error;
+        const message = String(error?.message || error || "");
+        const transientUsbState = /operation that changes the device state is in progress|invalidstateerror/i.test(message);
+        if (!transientUsbState || attempt === 4) throw error;
+        log("ה־USB עדיין עסוק. ממתין ומנסה שוב (" + (attempt + 1) + "/4)...");
+        await sleep(1000);
+      } finally {
+        if (sync) {
+          try { await sync.quit(); } catch (_) {}
+        }
+      }
     }
+
+    if (lastError) throw lastError;
 
     log("מתקין את דפדפן מאושר במכשיר...");
     const result = await runShell("pm install -r -t " + remotePath);
@@ -294,6 +319,7 @@
   function normalizeError(error) {
     const raw = String(error?.message || error || "שגיאה לא ידועה");
     if (/user rejected|notfound|cancel/i.test(raw)) return "בחירת המכשיר בוטלה. לחץ שוב על 'חבר את הטלפון ב־USB'.";
+    if (/operation that changes the device state is in progress|invalidstateerror/i.test(raw)) return "חיבור ה־USB עדיין מבצע פעולה קודמת. האתר ינסה שוב אוטומטית; אם השגיאה חוזרת, נתק וחבר מחדש את הטלפון.";
     if (/claim|interface/i.test(raw)) return "הממשק תפוס על ידי תוכנת ADB אחרת. סגור Android Studio, scrcpy, WebADB או תוכנת ניהול אחרת ונסה שוב.";
     if (/failed to fetch|networkerror|cors/i.test(raw)) return "לא ניתן להוריד את האפליקציה מהאתר. רענן את הדף ונסה שוב.";
     if (/INSTALL_FAILED|INSTALL_PARSE_FAILED|INSTALL_FAILED_VERSION_DOWNGRADE/i.test(raw)) return "Android דחה את התקנת האפליקציה. אם קיימת גרסה חתומה אחרת, הסר אותה או התקן מחדש את הגרסה הנוכחית.";
