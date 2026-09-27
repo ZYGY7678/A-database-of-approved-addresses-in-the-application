@@ -30,6 +30,14 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Prepare latest APK for same-origin download
+        run: |
+          curl -fL --retry 3 --retry-delay 2 \
+            "https://github.com/ZYGY7678/A-database-of-approved-addresses-in-the-application/releases/download/latest/app-debug.apk" \
+            -o website/app-debug.apk
+          test -s website/app-debug.apk
+          ls -lh website/app-debug.apk
+
       - name: Upload website
         uses: actions/upload-pages-artifact@v3
         with:
