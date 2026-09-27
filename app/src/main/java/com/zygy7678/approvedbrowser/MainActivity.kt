@@ -349,6 +349,19 @@ private fun ApprovedBrowserApp(
                 onChangeRoute = { routeDialog = true },
                 onChangeCode = { changeCodeDialog = true },
                 onDeviceOwnerInstructions = { deviceOwnerInstructionsDialog = true },
+                onReleaseDeviceOwner = {
+                    val released = DeviceManagement.releaseDeviceOwner(context)
+                    if (released) {
+                        runCatching {
+                            context.startActivity(
+                                Intent(Intent.ACTION_MAIN)
+                                    .addCategory(Intent.CATEGORY_HOME)
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            )
+                        }
+                        (context as? ComponentActivity)?.finishAndRemoveTask()
+                    }
+                },
                 onWeeklyLockChange = { windows ->
                     onPrefsChange(prefs.copy(weeklyLockWindows = windows))
                 },
@@ -1422,11 +1435,13 @@ private fun SecuritySettingsScreen(
     onChangeRoute: () -> Unit,
     onChangeCode: () -> Unit,
     onDeviceOwnerInstructions: () -> Unit,
+    onReleaseDeviceOwner: () -> Unit,
     onWeeklyLockChange: (List<WeeklyLockWindow>) -> Unit,
     onManagedAppsChange: (Set<String>, Set<String>) -> Unit,
     onBack: () -> Unit
 ) {
     val deviceOwner = DeviceManagement.isDeviceOwner(LocalContext.current)
+    var releaseOwnerDialog by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -1488,6 +1503,14 @@ private fun SecuritySettingsScreen(
                     OutlinedButton(onClick = onDeviceOwnerInstructions, modifier = Modifier.fillMaxWidth()) {
                         Text("הוראות הפעלה והגדרת בעל המכשיר")
                     }
+                    if (owner) {
+                        OutlinedButton(
+                            onClick = { releaseOwnerDialog = true },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("שחרור חירום של בעל המכשיר")
+                        }
+                    }
                 }
             }
 
@@ -1509,6 +1532,27 @@ private fun SecuritySettingsScreen(
                 )
             }
             item { SettingInfo("הערה", "ההגנות בתיקייה הזו ממשיכות לפעול גם אחרי יציאה מהמסך.") }
+        }
+            if (releaseOwnerDialog) {
+                AlertDialog(
+                    onDismissRequest = { releaseOwnerDialog = false },
+                    title = { Text("שחרור בעל המכשיר") },
+                    text = {
+                        Text(
+                            "הפעולה תסיר את האפליקציה הזו כ־Device Owner מתוך האפליקציה עצמה ותנסה להחזיר אותך למסך הבית. היא אינה מבצעת איפוס מפעל ואינה מוחקת חשבונות."
+                        )
+                    },
+                    confirmButton = {
+                        Button(onClick = {
+                            releaseOwnerDialog = false
+                            onReleaseDeviceOwner()
+                        }) { Text("שחרר את המכשיר") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { releaseOwnerDialog = false }) { Text("ביטול") }
+                    }
+                )
+            }
         }
     }
 }
