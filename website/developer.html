@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>דפדפן מאושר — ניהול בקשות</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.dashboard-grid{display:grid;grid-template-columns:minmax(280px,360px) 1fr;gap:16px}
+.request-list{display:grid;gap:12px}
+.request-card{background:rgba(9,25,53,.94);border:1px solid #1b3965;border-radius:16px;padding:16px}
+.request-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.request-card h3{margin:0 0 6px;font-size:18px}
+.request-meta{color:#91a8c8;font-size:13px;margin:0 0 10px}
+.request-body{background:#071632;border:1px solid #1c3966;border-radius:12px;padding:12px;white-space:pre-wrap;overflow:auto;max-height:280px;line-height:1.55}
+.status{display:inline-flex;padding:6px 10px;border-radius:999px;background:#0b2947;color:#9dc7e8;font-size:12px}
+.status.pending{background:#4a3509;color:#ffd98a}.status.approved{background:#0b5a43;color:#8fffe0}.status.denied{background:#5a1f2b;color:#ffc3cd}
+.request-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.request-actions button{border:0;border-radius:10px;padding:10px 13px;font-weight:700;cursor:pointer}
+.approve{background:#1d9b68;color:white}.deny{background:#c64862;color:white}.openIssue{background:#12345a;color:#dcecff;text-decoration:none;display:inline-flex;align-items:center;padding:10px 13px;border-radius:10px}
+.token-note{color:#91a8c8;line-height:1.5}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.toolbar button{border:0;border-radius:10px;padding:10px 14px;background:#1677ff;color:#fff;font-weight:700;cursor:pointer}
+.hidden{display:none}
+@media(max-width:850px){.dashboard-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="header">
+    <div>
+      <h1>ניהול בקשות</h1>
+      <p>מרכז ניהול פניות משתמשים עבור דפדפן מאושר</p>
+    </div>
+    <a class="secondary linkButton" href="index.html">חזרה להתקנת האפליקציה</a>
+  </header>
+
+  <section class="card">
+    <h2>חיבור לניהול GitHub</h2>
+    <p class="token-note">הכנס כאן Personal Access Token של המפתח עם הרשאות Issues לקריאת פניות, שינוי סטטוס ושליחת תגובות. הטוקן נשמר רק ב־sessionStorage של הדפדפן הזה ולא נשלח לשרת של האתר.</p>
+    <label>GitHub Token<input id="token" type="password" autocomplete="off" spellcheck="false"></label>
+    <div class="toolbar">
+      <button id="saveToken">שמור וחבר</button>
+      <button id="clearToken" class="secondary">נקה טוקן</button>
+      <button id="refresh" class="secondary">רענן בקשות</button>
+    </div>
+    <div id="status" class="notice">טרם התחברת.</div>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <div>
+        <h2>פניות</h2>
+        <p>בקשות אישור, תלונות ובקשות להסרת אתר</p>
+      </div>
+      <span id="count" class="badge">0</span>
+    </div>
+    <div id="requests" class="request-list"></div>
+  </section>
+</main>
+<script src="developer.js"></script>
+</body>
+</html>
