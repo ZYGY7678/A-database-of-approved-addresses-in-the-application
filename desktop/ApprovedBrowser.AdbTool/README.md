@@ -30,3 +30,5 @@ adb shell dpm set-device-owner com.zygy7678.approvedbrowser/.ApprovedBrowserDevi
 הקוד עצמו אינו נכתב ליומן הפעולות.
 
 הגדרת Device Owner מתבצעת באמצעות Android Device Policy Manager דרך ADB.
+
+הערה: גרסת כלי Windows שנבנית ב־GitHub כוללת את ה־APK העדכני של דפדפן מאושר בתוך קובץ ההפעלה.
