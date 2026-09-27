@@ -12,7 +12,7 @@
     "Claude",
     "Gemini"
   ],
-  "totalApprovedAddresses": 100,
+  "totalApprovedAddresses": 101,
   "ai": [
     {
       "name": "ChatGPT",
@@ -617,6 +617,12 @@
       "url": "https://www.kolsherut.org.il/",
       "host": "www.kolsherut.org.il",
       "category": "שירותים קהילתיים"
+    },
+    {
+      "name": "עוגן פליי",
+      "url": "https://ogenplay.com/",
+      "host": "ogenplay.com",
+      "category": "אפליקציות ותוכנות"
     }
   ]
 }
