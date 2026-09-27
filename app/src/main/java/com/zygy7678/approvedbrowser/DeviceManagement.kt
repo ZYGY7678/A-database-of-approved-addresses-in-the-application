@@ -34,32 +34,16 @@ object DeviceManagement {
             dpm.setLockTaskFeatures(admin, 0)
         }
 
-        applyDefaultBrowserPolicy(context, true)
-    }
-
-    fun applyDefaultBrowserPolicy(context: Context, enabled: Boolean) {
-        val dpm = context.getSystemService(DevicePolicyManager::class.java) ?: return
-        if (!dpm.isDeviceOwnerApp(context.packageName)) return
-
-        val admin = adminComponent(context)
-        val activity = ComponentName(context, MainActivity::class.java)
+        // Make this app the persistent handler for web links.
+        // The WebView still applies the whitelist before loading the URL.
         val webFilter = IntentFilter(Intent.ACTION_VIEW).apply {
             addCategory(Intent.CATEGORY_DEFAULT)
             addCategory(Intent.CATEGORY_BROWSABLE)
             addDataScheme("http")
             addDataScheme("https")
         }
-
-        if (enabled) {
-            runCatching {
-                dpm.addPersistentPreferredActivity(admin, webFilter, activity)
-            }
-            suspendKnownBrowsers(context, dpm, admin)
-        } else {
-            runCatching {
-                dpm.clearPackagePersistentPreferredActivities(admin, context.packageName)
-            }
-            unsuspendKnownBrowsers(context, dpm, admin)
+        runCatching {
+            dpm.addPersistentPreferredActivity(admin, webFilter, activity)
         }
     }
 
@@ -96,57 +80,6 @@ object DeviceManagement {
                     true
                 )
             }
-        }
-    }
-
-    private fun unsuspendKnownBrowsers(
-        context: Context,
-        dpm: DevicePolicyManager,
-        admin: ComponentName
-    ) {
-        val pm = context.packageManager
-        val probes = listOf(
-            Intent(Intent.ACTION_VIEW, android.net.Uri.parse("http://example.com")),
-            Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://example.com"))
-        )
-        val browserPackages = probes.flatMap { intent ->
-            pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)
-                .map { it.activityInfo.packageName }
-        }.filter { it != context.packageName }.distinct()
-
-        if (browserPackages.isNotEmpty()) {
-            runCatching {
-                dpm.setPackagesSuspended(
-                    admin,
-                    browserPackages.toTypedArray(),
-                    false
-                )
-            }
-        }
-    }
-
-    fun applyManagedAppPolicies(
-        context: Context,
-        lockedPackages: Set<String>,
-        protectedUninstallPackages: Set<String>
-    ) {
-        val dpm = context.getSystemService(DevicePolicyManager::class.java) ?: return
-        if (!dpm.isDeviceOwnerApp(context.packageName)) return
-        val admin = adminComponent(context)
-        val pm = context.packageManager
-        val installedLaunchers = pm.queryIntentActivities(
-            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER),
-            PackageManager.MATCH_ALL
-        ).map { it.activityInfo.packageName }.toSet()
-        val safeLocked = lockedPackages.filter { it != context.packageName && it in installedLaunchers }.toTypedArray()
-        val safeProtected = protectedUninstallPackages.filter { it != context.packageName && it in installedLaunchers }.toSet()
-        runCatching { dpm.setPackagesSuspended(admin, safeLocked, true) }
-        for (packageName in installedLaunchers) {
-            if (packageName == context.packageName) continue
-            if (packageName !in lockedPackages) {
-                runCatching { dpm.setPackagesSuspended(admin, arrayOf(packageName), false) }
-            }
-            runCatching { dpm.setUninstallBlocked(admin, packageName, packageName in safeProtected) }
         }
     }
 
