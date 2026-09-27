@@ -222,20 +222,32 @@ class MainActivity : ComponentActivity() {
         val initialPrefs = PrefStore(this).load()
         DeviceManagement.applyManagedAppPolicies(this, initialPrefs.lockedPackages, initialPrefs.protectedUninstallPackages)
 
+        val store = PrefStore(this)
+
         val setupAccessCode = intent?.getStringExtra("setup_access_code_b64")
-        if (!setupAccessCode.isNullOrBlank() && DeviceManagement.isDeviceOwner(this)) {
-            runCatching {
-                val decoded = String(
-                    Base64.decode(setupAccessCode, Base64.DEFAULT),
-                    Charsets.UTF_8
-                )
-                AccessCodeStore(this).provisionFromSetup(decoded)
+        val setupRoute = intent?.getStringExtra("setup_route")
+        if (DeviceManagement.isDeviceOwner(this)) {
+            if (!setupAccessCode.isNullOrBlank()) {
+                runCatching {
+                    val decoded = String(
+                        Base64.decode(setupAccessCode, Base64.DEFAULT),
+                        Charsets.UTF_8
+                    )
+                    AccessCodeStore(this).provisionFromSetup(decoded)
+                }
+                intent.removeExtra("setup_access_code_b64")
             }
-            intent.removeExtra("setup_access_code_b64")
+
+            if (!setupRoute.isNullOrBlank()) {
+                runCatching {
+                    val selectedRoute = BrowserRoute.valueOf(setupRoute)
+                    store.save(store.load().copy(route = selectedRoute))
+                }
+                intent.removeExtra("setup_route")
+            }
         }
 
         val externalUrl = intent?.data?.toString()
-        val store = PrefStore(this)
 
         setContent {
             var prefs by remember { mutableStateOf(store.load()) }
