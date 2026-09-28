@@ -522,6 +522,7 @@ private fun ApprovedBrowserApp(
             }
         ) { padding ->
             if (home) {
+                Box(Modifier.fillMaxSize().padding(padding)) {
                 key(route) {
                     val pagerState = rememberPagerState(pageCount = { categories.size })
 
@@ -545,6 +546,7 @@ private fun ApprovedBrowserApp(
                         },
                         onLongPressSite = { site -> selectedSiteForAction = site }
                     )
+                }
                 }
             } else {
                 AndroidView(
