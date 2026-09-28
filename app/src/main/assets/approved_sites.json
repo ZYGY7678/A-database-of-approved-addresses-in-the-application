@@ -18,25 +18,25 @@
       "name": "ChatGPT",
       "url": "https://chatgpt.com/",
       "host": "chatgpt.com",
-      "category": "בינה מלאכותית"
+      "category": "טכנולוגיה ובינה מלאכותית"
     },
     {
       "name": "Grok",
       "url": "https://grok.com/",
       "host": "grok.com",
-      "category": "בינה מלאכותית"
+      "category": "טכנולוגיה ובינה מלאכותית"
     },
     {
       "name": "Claude",
       "url": "https://claude.ai/",
       "host": "claude.ai",
-      "category": "בינה מלאכותית"
+      "category": "טכנולוגיה ובינה מלאכותית"
     },
     {
       "name": "Gemini",
       "url": "https://gemini.google.com/",
       "host": "gemini.google.com",
-      "category": "בינה מלאכותית"
+      "category": "טכנולוגיה ובינה מלאכותית"
     }
   ],
   "forums": [
@@ -44,121 +44,121 @@
       "name": "מתמחים טופ",
       "url": "https://mitmachim.top/",
       "host": "mitmachim.top",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "תחומים",
       "url": "https://tchumim.com/",
       "host": "tchumim.com",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "פרוג",
       "url": "https://www.prog.co.il/",
       "host": "www.prog.co.il",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "מקצב",
       "url": "https://miktzav.com/",
       "host": "miktzav.com",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "המוזיקאי",
       "url": "https://hamusicay.com/",
       "host": "hamusicay.com",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "פורום ימות המשיח",
       "url": "https://f2.freeivr.co.il/",
       "host": "f2.freeivr.co.il",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "פורום נטפרי",
       "url": "https://forum.netfree.link/",
       "host": "forum.netfree.link",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "רכבים זה לזה",
       "url": "https://rechavimzelaze.ovh/",
       "host": "rechavimzelaze.ovh",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "פורום אוצר החכמה",
       "url": "https://forum.otzar.org/index.php",
       "host": "forum.otzar.org",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "פורום אוצר התורה",
       "url": "https://forum-otzar-hatorah.co.il/",
       "host": "forum-otzar-hatorah.co.il",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "פורום לתורה",
       "url": "https://tora-forum.co.il/",
       "host": "tora-forum.co.il",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "פורום מורשת מרן",
       "url": "http://forum.moreshet-maran.com/",
       "host": "forum.moreshet-maran.com",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "אידישע וועלט",
       "url": "https://www.ivelt.com/",
       "host": "www.ivelt.com",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "פורום סייפר",
       "url": "https://forum.safera.co.il/",
       "host": "forum.safera.co.il",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "פרוג — מידע ועזרה הדדית",
       "url": "https://www.prog.co.il/",
       "host": "www.prog.co.il",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "פרוג — תכנות",
       "url": "https://www.prog.co.il/",
       "host": "www.prog.co.il",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "פרוג — עיצוב גרפי",
       "url": "https://www.prog.co.il/",
       "host": "www.prog.co.il",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "פרוג — מוזיקה ונגינה",
       "url": "https://www.prog.co.il/",
       "host": "www.prog.co.il",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "מתמחים טופ — טכנולוגיה",
       "url": "https://mitmachim.top/",
       "host": "mitmachim.top",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     },
     {
       "name": "תחומים — טכנולוגיה",
       "url": "https://tchumim.com/",
       "host": "tchumim.com",
-      "category": "פורומים"
+      "category": "קהילה ופורומים"
     }
   ],
   "core": [
@@ -166,463 +166,463 @@
       "name": "JDN",
       "url": "https://www.jdn.co.il/",
       "host": "www.jdn.co.il",
-      "category": "חדשות חרדיות"
+      "category": "חדשות ואקטואליה"
     },
     {
       "name": "בחדרי חרדים",
       "url": "https://www.bhol.co.il/",
       "host": "www.bhol.co.il",
-      "category": "חדשות חרדיות"
+      "category": "חדשות ואקטואליה"
     },
     {
       "name": "כיכר השבת",
       "url": "https://www.kikar.co.il/",
       "host": "www.kikar.co.il",
-      "category": "חדשות חרדיות"
+      "category": "חדשות ואקטואליה"
     },
     {
       "name": "הידברות",
       "url": "https://www.hidabroot.org/",
       "host": "www.hidabroot.org",
-      "category": "יהדות ותוכן"
+      "category": "יהדות ותורה"
     },
     {
       "name": "קול חי",
       "url": "https://www.93fm.co.il/",
       "host": "www.93fm.co.il",
-      "category": "חדשות ורדיו חרדי"
+      "category": "חדשות ואקטואליה"
     },
     {
       "name": "קול ברמה",
       "url": "https://kol-barama.co.il/",
       "host": "kol-barama.co.il",
-      "category": "חדשות ורדיו חרדי"
+      "category": "חדשות ואקטואליה"
     },
     {
       "name": "אמס",
       "url": "https://www.emess.co.il/",
       "host": "www.emess.co.il",
-      "category": "חדשות חרדיות"
+      "category": "חדשות ואקטואליה"
     },
     {
       "name": "בבלי",
       "url": "https://www.babli.co.il/",
       "host": "www.babli.co.il",
-      "category": "חדשות חרדיות"
+      "category": "חדשות ואקטואליה"
     },
     {
       "name": "שחרית",
       "url": "https://shaharit.com/",
       "host": "shaharit.com",
-      "category": "חדשות חרדיות"
+      "category": "חדשות ואקטואליה"
     },
     {
       "name": "חרדים 10",
       "url": "https://ch10.co.il/",
       "host": "ch10.co.il",
-      "category": "חדשות חרדיות"
+      "category": "חדשות ואקטואליה"
     },
     {
       "name": "בחזית",
       "url": "https://bahazit.co.il/",
       "host": "bahazit.co.il",
-      "category": "חדשות חרדיות"
+      "category": "חדשות ואקטואליה"
     },
     {
       "name": "כל הזמן",
       "url": "https://www.kolhazman.co.il/",
       "host": "www.kolhazman.co.il",
-      "category": "חדשות חרדיות"
+      "category": "חדשות ואקטואליה"
     },
     {
       "name": "דעת",
       "url": "https://daat.ac.il/",
       "host": "daat.ac.il",
-      "category": "יהדות ומידע"
+      "category": "יהדות ותורה"
     },
     {
       "name": "אתר ישיבה",
       "url": "https://www.yeshiva.org.il/",
       "host": "www.yeshiva.org.il",
-      "category": "תורה ויהדות"
+      "category": "יהדות ותורה"
     },
     {
       "name": "חב״ד אינפו",
       "url": "https://chabad.info/",
       "host": "chabad.info",
-      "category": "יהדות וחב״ד"
+      "category": "יהדות ותורה"
     },
     {
       "name": "חב״ד ישראל",
       "url": "https://www.chabad.org.il/",
       "host": "www.chabad.org.il",
-      "category": "יהדות וחב״ד"
+      "category": "יהדות ותורה"
     },
     {
       "name": "אוצר החכמה",
       "url": "https://otzar.org/",
       "host": "otzar.org",
-      "category": "ספרי יהדות"
+      "category": "יהדות ותורה"
     },
     {
       "name": "HebrewBooks",
       "url": "https://hebrewbooks.org/",
       "host": "hebrewbooks.org",
-      "category": "ספרי יהדות"
+      "category": "יהדות ותורה"
     },
     {
       "name": "קול הלשון",
       "url": "https://www.kolhalashon.com/",
       "host": "www.kolhalashon.com",
-      "category": "שיעורי תורה"
+      "category": "יהדות ותורה"
     },
     {
       "name": "דף יומי",
       "url": "https://www.daf-yomi.com/",
       "host": "www.daf-yomi.com",
-      "category": "תלמוד ותורה"
+      "category": "יהדות ותורה"
     },
     {
       "name": "תורת אמת",
       "url": "https://www.toratemetfreeware.com/",
       "host": "www.toratemetfreeware.com",
-      "category": "ספרי קודש"
+      "category": "יהדות ותורה"
     },
     {
       "name": "ספריא",
       "url": "https://www.sefaria.org.il/",
       "host": "www.sefaria.org.il",
-      "category": "מקורות יהודיים"
+      "category": "יהדות ותורה"
     },
     {
       "name": "ויקיטקסט",
       "url": "https://he.wikisource.org/",
       "host": "he.wikisource.org",
-      "category": "טקסטים ומקורות"
+      "category": "יהדות ותורה"
     },
     {
       "name": "ויקיפדיה עברית",
       "url": "https://he.wikipedia.org/",
       "host": "he.wikipedia.org",
-      "category": "מידע כללי"
+      "category": "שירותים ומידע"
     },
     {
       "name": "ערוץ 7",
       "url": "https://www.inn.co.il/",
       "host": "www.inn.co.il",
-      "category": "חדשות דתיות"
+      "category": "חדשות ואקטואליה"
     },
     {
       "name": "מקור ראשון",
       "url": "https://www.makorrishon.co.il/",
       "host": "www.makorrishon.co.il",
-      "category": "חדשות דתיות"
+      "category": "חדשות ואקטואליה"
     },
     {
       "name": "סרוגים",
       "url": "https://www.srugim.co.il/",
       "host": "www.srugim.co.il",
-      "category": "חדשות דתיות"
+      "category": "חדשות ואקטואליה"
     },
     {
       "name": "עולם קטן",
       "url": "https://olam-katan.co.il/",
       "host": "olam-katan.co.il",
-      "category": "תוכן דתי"
+      "category": "חדשות ואקטואליה"
     },
     {
       "name": "כל זכות",
       "url": "https://www.kolzchut.org.il/he/",
       "host": "www.kolzchut.org.il",
-      "category": "זכויות ושירותים"
+      "category": "שירותים ומידע"
     },
     {
       "name": "gov.il",
       "url": "https://www.gov.il/he",
       "host": "www.gov.il",
-      "category": "ממשלה ושירותים"
+      "category": "שירותים ומידע"
     },
     {
       "name": "ביטוח לאומי",
       "url": "https://www.btl.gov.il/",
       "host": "www.btl.gov.il",
-      "category": "שירותים ממשלתיים"
+      "category": "שירותים ומידע"
     },
     {
       "name": "רשות המסים",
       "url": "https://www.gov.il/he/departments/israel_tax_authority/govil-landing-page",
       "host": "www.gov.il",
-      "category": "שירותים ממשלתיים"
+      "category": "שירותים ומידע"
     },
     {
       "name": "כנסת ישראל",
       "url": "https://main.knesset.gov.il/",
       "host": "main.knesset.gov.il",
-      "category": "מידע ציבורי"
+      "category": "שירותים ומידע"
     },
     {
       "name": "משרד התחבורה",
       "url": "https://www.gov.il/he/departments/ministry_of_transport_and_road_safety/govil-landing-page",
       "host": "www.gov.il",
-      "category": "תחבורה"
+      "category": "שירותים ומידע"
     },
     {
       "name": "משטרת ישראל",
       "url": "https://www.gov.il/he/departments/israel_police/govil-landing-page",
       "host": "www.gov.il",
-      "category": "שירותים ציבוריים"
+      "category": "שירותים ומידע"
     },
     {
       "name": "פיקוד העורף",
       "url": "https://www.oref.org.il/",
       "host": "www.oref.org.il",
-      "category": "חירום ובטיחות"
+      "category": "שירותים ומידע"
     },
     {
       "name": "כבאות והצלה",
       "url": "https://www.gov.il/he/departments/israel_fire_and_rescue_services/govil-landing-page",
       "host": "www.gov.il",
-      "category": "חירום ובטיחות"
+      "category": "שירותים ומידע"
     },
     {
       "name": "שירות התעסוקה",
       "url": "https://www.taasuka.gov.il/",
       "host": "www.taasuka.gov.il",
-      "category": "תעסוקה"
+      "category": "שירותים ומידע"
     },
     {
       "name": "הרשות להגנת הצרכן",
       "url": "https://www.gov.il/he/departments/consumer_protection_and_fair_trade_authority/govil-landing-page",
       "host": "www.gov.il",
-      "category": "צרכנות"
+      "category": "שירותים ומידע"
     },
     {
       "name": "משרד הבריאות",
       "url": "https://www.gov.il/he/departments/ministry_of_health/govil-landing-page",
       "host": "www.gov.il",
-      "category": "בריאות"
+      "category": "שירותים ומידע"
     },
     {
       "name": "משרד החינוך",
       "url": "https://www.gov.il/he/departments/ministry_of_education/govil-landing-page",
       "host": "www.gov.il",
-      "category": "חינוך"
+      "category": "שירותים ומידע"
     },
     {
       "name": "בתי הדין הרבניים",
       "url": "https://www.gov.il/he/departments/rabbinical_courts/govil-landing-page",
       "host": "www.gov.il",
-      "category": "שירותי דת"
+      "category": "שירותים ומידע"
     },
     {
       "name": "הרבנות הראשית",
       "url": "https://www.gov.il/he/departments/chief_rabbinic_authority/govil-landing-page",
       "host": "www.gov.il",
-      "category": "שירותי דת"
+      "category": "שירותים ומידע"
     },
     {
       "name": "משרד המשפטים",
       "url": "https://www.gov.il/he/departments/ministry_of_justice/govil-landing-page",
       "host": "www.gov.il",
-      "category": "שירותים ממשלתיים"
+      "category": "שירותים ומידע"
     },
     {
       "name": "רשות האוכלוסין",
       "url": "https://www.gov.il/he/departments/population_and_immigration_authority/govil-landing-page",
       "host": "www.gov.il",
-      "category": "שירותים ממשלתיים"
+      "category": "שירותים ומידע"
     },
     {
       "name": "מגן דוד אדום",
       "url": "https://www.mdais.org/",
       "host": "www.mdais.org",
-      "category": "חירום"
+      "category": "שירותים ומידע"
     },
     {
       "name": "כללית",
       "url": "https://www.clalit.co.il/",
       "host": "www.clalit.co.il",
-      "category": "בריאות"
+      "category": "שירותים ומידע"
     },
     {
       "name": "כללית און־ליין הכשר",
       "url": "https://www.clalit.co.il/kosher/Pages/default.aspx",
       "host": "www.clalit.co.il",
-      "category": "בריאות מותאמת"
+      "category": "שירותים ומידע"
     },
     {
       "name": "מכבי",
       "url": "https://www.maccabi4u.co.il/",
       "host": "www.maccabi4u.co.il",
-      "category": "בריאות"
+      "category": "שירותים ומידע"
     },
     {
       "name": "מאוחדת",
       "url": "https://www.meuhedet.co.il/",
       "host": "www.meuhedet.co.il",
-      "category": "בריאות"
+      "category": "שירותים ומידע"
     },
     {
       "name": "לאומית",
       "url": "https://www.leumit.co.il/",
       "host": "www.leumit.co.il",
-      "category": "בריאות"
+      "category": "שירותים ומידע"
     },
     {
       "name": "הדסה",
       "url": "https://www.hadassah.org.il/",
       "host": "www.hadassah.org.il",
-      "category": "בריאות"
+      "category": "שירותים ומידע"
     },
     {
       "name": "איכילוב",
       "url": "https://www.tasmc.org.il/",
       "host": "www.tasmc.org.il",
-      "category": "בריאות"
+      "category": "שירותים ומידע"
     },
     {
       "name": "דואר ישראל",
       "url": "https://israelpost.co.il/",
       "host": "israelpost.co.il",
-      "category": "דואר ומשלוחים"
+      "category": "שירותים ומידע"
     },
     {
       "name": "Wolt",
       "url": "https://wolt.com/he/isr",
       "host": "wolt.com",
-      "category": "משלוחים וקניות"
+      "category": "שירותים ומידע"
     },
     {
       "name": "זאפ",
       "url": "https://www.zap.co.il/",
       "host": "www.zap.co.il",
-      "category": "השוואת מחירים"
+      "category": "שירותים ומידע"
     },
     {
       "name": "Moovit",
       "url": "https://moovitapp.com/israel-1",
       "host": "moovitapp.com",
-      "category": "תחבורה ציבורית"
+      "category": "שירותים ומידע"
     },
     {
       "name": "רב-קו אונליין",
       "url": "https://ravkavonline.co.il/",
       "host": "ravkavonline.co.il",
-      "category": "תחבורה ציבורית"
+      "category": "שירותים ומידע"
     },
     {
       "name": "אגד",
       "url": "https://www.egged.co.il/",
       "host": "www.egged.co.il",
-      "category": "תחבורה"
+      "category": "שירותים ומידע"
     },
     {
       "name": "דן",
       "url": "https://www.dan.co.il/",
       "host": "www.dan.co.il",
-      "category": "תחבורה"
+      "category": "שירותים ומידע"
     },
     {
       "name": "רשות שדות התעופה",
       "url": "https://www.iaa.gov.il/",
       "host": "www.iaa.gov.il",
-      "category": "תחבורה"
+      "category": "שירותים ומידע"
     },
     {
       "name": "בנק הפועלים",
       "url": "https://www.bankhapoalim.co.il/",
       "host": "www.bankhapoalim.co.il",
-      "category": "בנקאות"
+      "category": "שירותים ומידע"
     },
     {
       "name": "בנק לאומי",
       "url": "https://www.leumi.co.il/",
       "host": "www.leumi.co.il",
-      "category": "בנקאות"
+      "category": "שירותים ומידע"
     },
     {
       "name": "בנק דיסקונט",
       "url": "https://www.discountbank.co.il/",
       "host": "www.discountbank.co.il",
-      "category": "בנקאות"
+      "category": "שירותים ומידע"
     },
     {
       "name": "מזרחי טפחות",
       "url": "https://www.mizrahi-tefahot.co.il/",
       "host": "www.mizrahi-tefahot.co.il",
-      "category": "בנקאות"
+      "category": "שירותים ומידע"
     },
     {
       "name": "פאגי",
       "url": "https://www.pagi.co.il/",
       "host": "www.pagi.co.il",
-      "category": "בנקאות"
+      "category": "שירותים ומידע"
     },
     {
       "name": "אתר החרמון",
       "url": "https://www.hermon.co.il/",
       "host": "www.hermon.co.il",
-      "category": "טיולים"
+      "category": "שירותים ומידע"
     },
     {
       "name": "רשות הטבע והגנים",
       "url": "https://www.parks.org.il/",
       "host": "www.parks.org.il",
-      "category": "טיולים וטבע"
+      "category": "שירותים ומידע"
     },
     {
       "name": "הספרייה הלאומית",
       "url": "https://www.nli.org.il/he",
       "host": "www.nli.org.il",
-      "category": "ספרייה ומידע"
+      "category": "שירותים ומידע"
     },
     {
       "name": "ארכיון המדינה",
       "url": "https://www.archives.gov.il/",
       "host": "www.archives.gov.il",
-      "category": "מידע היסטורי"
+      "category": "שירותים ומידע"
     },
     {
       "name": "קמפוס IL",
       "url": "https://campus.gov.il/",
       "host": "campus.gov.il",
-      "category": "לימודים"
+      "category": "שירותים ומידע"
     },
     {
       "name": "רשות החדשנות",
       "url": "https://innovationisrael.org.il/",
       "host": "innovationisrael.org.il",
-      "category": "חדשנות ותעסוקה"
+      "category": "שירותים ומידע"
     },
     {
       "name": "מערך הסייבר הלאומי",
       "url": "https://www.gov.il/he/departments/israel_national_cyber_directorate/govil-landing-page",
       "host": "www.gov.il",
-      "category": "בטיחות דיגיטלית"
+      "category": "טכנולוגיה ובינה מלאכותית"
     },
     {
       "name": "נטפרי",
       "url": "https://netfree.link/",
       "host": "netfree.link",
-      "category": "סינון ואינטרנט בטוח"
+      "category": "טכנולוגיה ובינה מלאכותית"
     },
     {
       "name": "נטסמארט",
       "url": "https://netsmart.co.il/",
       "host": "netsmart.co.il",
-      "category": "סינון ואינטרנט בטוח"
+      "category": "טכנולוגיה ובינה מלאכותית"
     },
     {
       "name": "קול השירות",
       "url": "https://www.kolsherut.org.il/",
       "host": "www.kolsherut.org.il",
-      "category": "שירותים קהילתיים"
+      "category": "שירותים ומידע"
     },
     {
       "name": "עוגן פליי",
       "url": "https://ogenplay.com/",
       "host": "ogenplay.com",
-      "category": "אפליקציות ותוכנות"
+      "category": "טכנולוגיה ובינה מלאכותית"
     }
   ]
 }
