@@ -1503,7 +1503,7 @@ private fun SecuritySettingsScreen(
                             Text(route.title + " — " + route.description, fontWeight = FontWeight.Bold)
                             Text("מסלול הסינון הפעיל", style = MaterialTheme.typography.bodySmall)
                         }
-                        OutlinedButton(onClick = onChangeRoute, enabled = deviceOwner) { Text(if (deviceOwner) "שינוי" else "נעול") }
+                        OutlinedButton(onClick = onChangeRoute, enabled = true) { Text("שינוי") }
                     }
                 }
             }
